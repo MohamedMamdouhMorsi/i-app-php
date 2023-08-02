@@ -1,0 +1,20 @@
+<?php
+require ("vendor/autoload.php");
+//////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////
+class i_app{
+
+protected $data = "Hello Wolrd";
+
+function __construct()
+{
+    
+}
+
+function __toString()
+{
+    return $this->data;
+}
+
+}
