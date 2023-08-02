@@ -9,7 +9,7 @@ protected $data = "Hello Wolrd";
 
 function __construct()
 {
-    
+    $this->data =  test();
 }
 
 function __toString()
