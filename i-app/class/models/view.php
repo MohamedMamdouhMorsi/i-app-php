@@ -1,13 +1,17 @@
 <?php
 
 class view {
-    public $data = "FALSE";
-    function __construct()
+    public $data = "view";
+    function __construct($appData, $PR_D)
     {
-        $this->data = test();
+          
+        $appHeadGenerator = new AppHeadGenerator();
+        $PR_D = '#FFFFFF';
+        $this->data = $appHeadGenerator->createAppHead($appData, $PR_D);
+
     }
     function __toString()
     {
-        return $this->data;
+        return (string) $this->data;
     }
 }
