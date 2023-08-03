@@ -11,8 +11,8 @@ class system {
             $iAppReader = new IAppReader();
             $cleanedObject = $iAppReader->readIAppFile($i_app_file);
             $appData = json_decode($cleanedObject,true);
-            $this->data = new middleWare($appData,$dir);
-
+            $i_app_middleWare = new middleWare($appData,$dir,$cleanedObject );
+            $this->data = $i_app_middleWare->middleWareApp();
          
         }else{
             

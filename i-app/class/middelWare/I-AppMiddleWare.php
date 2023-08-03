@@ -10,16 +10,22 @@ class middleWare {
     private $userDir;
     private $i_app_st;
     private $swScript;
+    private $AppThemecolors;
+    private $AppThemecolorsPR;
 
-    public function __construct($i_app,$dir) {
+    public function __construct($i_app,$dir,$i_app_st) {
         $this->req = $_REQUEST; // Assume required data is passed as URL parameters
         $this->res = new stdClass(); // Dummy response object for demonstration purposes
         $this->i_app = $i_app;
-        $this->colorPR_D = $this->getAppStyleColor();
-        $this->manifest = '$manifest';
+        $this->AppThemecolors = $this->getAppStyleColor();
+        $this->AppThemecolorsPR = $this->getPRColor( $this->AppThemecolors );
+        $this->colorPR_D = $this->AppThemecolorsPR['PR_D'];
+        $manifestMaker = new ManifestMaker();
+        $this->manifest = $manifestMaker->manifestMaker($i_app,$this->AppThemecolorsPR);
+
         $this->tree = '$tree';
         $this->userDir = $dir;
-        $this->i_app_st = '$i_app_st';
+        $this->i_app_st = $i_app_st;
         $this->swScript =' $swScript';
     }
 
@@ -59,10 +65,18 @@ class middleWare {
 
                     if ($is_app) {
                       //  return app_file($req, $res, $extname, $fileName, $this->manifest, $this->i_app_st,  $this->userDir, $this->i_app);
+                      $appFileHandler = new AppFileHandler();
+                      $data = $appFileHandler->handleAppFile($url,$extname , $fileName, $this->manifest,$this->i_app_st, $this->tree, $this->userDir, $this->i_app);
+                        return $data;
                     } else if ($is_asset) {
                      //   return asset_file($req, $res, $this->userDir, $this->swScript, $userData);
+                     $assetFileHandler = new AssetFileHandler();
+                     $data = $assetFileHandler->handleAssetFile($url, $this->userDir,$this->swScript, $userData);
+                    return $data;
                     } else if ($is_route) {
                      //   return route_file($req, $res, $this->i_app, $this->colorPR_D);
+                     $data =  new view($this->i_app,$this->colorPR_D);
+                     return $data;
                     } else {
                      /*   $res->writeHead(400, array('Content-Type' => 'text/html'));
                         $res->end('<h1>500 Internal Server Error</h1><p>Sorry, there was a problem loading the requested URL.</p>');
@@ -130,12 +144,34 @@ class middleWare {
             $styleData = json_decode($styleDataSt,true);
             return  $styleData ;
         }else{
-            $basicStyleDir = '../../asset/css/style.json';
+            $basicStyleDir = __DIR__.'../../asset/css/style.json';
             $styleDataSt = file_get_contents( $basicStyleDir,true); 
             $styleData = json_decode($styleDataSt,true);
             return  $styleData ;
         }
        
+     }
+     public function getPRColor($styleData){
+        $theme = $styleData['theme'];
+        $themeData = [];
+        $colorPR = [];
+        if($theme == "dark"){
+            $themeData  = $styleData['dc'];
+            }else{
+                $themeData  = $styleData['lc'];
+            }
+               
+       for($c = 0 ; $c < sizeof($themeData);$c++){
+        $color = $themeData[$c];
+        if($color['k'] == "PR_D"){
+            $colorPR['PR_D'] = $color['v'];
+        }
+        if($color['k'] == "PR"){
+            $colorPR['PR'] = $color['v'];
+        }
+       }
+
+       return $colorPR;
      }
 }
 /*

@@ -6,7 +6,7 @@ class view {
     {
           
         $appHeadGenerator = new AppHeadGenerator();
-        $PR_D = '#FFFFFF';
+    
         $this->data = $appHeadGenerator->createAppHead($appData, $PR_D);
 
     }
