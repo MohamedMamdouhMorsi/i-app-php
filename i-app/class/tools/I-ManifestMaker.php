@@ -124,7 +124,7 @@ class ManifestMaker {
         ]
         ];
 
-    public function manifestMaker($i_app, $style) {
+    public function __construct($i_app, $style) {
         $this->base["name"] = $i_app["name"];
         $this->base["short_name"] = $i_app["short_name"];
         $this->base["id"] = $i_app["id"];
@@ -133,7 +133,11 @@ class ManifestMaker {
         $this->base["background_color"] = $style["PR"];
         
         
-        return $this->base;
+   
+    }
+    public function __toString()
+    {
+        return (string) json_encode( $this->base);
     }
 }
 /*
