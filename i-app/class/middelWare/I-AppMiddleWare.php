@@ -20,8 +20,8 @@ class middleWare {
         $this->AppThemecolors = $this->getAppStyleColor();
         $this->AppThemecolorsPR = $this->getPRColor( $this->AppThemecolors );
         $this->colorPR_D = $this->AppThemecolorsPR['PR_D'];
-        $manifestMaker = new ManifestMaker();
-        $this->manifest = $manifestMaker->manifestMaker($i_app,$this->AppThemecolorsPR);
+        $manifestMakerOB = new ManifestMaker();
+        $this->manifest = $manifestMakerOB->manifestMaker($i_app,$this->AppThemecolorsPR);
 
         $this->tree = '$tree';
         $this->userDir = $dir;
