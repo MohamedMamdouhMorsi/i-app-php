@@ -6,9 +6,9 @@ class view {
     {
           
         $appHeadGenerator = new AppHeadGenerator();
-    
+ 
         $this->data = $appHeadGenerator->createAppHead($appData, $PR_D);
-
+      
     }
     function __toString()
     {

@@ -8,20 +8,15 @@ class system {
         
         if(file_exists($loadeAppFile)){
             $i_app_file = file_get_contents($loadeAppFile,true);
-            $iAppReader = new IAppReader();
-            $cleanedObject = $iAppReader->readIAppFile($i_app_file);
+          
+            $cleanedObject = new IAppReader($i_app_file);
             $appData = json_decode($cleanedObject,true);
-            $i_app_middleWare = new middleWare($appData,$dir,$cleanedObject );
-            $this->data = $i_app_middleWare->middleWareApp();
-         
+            $this->data = new middleWare($appData,$dir,$cleanedObject );
         }else{
             
             $this->data = $dir;
          
         }
     }
-    function __toString()
-    {
-        return (string) $this->data;
-    }
+   
 }

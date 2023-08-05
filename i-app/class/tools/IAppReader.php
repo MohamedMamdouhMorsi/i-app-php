@@ -1,6 +1,7 @@
 <?php
 
 class IAppReader {
+    public $fileData = "No File Data";
     private function removeComments($str) {
         return preg_replace('/\/\*[\s\S]*?\*\/|\/\/.*/', '', $str);
     }
@@ -114,10 +115,14 @@ class IAppReader {
         return $str;
     }
 
-    public function readIAppFile($str) {
+    public function __construct($str) {
         $str = $this->removeComments($str);
         $str = $this->convertStrToOb($str);
-        return  $str;
+        $this->fileData =  $str;
+    }
+    public function __toString()
+    {
+        return (string) $this->fileData;
     }
 }
 

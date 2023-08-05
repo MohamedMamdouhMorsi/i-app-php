@@ -28,14 +28,8 @@ class AppFileHandler
         }
     }
 
-    private function iAppReader($data)
-    {
-        // You need to implement this function to parse and process the .app file data
-        // For simplicity, we'll assume it returns the processed data
-        return $data;
-    }
 
-    public function handleAppFile($req_url, $ext, $fileName, $manifest, $i_app_st, $tree, $userDir, $i_app)
+    public function __construct($req_url, $ext, $fileName, $manifest, $i_app_st, $tree, $userDir, $i_app)
     {
         $backBody = null;
         $filePath = null;
@@ -45,16 +39,16 @@ class AppFileHandler
         if ($isDevUrl) {
             $dev_ = explode('/', $req_url);
             $fileNamedev = end($dev_);
-            $filePath = __DIR__ . '/../../elements/' . $fileNamedev;
+            $filePath = __DIR__ . '/../../asset/elements/' . $fileNamedev;
         } elseif ($req_url === '/manifest.json') {
             $backBody = json_encode($manifest);
         } elseif ($backBody == null && $req_url === '/i.app') {
             $backBody = $i_app_st;
         } else {
             if ($req_url === '/sl.app') {
-                $filePath = __DIR__ . '/../../elements/sl.app';
+                $filePath = __DIR__ . '/../../asset/elements/sl.app';
             } elseif ($req_url === $i_app['dir']['src'] . 'dev.app' && $i_app['mode'] === 'dev') {
-                $filePath = __DIR__ . '/../../elements/dev.app';
+                $filePath = __DIR__ . '/../../asset/elements/dev.app';
             } else {
                 if ($filePath == null && $backBody == null && $ext === '.app') {
                     if ($i_app['mode'] && $i_app['mode'] == 'dev') {
@@ -67,7 +61,7 @@ class AppFileHandler
                     }
                 } elseif ($filePath == null && $backBody == null && $ext === '.json') {
                     $isApp = true;
-                    $filePath = $userDir . '/public' . $req_url;
+                    $filePath = $userDir . '/public_html' . $req_url;
                 }
             }
         }
@@ -77,25 +71,33 @@ class AppFileHandler
             $contentType = $this->getContentType($extname);
             if (file_exists($filePath)) {
                 $data = file_get_contents($filePath);
-                $appData = $this->iAppReader($data);
+              
+                $appDataSt =  new IAppReader($data);
+                $appData = json_decode($appDataSt,true);
                 if (isset($appData['page']) || $isApp) {
                     header('Content-Type: ' . $contentType);
                     echo $data;
+                    exit();
                 } else {
                     http_response_code(400);
                     echo '<h1>400 Internal Server Error</h1><p>Sorry, there was a problem loading the requested URL.</p>';
+                    exit();
                 }
             } else {
                 http_response_code(404);
                 echo '<h1>404 Not Found</h1><p>The requested URL ' . $req_url . ' was not found on this server.</p>';
+                exit();
             }
         } else {
             if ($backBody !== null) {
                 header('Content-Type: application/json');
+
                 echo $backBody;
+                exit();
             } else {
                 http_response_code(404);
                 echo '<h1>404 Not Found</h1><p>The requested URL ' . $req_url . ' was not found on this server.</p>';
+                exit();
             }
         }
     }

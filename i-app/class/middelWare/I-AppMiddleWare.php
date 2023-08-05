@@ -12,6 +12,7 @@ class middleWare {
     private $swScript;
     private $AppThemecolors;
     private $AppThemecolorsPR;
+    public $data = "No Data ";
 
     public function __construct($i_app,$dir,$i_app_st) {
         $this->req = $_REQUEST; // Assume required data is passed as URL parameters
@@ -20,22 +21,23 @@ class middleWare {
         $this->AppThemecolors = $this->getAppStyleColor();
         $this->AppThemecolorsPR = $this->getPRColor( $this->AppThemecolors );
         $this->colorPR_D = $this->AppThemecolorsPR['PR_D'];
-        $manifestMakerOB = new ManifestMaker();
-        $this->manifest = $manifestMakerOB->manifestMaker($i_app,$this->AppThemecolorsPR);
+      
+        $this->manifest =  new ManifestMaker($i_app,$this->AppThemecolorsPR);
 
         $this->tree = '$tree';
         $this->userDir = $dir;
         $this->i_app_st = $i_app_st;
         $this->swScript =' $swScript';
-    }
 
-    public function middleWareApp() {
-
+        ////////////////////////////////////
         $is_user = false;
         $userData = null;
 
         $appWare = function ($req, $res, $userData) {
-            $req->user = $userData;
+            if(isset($req->user)){
+                $req->user = $userData;
+            }
+           
             $url = $_SERVER['REQUEST_URI'];
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (property_exists($res, 'destroySession')) {
@@ -65,19 +67,22 @@ class middleWare {
 
                     if ($is_app) {
                       //  return app_file($req, $res, $extname, $fileName, $this->manifest, $this->i_app_st,  $this->userDir, $this->i_app);
-                      $appFileHandler = new AppFileHandler();
-                      $data = $appFileHandler->handleAppFile($url,$extname , $fileName, $this->manifest,$this->i_app_st, $this->tree, $this->userDir, $this->i_app);
-                        return $data;
+                     
+                      new AppFileHandler($url,$extname , $fileName, $this->manifest,$this->i_app_st, $this->tree, $this->userDir, $this->i_app);
+                      
                     } else if ($is_asset) {
                      //   return asset_file($req, $res, $this->userDir, $this->swScript, $userData);
-                     $assetFileHandler = new AssetFileHandler();
-                     $data = $assetFileHandler->handleAssetFile($url, $this->userDir,$this->swScript, $userData);
-                    return $data;
+                  
+                    
+                     new AssetFileHandler($url, $this->userDir,$this->swScript, $userData);
+                   
                     } else if ($is_route) {
                      //   return route_file($req, $res, $this->i_app, $this->colorPR_D);
-                     $data =  new view($this->i_app,$this->colorPR_D);
-                     return $data;
+                      new view($this->i_app,$this->colorPR_D);
+                     
                     } else {
+                        echo  "<h1>500 Internal Server Error</h1>";
+                        exit();
                      /*   $res->writeHead(400, array('Content-Type' => 'text/html'));
                         $res->end('<h1>500 Internal Server Error</h1><p>Sorry, there was a problem loading the requested URL.</p>');
                         */
@@ -86,7 +91,7 @@ class middleWare {
             }
         };
 
-        if ($this->i_app['users']) {
+        if (isset($this->i_app['users'])) {
             if ($is_user) {
                // sessionData($this->req, $this->res, $appWare, $userData);
             } else {
@@ -96,6 +101,7 @@ class middleWare {
             $appWare($this->req, $this->res, array('id' => 0, 'notBasic' => true));
         }
     }
+
     public function getFileName($reqUrl) {
         $reqStAr = explode("/", $reqUrl);
     
@@ -116,6 +122,7 @@ class middleWare {
         return false;
     }
     public function  is_asset($url){
+      
         if($url !== '' && $url !== '.app' && $url !== '.json'){
             return true;
            }
@@ -144,7 +151,7 @@ class middleWare {
             $styleData = json_decode($styleDataSt,true);
             return  $styleData ;
         }else{
-            $basicStyleDir = __DIR__.'../../asset/css/style.json';
+            $basicStyleDir = __DIR__.'/../../asset/css/style.json';
             $styleDataSt = file_get_contents( $basicStyleDir,true); 
             $styleData = json_decode($styleDataSt,true);
             return  $styleData ;
