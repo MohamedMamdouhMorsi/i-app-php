@@ -5,13 +5,12 @@ class view {
     function __construct($appData, $PR_D)
     {
           
-        $appHeadGenerator = new AppHeadGenerator();
  
-        $this->data = $appHeadGenerator->createAppHead($appData, $PR_D);
+ 
+        $this->data =new AppHeadGenerator($appData, $PR_D);
+        echo $this->data;
+        exit();
       
     }
-    function __toString()
-    {
-        return (string) $this->data;
-    }
+
 }

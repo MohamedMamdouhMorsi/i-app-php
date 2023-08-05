@@ -11,10 +11,11 @@ class system {
           
             $cleanedObject = new IAppReader($i_app_file);
             $appData = json_decode($cleanedObject,true);
-            $this->data = new middleWare($appData,$dir,$cleanedObject );
+             new middleWare($appData,$dir,$cleanedObject );
+             
         }else{
-            
-            $this->data = $dir;
+            echo "Please insert i.app file to your dir ".$dir;
+          exit();
          
         }
     }

@@ -3,7 +3,7 @@ class AppFileHandler
 {
     private function isUrlFilleApp($url)
     {
-        $urlArr = explode('.app', $url);
+        $urlArr = explode('app', $url);
         return count($urlArr) > 1;
     }
 
@@ -18,9 +18,9 @@ class AppFileHandler
         // You need to implement this function to return the content type based on the file extension
         // Example implementation:
         switch ($extname) {
-            case '.html':
+            case 'html':
                 return 'text/html';
-            case '.json':
+            case 'json':
                 return 'application/json';
             // Add more cases for other file types if needed
             default:
@@ -47,10 +47,10 @@ class AppFileHandler
         } else {
             if ($req_url === '/sl.app') {
                 $filePath = __DIR__ . '/../../asset/elements/sl.app';
-            } elseif ($req_url === $i_app['dir']['src'] . 'dev.app' && $i_app['mode'] === 'dev') {
+            } elseif ($req_url ===  'dev.app' && $i_app['mode'] === 'dev') {
                 $filePath = __DIR__ . '/../../asset/elements/dev.app';
             } else {
-                if ($filePath == null && $backBody == null && $ext === '.app') {
+                if ($filePath == null && $backBody == null && $ext === 'app') {
                     if ($i_app['mode'] && $i_app['mode'] == 'dev') {
                         $filePath = $userDir . '/public_html' . $req_url;
                     } else {
@@ -59,7 +59,7 @@ class AppFileHandler
                        // $is_app_file = $this->searchFiles($tree, $app_file_test);
                       //  $backBody = $is_app_file['fileData'];
                     }
-                } elseif ($filePath == null && $backBody == null && $ext === '.json') {
+                } elseif ($filePath == null && $backBody == null && $ext === 'json') {
                     $isApp = true;
                     $filePath = $userDir . '/public_html' . $req_url;
                 }
@@ -70,13 +70,13 @@ class AppFileHandler
             $extname = pathinfo($filePath, PATHINFO_EXTENSION);
             $contentType = $this->getContentType($extname);
             if (file_exists($filePath)) {
-                $data = file_get_contents($filePath);
+                $data = file_get_contents($filePath,true);
               
                 $appDataSt =  new IAppReader($data);
                 $appData = json_decode($appDataSt,true);
                 if (isset($appData['page']) || $isApp) {
-                    header('Content-Type: ' . $contentType);
-                    echo $data;
+                    header('Content-Type: ' . $contentType.";");
+                   echo $data;
                     exit();
                 } else {
                     http_response_code(400);
@@ -85,18 +85,18 @@ class AppFileHandler
                 }
             } else {
                 http_response_code(404);
-                echo '<h1>404 Not Found</h1><p>The requested URL ' . $req_url . ' was not found on this server.</p>';
+                echo '<h1>404 Not Found</h1><p>app file_exists The requested URL ' . $filePath . ' was not found on this server.</p>';
                 exit();
             }
         } else {
-            if ($backBody !== null) {
-                header('Content-Type: application/json');
+            if ($backBody !== null && $filePath == null) {
+                header('Content-Type: application/json;');
 
                 echo $backBody;
                 exit();
             } else {
                 http_response_code(404);
-                echo '<h1>404 Not Found</h1><p>The requested URL ' . $req_url . ' was not found on this server.</p>';
+                echo '<h1>404 Not Found</h1><p>app backBody The requested URL ' . $filePath . ' was not found on this server.</p>';
                 exit();
             }
         }

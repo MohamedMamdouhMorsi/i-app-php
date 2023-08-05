@@ -5,20 +5,20 @@ class AssetFileHandler
     private function getContentType($extname)
     {
         switch ($extname) {
-            case '.html':
+            case 'html':
                 return 'text/html';
-            case '.css':
+            case 'css':
                 return 'text/css';
-            case '.js':
+            case 'js':
                 return 'text/javascript';
-            case '.json':
+            case 'json':
                 return 'application/json';
-            case '.png':
+            case 'png':
                 return 'image/png';
-            case '.jpg':
-            case '.jpeg':
+            case 'jpg':
+           
                 return 'image/jpeg';
-            case '.ico':
+            case 'ico':
                 return 'image/x-icon';
             default:
                 return 'application/app';
@@ -26,7 +26,7 @@ class AssetFileHandler
     }
 
 
-    public function __construct($req_url, $userDir, $swScript, $userData)
+    public function __construct($req_url,$extname, $userDir, $swScript, $userData)
     {
         $filePath = null;
         $backBody = null;
@@ -37,6 +37,7 @@ class AssetFileHandler
             $contentType = 'text/javascript';
             $backBody = $swScript;
         } elseif (preg_match('/\/img\/flags\//', $req_url)) {
+         
             $img = str_replace('/img/flags/', '', $req_url);
             $filePath = __DIR__ . '/../../asset/img/flags/' . $img;
         } elseif ($req_url === '/i-app-ui.js') {
@@ -61,41 +62,63 @@ class AssetFileHandler
                 $filePath = $userDir . '/public_html' . $lastUrl;
             } else {
                 if ($filePath == null && $backBody == null) {
-                    $filePath = $userDir . '/public_html' . $lastUrl;
+                   
+                    $filePath = $userDir . '/public_html' .$req_url;
+             
                 }
             }
         }
 
+     
         if ($filePath !== null) {
-          
-            $extname = pathinfo($filePath, PATHINFO_EXTENSION);
+         
+        
             $contentType = $this->getContentType($extname);
-
+          
             if (file_exists($filePath)) {
-                $data = file_get_contents($filePath);
-                
-                if ($isUiJs) {
+                $data = file_get_contents($filePath,true);
+           
+                if ($isUiJs && $userData !== 'FALSE') {
                     $userDataSt = 'const userData = ' . json_encode($userData);
                     $regex = '/\/\/\*\*userDataArea\*\*\/\/?\n?/';
                     $data = preg_replace($regex, $userDataSt, $data);
                 }
 
-                header('Content-Type: ' . $contentType);
-                echo $data;
-                exit();
+               
+                if($extname === 'png' || $extname === 'jpg' ){
+                  
+
+                 header('Content-Type: ' . $contentType.';');
+                 header('Content-Length: ' . filesize($filePath));
+             
+                 // Disable output buffering to allow large image files
+                 @ob_end_clean();
+             
+                 // Output the image data directly to the browser
+                 readfile($filePath);
+                 exit();
+                  }else{
+                    header('Content-Type: ' . $contentType.';');
+                    echo($data);
+                    exit();
+                  }
+             
             } else {
                 http_response_code(404);
-                echo '<h1>404 Not Found</h1><p>The requested URL ' . $req_url . ' was not found on this server.</p>';
+                echo '<h1>404 Not Found</h1><p>file_exists The requested URL ' . $filePath . ' was not found on this server.</p>';
                 exit();
             }
+            
         } else {
+         
+        
             if ($backBody !== null) {
                 header('Content-Type: ' . $contentType);
                 echo $backBody;
                 exit();
             } else {
-                http_response_code(404);
-                echo '<h1>404 Not Found</h1><p>The requested URL ' . $req_url . ' was not found on this server.</p>';
+               http_response_code(404);
+                echo '<h1>404 Not Found</h1><p>backBody The requested URL ' . $filePath . ' was not found on this server.</p>';
                 exit();
             }
         }

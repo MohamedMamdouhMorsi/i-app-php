@@ -7,7 +7,7 @@ class middleWare {
     private $colorPR_D;
     private $manifest;
     private $tree;
-    private $userDir;
+    public $userDir;
     private $i_app_st;
     private $swScript;
     private $AppThemecolors;
@@ -31,55 +31,63 @@ class middleWare {
 
         ////////////////////////////////////
         $is_user = false;
-        $userData = null;
+       
 
-        $appWare = function ($req, $res, $userData) {
-            if(isset($req->user)){
-                $req->user = $userData;
-            }
+        $appWare = function () {
+            $userData = 'FALSE';
            
             $url = $_SERVER['REQUEST_URI'];
+            // $destroy = "";
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                if (property_exists($res, 'destroySession')) {
-                    echo 'res.destroySession';
+              //  if ($destroy) {
+                //    echo 'res.destroySession';
                   
-                } else {
+               // } else {
                     $is_api = $this->is_api($url);
                     if ($is_api) {
+                        echo "api";
+                        exit();
                        /// return api($req, $res);
-                    } else {
+                    } 
+                    //else {
                      /*   $userRouterPost = routerPost::match($req, $res);
                         if (!$userRouterPost) {
                             $res->writeHead(200, array('Content-Type' => 'text/html'));
                             $res->end('<h1>500 Internal Server Error</h1><p>Sorry, there was a problem loading the requested URL.</p>');
                         }*/
-                    }
+                    //}
                 }
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            //} else 
+            
+            if (isset($_GET['url'])) {
               //  $userRouter = router::match($req, $res);
+              
               $userRouter = false;
                 if (!$userRouter) {
                     $extname = pathinfo($url, PATHINFO_EXTENSION);
                     $is_app = $this->is_app($extname);
                     $is_asset = $this->is_asset($extname);
-                    $is_route = $this->is_route($extname);
+                    $is_route = $this->is_route($url ,$extname);
                     $fileName = $this->getfileName($url);
-
+                
+                   
+             
+                    
                     if ($is_app) {
                       //  return app_file($req, $res, $extname, $fileName, $this->manifest, $this->i_app_st,  $this->userDir, $this->i_app);
-                     
+                  
                       new AppFileHandler($url,$extname , $fileName, $this->manifest,$this->i_app_st, $this->tree, $this->userDir, $this->i_app);
                       
                     } else if ($is_asset) {
                      //   return asset_file($req, $res, $this->userDir, $this->swScript, $userData);
-                  
-                    
-                     new AssetFileHandler($url, $this->userDir,$this->swScript, $userData);
                    
+                
+                    new AssetFileHandler($url,$extname,$this->userDir,$this->swScript, $userData);
+               
                     } else if ($is_route) {
                      //   return route_file($req, $res, $this->i_app, $this->colorPR_D);
-                      new view($this->i_app,$this->colorPR_D);
-                     
+                     new view($this->i_app,$this->colorPR_D);
+                  
                     } else {
                         echo  "<h1>500 Internal Server Error</h1>";
                         exit();
@@ -98,7 +106,7 @@ class middleWare {
              //   sessionsControl($this->req, $this->res, $appWare, $userData);
             }
         } else {
-            $appWare($this->req, $this->res, array('id' => 0, 'notBasic' => true));
+            $appWare();
         }
     }
 
@@ -121,23 +129,25 @@ class middleWare {
         }
         return false;
     }
-    public function  is_asset($url){
+    public function  is_asset($ext){
       
-        if($url !== '' && $url !== '.app' && $url !== '.json'){
+        if($ext !== '' && $ext !== 'app' && $ext !== 'json'){
             return true;
            }
             return false;
      }
-     public function  is_route($url){
+     public function  is_route($url,$ext ){
 
-        if($url == ''){
+        if(  $url !== '' && $ext ===  '' ){
             return true;
+        }else{
+            return false;
         }
-        return false;
-     }
-     public function  is_app($url){
 
-        if($url === '.app' || $url === '.json'){
+     }
+     public function  is_app($ext){
+
+        if($ext === 'app' || $ext === 'json'){
          return true;
         }
          return false;
