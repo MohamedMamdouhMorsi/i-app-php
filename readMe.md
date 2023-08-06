@@ -40,8 +40,8 @@ you can easy use i-app cdn
 ## Full-stack usage
 ``` php
 <?php
-require ("../../../i-app/vendor/autoload.php");
-new qvc();
+require ("../vendor/autoload.php");
+new yourApp();
 exit();
 
 ```
