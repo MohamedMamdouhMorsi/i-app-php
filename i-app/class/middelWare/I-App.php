@@ -42,8 +42,10 @@ class AppFileHandler
             $filePath = __DIR__ . '/../../asset/elements/' . $fileNamedev;
         } elseif ($req_url === '/manifest.json') {
             $backBody = json_encode($manifest);
+        
         } elseif ($backBody == null && $req_url === '/i.app') {
             $backBody = $i_app_st;
+          
         } else {
             if ($req_url === '/sl.app') {
                 $filePath = __DIR__ . '/../../asset/elements/sl.app';

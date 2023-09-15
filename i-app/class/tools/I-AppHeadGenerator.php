@@ -17,6 +17,7 @@ class AppHeadGenerator {
         $this->innerHTML .= '<link rel="icon" type="image/png" href="' . $app['dir']['icon'] . 'favicon-32x32.png" sizes="32x32">';
         $this->innerHTML .= '<link rel="apple-touch-icon" href="' . $app['dir']['icon'] . 'apple-icon-120x120.png">';
         $this->innerHTML .= '<link href="' . ($devMode ? '/i-app-basic.css' : '/i-app-basic.min.css') . '" rel="stylesheet" type="text/css" />';
+        $this->innerHTML .= '<link id="css_style" href="/css/style.css" rel="stylesheet" type="text/css" />';
         $this->innerHTML .= '<meta property="og:title" content="' . $app['title'] . '" />';
         $this->innerHTML .= '<meta property="og:description" content="' . $app['description'] . '" />';
         $this->innerHTML .= '<meta property="og:type" content="' . $app['type'] . '" />';

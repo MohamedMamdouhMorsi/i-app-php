@@ -15,6 +15,7 @@ class middleWare {
     public $data = "No Data ";
 
     public function __construct($i_app,$dir,$i_app_st) {
+       
         $this->req = $_REQUEST; // Assume required data is passed as URL parameters
         $this->res = new stdClass(); // Dummy response object for demonstration purposes
         $this->i_app = $i_app;
@@ -23,11 +24,11 @@ class middleWare {
         $this->colorPR_D = $this->AppThemecolorsPR['PR_D'];
       
         $this->manifest =  new ManifestMaker($i_app,$this->AppThemecolorsPR);
-
-        $this->tree = '$tree';
+       
+        $this->tree = 'tree';
         $this->userDir = $dir;
         $this->i_app_st = $i_app_st;
-        $this->swScript =' $swScript';
+        $this->swScript ='swScript';
 
         ////////////////////////////////////
         $is_user = false;
@@ -106,6 +107,7 @@ class middleWare {
              //   sessionsControl($this->req, $this->res, $appWare, $userData);
             }
         } else {
+       
             $appWare();
         }
     }

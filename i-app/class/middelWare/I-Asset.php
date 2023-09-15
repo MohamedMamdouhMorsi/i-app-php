@@ -43,12 +43,18 @@ class AssetFileHandler
         } elseif ($req_url === '/i-app-ui.js') {
             $filePath = __DIR__ . '/../../asset/js/i-app-ui.js';
             $isUiJs = true;
+        }  elseif ($req_url === '/i-app-ui.min.js') {
+            $filePath = __DIR__ . '/../../asset/js/i-app-ui.min.js';
+            $isUiJs = true;
         } elseif ($req_url === '/icofont.css') {
             $filePath = __DIR__ . '/../../asset/css/icofont.css';
         } elseif ($req_url === '/app.png') {
             $filePath = __DIR__ . '/../../img/app.png';
         } elseif ($req_url === '/i-app-basic.css') {
             $filePath = __DIR__ . '/../../asset/css/i-app-basic.css';
+
+        }  elseif ($req_url === '/i-app-basic.min.css') {
+            $filePath = __DIR__ . '/../../asset/css/i-app-basic.min.css';
 
         } else {
             $is_get = false;
