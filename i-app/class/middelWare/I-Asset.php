@@ -15,6 +15,8 @@ class AssetFileHandler
                 return 'application/json';
             case 'png':
                 return 'image/png';
+            case 'gif':
+                return 'image/gif';
             case 'jpg':
            
                 return 'image/jpeg';
@@ -91,7 +93,7 @@ class AssetFileHandler
                 }
 
                
-                if($extname === 'png' || $extname === 'jpg' ){
+                if($extname === 'png' || $extname === 'jpg' ||  $extname === 'gif' ){
                   
 
                  header('Content-Type: ' . $contentType.';');

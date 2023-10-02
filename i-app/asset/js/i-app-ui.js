@@ -63,7 +63,8 @@ i-app start by one function i-app() default with loading
   * @returns {Element} - The newly created element.
   */
   const CE_ = (tag) => {
-    return document.createElement(tag);
+    const elem =   document.createElement(`${tag}`) ;
+    return elem;
     };
       /**
   * Returns an array of all elements with the specified tag name.
@@ -119,7 +120,7 @@ const configFire = (con, lan,ty,theme,sendNumber) => {
 }
 
 const GOS = (function(d, s, id) {
-    var hh = d.getElementsByTagName('head')[0];
+  /*  var hh = d.getElementsByTagName('head')[0];
    
     hh.innerHTML += '<meta name="google-signin-scope" content="profile email">';
     hh.innerHTML += '<meta name="google-signin-client_id" content="94508468930-rnl3toalkm9akk5kri0qff4i6f39fcv9.apps.googleusercontent.com">';
@@ -130,7 +131,7 @@ const GOS = (function(d, s, id) {
     js = d.createElement(s);
     js.id = id;
     js.src = 'https://apis.google.com/js/platform.js';
-    fjs.parentNode.insertBefore(js, fjs)
+    fjs.parentNode.insertBefore(js, fjs)*/
 }(document,  'script','google-jssdk'));
 
 
@@ -198,6 +199,13 @@ const i_app = (()=>{
     window.pJSDom = [];
   
     var LIN = {};
+    /**
+     * change value events
+     */
+     let onValueChange = {};
+     let onTxtChange = {};
+     let onInputChange = {};
+     let elementValue ={};
     /*
     screen
     general screen object document.body
@@ -471,7 +479,7 @@ const i_app = (()=>{
   @param {Element} p - The element to insert before.
   @param {Element} c - The element to be inserted.
 
-  
+
   */
   const IN_B = (p,c)=>{p.parentNode.insertBefore(c,p);}
   /**
@@ -480,24 +488,21 @@ const i_app = (()=>{
   @param {object} ob - The object to be copied.
   @returns {object} A deep copy of the object.
   */
-  const COPY_OB = (ob) => {  
-    if(typeof ob === 'object'){
-      if(ob.a && ob.fn){
-       const fn = ob.a;
-       delete ob.a;
-       const NewOb = JD_(JDS_(ob));
-       NewOb.a = fn;
-       return  NewOb;
-      }else{
-        const NewOb = JD_(JDS_(ob));
- 
-        return  NewOb;
-      }
-    }else{
-      CL_('Error COPY_OB is Not Object');
+  const COPY_OB = (ob) => {
+    if (typeof ob !== 'object') {
+      console.error('Error: COPY_OB argument is not an object');
+      return;
     }
-    
-  }  
+  
+    const { a, ...rest } = ob;
+    const NewOb = { ...rest };
+  
+    if (a ) {
+      NewOb.a = a;
+    }
+  
+    return NewOb;
+  };  
   /**
   * Returns the current timestamp in milliseconds
   * @returns {number} The current timestamp in milliseconds
@@ -574,15 +579,43 @@ const hideOtherKeys = (k,obj)=>{
     }
   
   }
-  const DEL_E = (mw) => {
-    const myNode = isString(mw) ? E_I_S(mw) : mw;
+  const deleteChildren = (id)=>{
+    if(I_OB[id] && I_OB[id].children){
+     
+    const children = I_OB[id].children;
+    
+    for(var c = 0 ; c < children.length; c++){
+      const childId  = children[c];
+      const childBody = I_OB[childId];
+      if(childBody && childBody.children){
+        deleteChildren(childId);
+      }
+      delete  I_OB[childId];
+      onValueChange[childId] ? delete onValueChange[childId] : '';
+      onTxtChange[childId] ? delete onTxtChange[childId] : '';
+      onInputChange[childId] ? delete onInputChange[childId] : '';
+      if(elementValue.hasOwnProperty(i_root) && elementValue[i_root].hasOwnProperty(childId)){
+        delete elementValue[i_root][childId];
+      
+      }
+ 
+    }
+  }
+  }
+  const DEL_E = (id) => {
+    const myNode = isString(id) ? E_I_S(id) : id;
     if (myNode && myNode.childNodes && myNode.childNodes.length > 0) {
         while (myNode.firstChild) {
             myNode.removeChild(myNode.firstChild);
         }
     }
-
+    deleteChildren(id);
 }
+const DEL_ = (id)=>{
+  const myNode = isString(id) ? E_I_S(id) : id;
+  myNode.remove();
+  deleteChildren(id);
+} 
   const GTX = (txt)=>{
     return i_app_select_lang[txt] ? i_app_select_lang[txt] : txt;
   }
@@ -669,8 +702,14 @@ const hideOtherKeys = (k,obj)=>{
     }
     return [dd];
   }
-  
-  const D_CL = ([m, w]) => {
+  const D_CL = (m, w) => {
+    if(Array.isArray(m) && ! w){
+      D_CL_A(m);
+    }else{
+      D_CL_A([m,w]);
+    }
+  }
+  const D_CL_A = ([m, w]) => {
       
     var e = isString(m) ? E_I_S(m) : m;
    
@@ -913,7 +952,6 @@ const funcHandel = (str) => {
     }else{
       i_root ="start";
     }
-    CL_(["i_root",i_root])
     // Return an object containing the root name and directory with the specified file extension
     return { name: i_root, dir: `${i_root}${ex}` };
   };
@@ -953,8 +991,7 @@ const funcHandel = (str) => {
     }
     function convertStrToOb (str) {
         str = funcHandel(str)
-        str = str.replace(/(\n\n|\r\n|\n|\r)/g, ''); // remove newlines
-       
+        str = str.replace(/(\r\n|\n|\r)/g, ''); // remove newlines
         str = escapeKeysSym(str);
         str = str.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
    
@@ -1015,8 +1052,8 @@ const funcHandel = (str) => {
   };
   
   const OBJ_ = (st)=>{
-    
-    const fn = new Function("{return "+st+"}")
+
+    const fn = new Function(`{return ${st}; }`);
    
     return fn();
   }
@@ -1059,13 +1096,12 @@ const funcHandel = (str) => {
 
                     var jsonOb ;
                     if(isJson(txt)){
-                        // Clean the text response using the cleanSt function   
-                        
-                         jsonOb = JD_(txt);
+                        // Clean the text response using the cleanSt function  
+                       
+                        jsonOb = JD_(txt);
                     } else{
-                     
                         var jsonTx = cleanSt(txt);
-                         jsonOb = OBJ_(jsonTx);
+                            jsonOb = OBJ_(jsonTx);
                     }
 
                     // Log the cleaned JSON to the console for debugging
@@ -1119,16 +1155,20 @@ const funcHandel = (str) => {
   const _POST =  async(url, data, callback) => {
     let send = true;
     let isQuery = false;
+    const strQ = data.query ? data.query : data;
     if (data.query || data[0] && data[0].a) {
-      const queryName =await SHA256(JDS_(data));
-     CL_(queryName)
+      
+    
+      const queryName =await SHA256(JDS_(strQ));
+    
       isQuery = true;
       if (Queries[queryName]) {
         if (Queries[queryName].res) {
-          send = false;
-         
           const res = Queries[queryName].res;
-          callback(res, data);
+          data.upTime = res.upTime;
+          if (Queries[queryName].callBack) {
+              Queries[queryName].callBack.push(callback);
+            }
         } else {
           if (Queries[queryName].callBack) {
                 Queries[queryName].callBack.push(callback);
@@ -1158,10 +1198,17 @@ const funcHandel = (str) => {
             } else {
               if (typeof callback === "function") {
                 if (isQuery) {
-                  const queryName = await SHA256(JDS_(data));
+                  const queryName = await SHA256(JDS_(strQ));
                 if (Queries[queryName]) {
                   if (Queries[queryName].callBack && Queries[queryName].callBack.length > 0) {
-                    Queries[queryName].res = json;
+                    if(Queries[queryName].res && json.res && json.res == "UPTODATE"){
+                     json.res = Queries[queryName].res.res ;
+                   
+                    }else{
+                      Queries[queryName].res = json;
+                    
+                    }
+                   
                     for (const cureCallBack of Queries[queryName].callBack) {
                       cureCallBack(json, data);
                     }
@@ -1169,6 +1216,7 @@ const funcHandel = (str) => {
                   }
                 }
               } else {
+             
                   callback(json, data);
                 }
               }
@@ -1183,16 +1231,160 @@ const funcHandel = (str) => {
       return SWITCH_VOICE(data)
     }
   }
+  const translateFromTo = async(from,to,text, callback)=> {
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURI(text)}`;
+    fetch(url)
+        .then(response => { return response.json()})
+        .then(data => {
+         
+          let translatedAll = "";
+      const translatedText = data[0];
+        for(var x =0 ; x < translatedText.length; x++){
+          translatedAll += translatedText[x][0]
+        }
+        
+            callback(translatedAll);
+           
+            return translatedAll;
+        })
+        
+        .catch(error => {
+          if(error){
+            console.log(error);
+          }
   
+       
+        });
+}
+  const dev_translate =async (txt)=>{
+    if(txt === 'app'){
+
+   
+
+      for(let i = 0 ; i < app.lang.length; i++){
+       const lang = app.lang[i];
+       if(!i_app_lang[lang]){
+        i_app_lang[lang]={}
+       }
+       var time = 300;
+       let count = 0;
+       if(lang !== "en" && lang !== "ar"){
+        for(const key in i_app_lang['en']){
+          const text = i_app_lang['en'][key];
+
+          const callback =(value)=>{
+            i_app_lang[lang][key] = value;
+            count = count + 1 ;
+            if (count === Object.keys(i_app_lang['en']).length) {
+              const callBack = ()=>{
+          
+                const lastLang = i_app_lang[lang];
+                _POST('/api',{order:'updateTranslate',data:lastLang ,lang:lang},false);
+        
+               }
+               setTimeout(callBack,5000);
+            }
+
+          }
+          const tt = ()=>{
+            translateFromTo("ar",lang,text,callback);
+          }
+          
+          setTimeout(tt,time);
+          time = time + 300;
+        }
+       
+       
+       }
+      }
+   
+    
+    }else{
+
+    }
+  }
+  const makeDBtx =async (v)=>{
+   const dbA = v.dbA ;
+   const dbB = v.dbB;
+   const upTxtArabic = {};
+   for(var i = 0 ; i < dbA.length;i++){
+    const topic  = dbA[i];
+    if(topic.id !== 19){
+  
+    const topicTitleEn =topic.key;
+
+   
+    const  topicTitleKey = `${topicTitleEn}-A-${topic.id}`;
+    upTxtArabic[topicTitleKey] = topic.title;
+    dbA[i].title = `t.{${topicTitleKey}}`;
+    var subNo = 1;
+    for(var x = 0 ; x < topic.subjects.length;x++){
+      const subject  = topic.subjects[x];
+      const subTitleKey = `${topicTitleKey}-sub-${subNo}`;
+      upTxtArabic[subTitleKey] = subject.title;
+      dbA[i].subjects[x].title = `t.{${subTitleKey}}`;
+      var stepNo = 1;
+      for(var e = 0 ; e < subject.steps.length;e++){
+          const step  = subject.steps[e];
+          const stepTxtKey = `${topicTitleKey}-sub-${subNo}-tx-${stepNo}`;
+          upTxtArabic[stepTxtKey] = step.txt;
+          dbA[i].subjects[x].steps[e].txt = `t.{${stepTxtKey}}`;
+          stepNo=stepNo+1;
+      }
+      subNo = subNo + 1;
+    }
+    
+  }
+
+   }
+   for(var i = 0 ; i < dbB.length;i++){
+    const topic  = dbB[i];
+    if(topic.id !== 19){
+
+    const topicTitleEn = topic.key;
+
+    const  topicTitleKey = `${topicTitleEn}-B-${topic.id}`;
+    upTxtArabic[topicTitleKey] = topic.title;
+    dbB[i].title = `t.{${topicTitleKey}}`;
+    var subNo = 1;
+    for(var x = 0 ; x < topic.subjects.length;x++){
+      const subject  = topic.subjects[x];
+      const subTitleKey = `${topicTitleKey}-sub-${subNo}`;
+      upTxtArabic[subTitleKey] = subject.title;
+      dbB[i].subjects[x].title = `t.{${subTitleKey}}`;
+      var stepNo = 1;
+      for(var e = 0 ; e < subject.steps.length;e++){
+          const step  = subject.steps[e];
+          const stepTxtKey = `${topicTitleKey}-sub-${subNo}-tx-${stepNo}`;
+          upTxtArabic[stepTxtKey] = step.txt;
+          dbB[i].subjects[x].steps[e].txt = `t.{${stepTxtKey}}`;
+          stepNo=stepNo+1;
+      }
+      subNo = subNo + 1;
+    }
+  }
+   }
+   CL_(JDS_(upTxtArabic))
+   CL_(JDS_(dbA))
+   CL_(JDS_(dbB))
+  }
   const URS = () => Object.freeze({
+    dev_translate:dev_translate,
+    inCssCls:inCssCls,
+    G_Json:G_Json,
+    makeDBtx:makeDBtx,
+    divScreenShot:divScreenShot,
+    _GET:G_Json,
     E_I_S: E_I_S,
     E_I: E_I,
     E_I_V: E_I_V,
+    print:print,
     G_SRC: G_SRC,
     MW_SW_L: createAppTxt,
     s_Lang: s_Lang,
     createAppTxt: createAppTxt,
     SLIDER_SW: SLIDER_SW,
+    DEL_:DEL_,
     DEL_E:DEL_E,
     DEL_E_E: DEL_E_E,
     In_S: In_S,
@@ -1211,6 +1403,7 @@ const funcHandel = (str) => {
     cele: cele,
     selD: selD,
     CR_: CR_,
+    CR: CR_,
     I_O: I_O,
     _POST: _POST,
     GTX: GTX,
@@ -1225,6 +1418,7 @@ const funcHandel = (str) => {
     switchTheme: switchTheme,
     scrollToTop: scrollToTop,
     CL_: CL_,
+    CL: CL_,
     FCMTC: FCMTC,
     FCMTA: FCMTA,
     AL_: AL_,
@@ -1232,24 +1426,31 @@ const funcHandel = (str) => {
     IS_USERNAME: IS_USERNAME,
     wait_: wait_,
     E_C: E_C,
+    upQuery:dataQuery,
+    openOverHide:openOverHide,
+    closeOverHide: closeOverHide,
     hideOtherKeys: hideOtherKeys,
     makeFunction:makeFunction
   });
   
-  const L_CSS = (f)=>{
-             
-    if(!E_I(`css_${f}`)){
-    const src = CE_('link');
-    src.id = `css_${f}`;
-    let currentDate = new Date();
-    let tt = currentDate.getTime() ;
-    src.id = f;
-    src.href = `${app.dir.css}${f}.css?${tt}`;
-    src.rel = "stylesheet";
-    const head = E_T("head")[0]
-  head.appendChild(src);
+  const L_CSS = (f) => {
+    const existingCss = E_I(`css_${f}`);
+
+    if (!existingCss) {
+        const src = CE_('link');
+        src.id = `css_${f}`;
+        const tt = Date.now(); // Generate a new timestamp for cache busting
+
+        src.href = `${app.dir.css}${f}.css`;
+        src.rel = "stylesheet";
+
+        const head = E_T("head")[0];
+       
+        head.insertBefore(src, head.children[0]);
+
     }
-  }
+};
+
   const L_SCRIPT = (f,v)=>{
     const srcFn = URS();
     if(!E_I(`js_${f}`)){
@@ -1259,10 +1460,30 @@ const funcHandel = (str) => {
     // Get the number of milliseconds since midnight
     src.src = `${app.dir.script}${f}.js?${time_()}`;
     src.type = "text/javascript";
-    const head = E_T("head")[0]
-  head.appendChild(src)
+
+    var afterload =false;
+    if(v === 'afterload'){
+      afterload =true;
+      src.setAttribute('defer','true');
+      document.body.appendChild(src);
+    }else  if(v === 'global'){
+      const head = E_T("head")[0];
+      src.setAttribute('defer','true');
+      const iappScript = E_I('i-app-ui');
+      head.insertBefore(src, head.children[head.children.length -1]);
+    }else  if(v === 'https'){
+      const head = E_T("head")[0];
+      src.src = `https://${f}`;
+      src.setAttribute('defer','true');
+      const iappScript = E_I('i-app-ui');
+      head.insertBefore(src, head.children[head.children.length -1]);
+    }else{
+      const head = E_T("head")[0];
+      head.appendChild(src);
+    }
+
   
-    if(v){
+    if(v && !afterload){
       window[f] = (a,b)=>{}
       ReturnScriptFunctions[f] = (a,b)=>{}
       const srcOnLoad = ()=> {
@@ -1272,7 +1493,7 @@ const funcHandel = (str) => {
         
             if(typeof ReturnScriptFunctions[f] ===  'function'){
              CL_(["script loaded :", ReturnScriptFunctions])
-              return  ReturnScriptFunctions[f](v,[srcFn]); 
+              return  ReturnScriptFunctions[f](v,[srcFn,app]); 
             }else{
                 setTimeout(rFd,300);
             }
@@ -1294,7 +1515,7 @@ const funcHandel = (str) => {
           
               if(typeof ReturnScriptFunctions[f] ===  'function'){
                CL_(["script loaded :", ReturnScriptFunctions])
-                return  ReturnScriptFunctions[f](v,[srcFn]); 
+                return  ReturnScriptFunctions[f](v,[srcFn,app]); 
               }else{
                   setTimeout(rFd,300);
               }
@@ -1386,7 +1607,7 @@ const funcHandel = (str) => {
   /**
   * VALUES builder
   */
-  let onValueChange = {}
+
   const onValueChange_ =(k,v)=> {
   if(onValueChange[k]){
     for(var i = 0 ; i < onValueChange[k].length ; i++){
@@ -1418,7 +1639,7 @@ const funcHandel = (str) => {
   }
   
    };
-  let onTxtChange = {};
+
   const onTxtChange_ =(k,v)=> {
   if(onTxtChange[k]){
     for(var i = 0 ; i < onTxtChange[k].length ; i++){
@@ -1455,8 +1676,7 @@ const funcHandel = (str) => {
   
   };
   
-  let onInputChange = {};
-  let elementValue ={};
+
   const onInputChange_ =(k)=> {
     
     if(onInputChange[k]){
@@ -1470,17 +1690,18 @@ const funcHandel = (str) => {
     }
     }
     const setInputV = async (k) => {
-      if(elementValue[i_root][k]){
-        CL_(`Error Please Insert  Unique input name , ${k} is already used , that To make the i-app track changes on elements`);
-      }else{
+    
         Object.defineProperty(elementValue[i_root], k, {
+    
+            configurable: true,
+            enumerable:false,
           get: () => this[k],
           set: (_v) => {
             this[k] = _v;
           
           },
         });
-      }
+      
     
     
       };
@@ -1517,13 +1738,13 @@ const funcHandel = (str) => {
   *  
   */
  
-  const replacePattern = (text,id,data)=>{
+  const replacePatternTxt = (text,id,data)=>{
    
     const txtQ = /q\.\{\s*(?<query>[^\}]+)\s*\}/g;
     const txtQTranslate = /qt\.\{\s*(?<queryTranslate>[^\}]+)\s*\}/g;
-    
     const txtTranslate = /t\.\{\s*(?<translate>[^\}]+)\s*\}/g;
     const txtvalues = /v\.\{\s*(?<values>[^\}]+)\s*\}/g;
+    const txtvaluesTr = /vt\.\{\s*(?<valuesTr>[^\}]+)\s*\}/g;
     const txtInput = /val\.\{\s*(?<input>[^\}]+)\s*\}/g;
     const txtApp = /app\.\{\s*(?<apptxt>[^\}]+)\s*\}/g;
     const txtUser = /u\.\{\s*(?<apptxt>[^\}]+)\s*\}/g;
@@ -1587,7 +1808,26 @@ const funcHandel = (str) => {
      
    }
    );
-  
+   output = output.replace(txtvaluesTr, (_, valuesTr) =>{
+    if(i_app_v.hasOwnProperty(valuesTr.trim())){
+        if(onValueChange[valuesTr.trim()]){
+          let itExsit = false;
+          for(let x = 0 ; x < onValueChange[valuesTr.trim()].length;x++){
+              if(onValueChange[valuesTr.trim()][x][0] == id){ 
+                itExsit = true;
+              }
+          }
+          if(!itExsit){
+            onValueChange[valuesTr.trim()].push([id,text])
+          }
+        }else{
+          onValueChange[valuesTr.trim()] =[[id,text]]
+        }
+     return `t.{${i_app_v[valuesTr.trim().toString()]}}`;
+    }else{ 
+      return  valuesTr.trim();
+    }
+    });
     output = output.replace(txtTranslate, (_, translate) =>
     {
      if(i_app_select_lang[translate.trim()]){
@@ -1643,26 +1883,159 @@ const funcHandel = (str) => {
                   }
               }
               if(!itExsit){
-                onInputChange[input.trim()].push([id,text])
+                onInputChange[input.trim()].push([id,text]);
               }
             }else{
               onInputChange[input.trim()] =[[id,text]]
             }
             if(elementValue[i_root][input.trim()]){
-         return `${elementValue[i_root][input.trim().toString()]}`;
-        }else{ 
-          return  '';
-        }
+              return `${elementValue[i_root][input.trim().toString()]}`;
+            }else{ 
+              return  '';
+            }
         });
     
     return output;
     }
+    const replacePatternId = (text,data)=>{
+   
+      const txtQ = /q\.\{\s*(?<query>[^\}]+)\s*\}/g;
+      const txtvalues = /v\.\{\s*(?<values>[^\}]+)\s*\}/g;
+      const txtInput = /val\.\{\s*(?<input>[^\}]+)\s*\}/g;
+      const txtApp = /app\.\{\s*(?<apptxt>[^\}]+)\s*\}/g;
+      const txtUser = /u\.\{\s*(?<apptxt>[^\}]+)\s*\}/g;
+      let output = text;
+    
+          output = text.replace(txtQ, (_, query) =>
+          {
+          let  testData = query.trim();
+          if( data[query.trim()]){
+            if( data[query.trim()] === 0){
+              testData = '0'
+            }else{
+              testData = data[query.trim()]
+            }
+          }else{
+            testData =  false;
+          }
+  
+            if(testData){
+              return `${testData}`;
+            }else{
+              return query.trim();
+            }
+  
+          }
+      );
+    
+      output = output.replace(txtApp, (_, appTxt) =>
+      {
+       if(app[appTxt.trim()]){
+         return `t.{${app[appTxt.trim()]}}`;
+       }else{
+         return appTxt.trim();
+       }
+     }
+     );
+     output = output.replace(txtUser, (_, appTxt) =>
+     {
+      if(userData[appTxt.trim()]){
+        return userData[appTxt.trim()];
+      }else{
+        return appTxt.trim();
+      }
+    }
+    );
+      output = output.replace(txtvalues, (_, values) =>{
+      if(i_app_v.hasOwnProperty(values.trim())){
+       return `${i_app_v[values.trim().toString()]}`;
+      }else{ 
+        return  values.trim();
+      }
+      });
+      output = output.replace(txtInput, (_, input) =>{
+          if(elementValue[i_root][input.trim()]){
+           return `${elementValue[i_root][input.trim().toString()]}`;
+          }else{ 
+            return  '';
+          }
+          });
+      
+      return output;
+      }
   /**
   * Build Function Tools
   * Basic Functions to control 
   * Animtion and Building Tools
   * 
   */
+
+  /**
+   * print doc
+   */
+  const print = (id,cls)=>{
+    
+    const body = E_I_S(id).innerHTML;
+    var nD = '';
+    nD += '<html> ';
+    nD += '<head> <meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1">';
+    nD += '<style>';
+    nD += 'th.inpr{display:none;} td.inpr{display:none;} tr.inpr{display:none;} div.inpr{display:none;} button.inpr{display:none;} p.inpr{display:none;} b.inpr{display:none;} input.inpr{border:none;} table.inpr{display:none;} ';
+    nD += '.ST_B_PR_2_D {border-bottom:2px #000 dotted;border-top:none;border-right:none;border-left:none;}';
+    nD += '.F_S_25{font-size:18px;}';
+    nD += '.chart{background-color: #999999;border-radius: 50%;direction: ltr;}';
+    nD += '.chart::before{    content: "";margin: auto;display: block;width: 20%;height: 20%;background: #ffffff;border-radius: 50%;top: 50%;-ms-transform: translateY(200%);transform: translateY(200%);}';
+    nD += '.F_S_14{font-size:10px;}';
+    nD += '.H_25{height:18px;}';
+    nD += '.titImg{width:180px;}';
+    nD += '.DNP{border:none;}.T_C{text-align: center;}.T_R{text-align: right;}.LHF{line-height: 0.2;}.ST_B_1{border:#000 1px solid;}.ST_B_B_1{border-bottom:#000 1px solid;padding-bottom:20px;}.FF_BOLD{ font-weight: bold;}.TT_0{ top:0;}.RR_0{ right:0;}.mR_0{ margin-right:0;}.mR_278{ margin-right:330px;}.mR_200{ margin-right:200px;}.D_INB{display: inline-block;}.WW{width:100%;}.W_P_30{width:30%;}.W_100{width:100px;}.LL_0{left:0;}.mT_50{margin-top:120px;}.mT30{margin-top:30px;}.mT20{margin-top:20px;}.PD_5{padding:10px;}.B_PR{background:#cccccc;}';
+    nD += 'cr {border-radius: 50%;width: fit-content;width: -moz-fit-content;display: inline-block;}';
+    nD += '.Box_20{width:20px; height:20px} .mR_20{margin-right:20px} .F_GRY2{color:#666;}';
+    nD += '@media print {* {-webkit-print-color-adjust: exact !important; color-adjust: exact !important; }}';
+    nD += cls;
+    nD += 'body{margin:0;padding:0;}';
+    nD += 'table{ font-size:10px; text-align:center; padding:5px;border-collapse: collapse;margin:0 0 20px 0;width:100%;} ';
+    nD += 'th{border:#000 2px solid;padding:2px;font-size:15px;}';
+    nD += 'td{border:#000 1px solid;padding:2px;font-size:15px;}';
+    nD += 'button{margin:20px;background:transparent;border:none;padding:0;position: relative} ';
+    nD += 'h2{margin:0; text-align:center;padding:0;top:0;right:0;left:0;bottom:0;display: inline-block;width: max-content;} ';
+    nD += '</style>';
+    nD += '<title> Print </title>';
+    nD += '</head>';
+    nD += '<body >';
+    nD += '' + body + '';
+  
+    nD += '</body>';
+    nD += '</html>';
+  
+    if(app.electron){
+      _POST('/print',{sc:nD},(res)=>{
+        CL_(res);
+      })
+    }else{
+      var Pagelink = app.name;
+
+      var mywindow = window.open(Pagelink, "_new");
+      var is_chrome = Boolean(mywindow.chrome);
+      mywindow.document.write(nD);
+      mywindow.document.close();
+      if (is_chrome) {
+          mywindow.onload = () => {
+              mywindow.focus();
+              mywindow.print();
+              mywindow.close();
+          };
+      } else {
+          mywindow.document.close();
+          mywindow.focus();
+          mywindow.print();
+          mywindow.close();
+      }
+  
+    }
+
+
+  }
   const PLAY_SLI_T = () => {
   SLIDER_SW(['all', 'a']);
   }
@@ -1984,522 +2357,522 @@ const funcHandel = (str) => {
   };//  website for ISO consulting company ui/ux use black and red   
   
   const _FN = (FN_, FN_DATA, FN_ELMENT) => {
-  var MWR;
-  var V = [];
-  const chickValue = (x) => {
-      var isE = false;
-      var nn = 0;
-      for (var z = 0; z < V.length; z++) {
-          if (V[z].n == x) {
-              isE = true;
-              nn = z;
+      var MWR;
+      var V = [];
+      const chickValue = (x) => {
+          var isE = false;
+          var nn = 0;
+          for (var z = 0; z < V.length; z++) {
+              if (V[z].n == x) {
+                  isE = true;
+                  nn = z;
+              }
+          }
+          if (isE == true) {
+              return nn;
+          } else {
+              return null;
           }
       }
-      if (isE == true) {
-          return nn;
-      } else {
-          return null;
-      }
-  }
-  for (var n = 0; n < FN_.length; n++) {
-      if (FN_[n].T == "C") {
-          MWR = FN_[n].T;
-          var D = FN_[n].D;
-          for (var b = 0; b < D.length; b++) {
-              if (D[b].T == "V") {
-                  var a = D[b].D;
-                  for (var x = 0; x < a.length; x++) {
-                      if (a[x].T == "SD") {
-                          var om = { n: a[x].N, v: a[x].D };
-                          V.push(om);
-                      } else if (a[x].T == "ADB") {
-                          var om = { n: a[x].N, v: MW_NT._ADB[a[x].D] };
-                          V.push(om);
-                      } else if (a[x].T == "Q_A") {
-                          
-                          var t = a[x].D[0];
-                          var k = a[x].D[1];
-                          var io = I_O(t);
-                          var Q_A = [];
-                          if(io && io.Q && io.Q.res &&io.Q.res.length > 0 ){
-                              for(var j = 0 ; j < io.Q.res.length;j++){
-                                  if(io.Q.res[j][k]){
-                                      Q_A.push(io.Q.res[j][k]);
-                                  }
-                              }
-                          }
-  
-                          var om = { n: a[x].N, v:Q_A };
-                          V.push(om);
-                      } else if (a[x].T == "STA") {
-                          var om = { n: a[x].N, v: MW_NT._ST[a[x].D] };
-                          V.push(om);
-                      } else if (a[x].T == "UDA") {
-                          var om = { n: a[x].N, v: MW_NT._UDA[a[x].D] };
-                          V.push(om);
-                      } else if (a[x].T == "UD") {
-                          var om = { n: a[x].N, v: MW_NT._UD[a[x].D] };
-                          V.push(om);
-                      } else if (a[x].T == "S") {
-                          if (a[x].Q) {
-                              var v = {};
-                              if (FN_DATA !== "FALSE") {
-                                  v = { n: a[x].N, v: FN_DATA[0][a[x].Q] };
-                              } else {
-                                  v = { n: a[x].N, v: a[x].D };
-                              }
-                              V.push(v);
-                          } else if (a[x].A) {
-                              var v = {};
-                              if (FN_DATA !== "FALSE") {
-                                  v = { n: a[x].N, v: FN_DATA[0] };
-                              }
-                              V.push(v);
-                          } else if (a[x].D) {
-                              var vv = [];
-                              for (var er = 0; er < a[x].D.length; er++) {
-                                  if (a[x].D[er].s) {
-                                      vv.push(a[x].D[er].s);
-                                  } else if (a[x].D[er].d) {
-                                      var dvd;
-                                      for (var iu = 0; iu < V.length; iu++) {
-                                          if (V[iu].n == a[x].D[er].d) {
-                                              dvd = V[iu].v;
-                                          }
-                                      }
-                                      vv.push(dvd);
-                                  } else if (a[x].D[er].q) {
-                                      if (FN_DATA !== "FALSE") {
-                                          vv.push(FN_DATA[0]);
+      for (var n = 0; n < FN_.length; n++) {
+          if (FN_[n].T == "C") {
+              MWR = FN_[n].T;
+              var D = FN_[n].D;
+              for (var b = 0; b < D.length; b++) {
+                  if (D[b].T == "V") {
+                      var a = D[b].D;
+                      for (var x = 0; x < a.length; x++) {
+                          if (a[x].T == "SD") {
+                              var om = { n: a[x].N, v: a[x].D };
+                              V.push(om);
+                          } else if (a[x].T == "ADB") {
+                              var om = { n: a[x].N, v: MW_NT._ADB[a[x].D] };
+                              V.push(om);
+                          } else if (a[x].T == "Q_A") {
+                              
+                              var t = a[x].D[0];
+                              var k = a[x].D[1];
+                              var io = I_O(t);
+                              var Q_A = [];
+                              if(io && io.Q && io.Q.res &&io.Q.res.length > 0 ){
+                                  for(var j = 0 ; j < io.Q.res.length;j++){
+                                      if(io.Q.res[j][k]){
+                                          Q_A.push(io.Q.res[j][k]);
                                       }
                                   }
                               }
-                              var v = { n: a[x].N, v: vv };
-                              V.push(v);
-                          } else {
-                              var v = { n: a[x].N, v: a[x].D };
-                              V.push(v);
-                          }
-                      } else if (a[x].T == "F") {
-                          var e = a[x].D;
-                          var fn = e.N;
-                          var fv = e.D;
-                          var goog = true;
-  
-                          if (a[x].IF) {
-                              var dos = a[x].IF[0];
-                              var cos = a[x].IF[1] == undefined ? "" : a[x].IF[1];
-                              for (let qw = 0; qw < V.length; qw++) {
-                                  var joj = qw;
-                                  if (V[joj] && V[joj].n && V[joj].n !== undefined && dos == V[joj].n) {
-                                      dos = V[joj].v;
-                                     qw = V.length + 1;
+      
+                              var om = { n: a[x].N, v:Q_A };
+                              V.push(om);
+                          } else if (a[x].T == "STA") {
+                              var om = { n: a[x].N, v: MW_NT._ST[a[x].D] };
+                              V.push(om);
+                          } else if (a[x].T == "UDA") {
+                              var om = { n: a[x].N, v: MW_NT._UDA[a[x].D] };
+                              V.push(om);
+                          } else if (a[x].T == "UD") {
+                              var om = { n: a[x].N, v: MW_NT._UD[a[x].D] };
+                              V.push(om);
+                          } else if (a[x].T == "S") {
+                              if (a[x].Q) {
+                                  var v = {};
+                                  if (FN_DATA !== "FALSE") {
+                                      v = { n: a[x].N, v: FN_DATA[0][a[x].Q] };
+                                  } else {
+                                      v = { n: a[x].N, v: a[x].D };
                                   }
-                              }
-                              for (let qw = 0; qw < V.length; qw++) {
-                                  
-                                  var joj = qw;
-                                  if (V[joj] && V[joj].n && V[joj].n !== undefined && cos == V[joj].n) {
-                                      cos = V[joj].v;
-                                      qw = V.length + 1;
+                                  V.push(v);
+                              } else if (a[x].A) {
+                                  var v = {};
+                                  if (FN_DATA !== "FALSE") {
+                                      v = { n: a[x].N, v: FN_DATA[0] };
                                   }
-                              }
-  
-                              if (dos !== cos) {
-                                  goog = false;
-                              }
-                          }
-                          if (a[x].IFN) {
-                              var dos = a[x].IFN[0];
-                              var cos = a[x].IFN[1] == undefined ? "" : a[x].IFN[1];
-                              for (let qw = 0; qw < V.length; qw++) {
-                                  var joj = qw;
-                                  if (V[joj] && V[joj].n && V[joj].n !== undefined && dos == V[joj].n) {
-                                      dos = V[joj].v;
-                                     qw = V.length + 1;
-                                  }
-                              }
-                              for (let qw = 0; qw < V.length; qw++) {
-                                  
-                                  var joj = qw;
-                                  if (V[joj] && V[joj].n && V[joj].n !== undefined && cos == V[joj].n) {
-                                      cos = V[joj].v;
-                                      qw = V.length + 1;
-                                  }
-                              }
-  
-                              if (dos == cos) {
-                                  goog = false;
-                              }
-                          }
-                          if (goog == true) {
-                              for (var qr = 0; qr < fv.length; qr++) {
-                                  if (fv[qr].t && fv[qr].t == "q") {
-                                      if (FN_DATA) {
-                                          fv[qr] = FN_DATA;
-                                      } else {
-                                          if (fv[qr].d) {
-                                              fv[qr] = fv[qr].d;
-                                          }
-                                      }
-                                  } else if (fv[qr].D || fv[qr].d) {
-                                      if (fv[qr].D) {
-  
-                                          if (fv[qr].D !== "0") {
-                                              var vcv = GET_MEMORY(fv[qr].D)
-  
-                                              if (vcv !== fv[qr].D) {
-                                                  fv[qr].Do = GET_MEMORY(fv[qr].D)
-  
-                                              } else {
-                                                  for (var nov = 0; nov < V.length; nov++) {
-                                                      if (fv[qr].D == V[nov].n) {
-                                                          fv[qr].Do = V[nov].v;
-                                                          nv = V.length;
-                                                      }
-                                                  }
+                                  V.push(v);
+                              } else if (a[x].D) {
+                                  var vv = [];
+                                  for (var er = 0; er < a[x].D.length; er++) {
+                                      if (a[x].D[er].s) {
+                                          vv.push(a[x].D[er].s);
+                                      } else if (a[x].D[er].d) {
+                                          var dvd;
+                                          for (var iu = 0; iu < V.length; iu++) {
+                                              if (V[iu].n == a[x].D[er].d) {
+                                                  dvd = V[iu].v;
                                               }
                                           }
-                                      } else if (fv[qr].d) {
-  
-                                          if (fv[qr].d !== "0") {
-                                              if (GET_MEMORY(fv[qr].d) !== fv[qr].d) {
-                                                  fv[qr] = GET_MEMORY(fv[qr].d);
-                                              } else {
-                                                  for (var nov = 0; nov < V.length; nov++) {
-                                                      if (fv[qr].d == V[nov].n) {
-                                                          fv[qr] = V[nov].v;
-                                                          nv = V.length;
-                                                      }
-                                                  }
-                                              }
-                                          }
-                                      } else {
-                                          var tqt = GET_MEMORY(fv[qr]);
-                                          if (tqt !== fv[qr]) {
-                                              fv[qr] = tqt;
+                                          vv.push(dvd);
+                                      } else if (a[x].D[er].q) {
+                                          if (FN_DATA !== "FALSE") {
+                                              vv.push(FN_DATA[0]);
                                           }
                                       }
                                   }
-                              }
-                              var vdd = _RETURN([fn, fv, FN_ELMENT]);
-                              if (vdd !== false) {
-                                  var vd = { n: a[x].N, v: vdd };
-                                  V.push(vd);
+                                  var v = { n: a[x].N, v: vv };
+                                  V.push(v);
                               } else {
-                                  return false;
+                                  var v = { n: a[x].N, v: a[x].D };
+                                  V.push(v);
                               }
-  
-                          }
-                      } else if (a[x].T == "D") {
-                          var e = a[x].D;
-                          var vn = a[x].N;
-                          var goog = true;
-                          if (a[x].IF) {
-                              var dos = a[x].IF[0];
-                              var cos = a[x].IF[1];
-                              for (let qw = 0; qw < V.length; qw++) {
-                                  var joj = qw;
-                                  if (V[joj] && V[joj].n && V[joj].n !== undefined && dos == V[joj].n) {
-                                      dos = V[joj].v;
-                                     qw = V.length + 1;
+                          } else if (a[x].T == "F") {
+                              var e = a[x].D;
+                              var fn = e.N;
+                              var fv = e.D;
+                              var goog = true;
+      
+                              if (a[x].IF) {
+                                  var dos = a[x].IF[0];
+                                  var cos = a[x].IF[1] == undefined ? "" : a[x].IF[1];
+                                  for (let qw = 0; qw < V.length; qw++) {
+                                      var joj = qw;
+                                      if (V[joj] && V[joj].n && V[joj].n !== undefined && dos == V[joj].n) {
+                                          dos = V[joj].v;
+                                        qw = V.length + 1;
+                                      }
+                                  }
+                                  for (let qw = 0; qw < V.length; qw++) {
+                                      
+                                      var joj = qw;
+                                      if (V[joj] && V[joj].n && V[joj].n !== undefined && cos == V[joj].n) {
+                                          cos = V[joj].v;
+                                          qw = V.length + 1;
+                                      }
+                                  }
+      
+                                  if (dos !== cos) {
+                                      goog = false;
                                   }
                               }
-                              for (let qw = 0; qw < V.length; qw++) {
-                                  
-                                  var joj = qw;
-                                  if (V[joj] && V[joj].n && V[joj].n !== undefined && cos == V[joj].n) {
-                                      cos = V[joj].v;
-                                      qw = V.length + 1;
+                              if (a[x].IFN) {
+                                  var dos = a[x].IFN[0];
+                                  var cos = a[x].IFN[1] == undefined ? "" : a[x].IFN[1];
+                                  for (let qw = 0; qw < V.length; qw++) {
+                                      var joj = qw;
+                                      if (V[joj] && V[joj].n && V[joj].n !== undefined && dos == V[joj].n) {
+                                          dos = V[joj].v;
+                                        qw = V.length + 1;
+                                      }
+                                  }
+                                  for (let qw = 0; qw < V.length; qw++) {
+                                      
+                                      var joj = qw;
+                                      if (V[joj] && V[joj].n && V[joj].n !== undefined && cos == V[joj].n) {
+                                          cos = V[joj].v;
+                                          qw = V.length + 1;
+                                      }
+                                  }
+      
+                                  if (dos == cos) {
+                                      goog = false;
                                   }
                               }
-                              if (dos !== cos) {
-                                  goog = false;
-                              }
-                          }
-                          if (a[x].IFN) {
-                             
-                              var dos = a[x].IFN[0];
-                              var cos = a[x].IFN[1];
-                             
-                              for (let qw = 0; qw < V.length; qw++) {
-                                  var joj = qw;
-                                  if (V[joj] && V[joj].n && V[joj].n !== undefined && dos == V[joj].n) {
-                                      dos = V[joj].v;
-                                     qw = V.length + 1;
-                                  }
-                              }
-                              for (let qw = 0; qw < V.length; qw++) {
-                                  
-                                  var joj = qw;
-                                  if (V[joj] && V[joj].n && V[joj].n !== undefined && cos == V[joj].n) {
-                                      cos = V[joj].v;
-                                      qw = V.length + 1;
-                                  }
-                              }
-                              if (dos == cos) {
-                                  goog = false;
-                              }
-                          }
-                          if (goog == true) {
-                              for (var ee = 0; ee < e.length; ee++) {
-                                  if (e[ee].T == "F") {
-                                      var q = [];
-                                      for (var ss = 0; ss < e[ee].D.length; ss++) {
-                                          if (e[ee].D[ss].D) {
-                                              if (e[ee].D[ss].D == "0") {
-                                                  q.push("0")
-  
-                                              } else {
-                                                  if (GET_MEMORY(e[ee].D[ss].D) !== e[ee].D[ss].D) {
-                                                      
-                                                      q.push(GET_MEMORY(e[ee].D[ss].D));
-                                                  
+                              if (goog == true) {
+                                  for (var qr = 0; qr < fv.length; qr++) {
+                                      if (fv[qr].t && fv[qr].t == "q") {
+                                          if (FN_DATA) {
+                                              fv[qr] = FN_DATA;
+                                          } else {
+                                              if (fv[qr].d) {
+                                                  fv[qr] = fv[qr].d;
+                                              }
+                                          }
+                                      } else if (fv[qr].D || fv[qr].d) {
+                                          if (fv[qr].D) {
+      
+                                              if (fv[qr].D !== "0") {
+                                                  var vcv = GET_MEMORY(fv[qr].D)
+      
+                                                  if (vcv !== fv[qr].D) {
+                                                      fv[qr].Do = GET_MEMORY(fv[qr].D)
+      
                                                   } else {
-  
                                                       for (var nov = 0; nov < V.length; nov++) {
-                                                          if (e[ee].D[ss].D == V[nov].n) {
-                                                              q.push(V[nov].v);
+                                                          if (fv[qr].D == V[nov].n) {
+                                                              fv[qr].Do = V[nov].v;
                                                               nv = V.length;
                                                           }
                                                       }
                                                   }
                                               }
-                                          } else if (e[ee].D[ss].d) {
-  
-                                              if (e[ee].D[ss].d == "0") {
-                                                  q.push("0")
-  
-                                              } else {
-                                                  if (GET_MEMORY(e[ee].D[ss].d) !== e[ee].D[ss].d) {
-                                                      q.push(GET_MEMORY(e[ee].D[ss].d));
+                                          } else if (fv[qr].d) {
+      
+                                              if (fv[qr].d !== "0") {
+                                                  if (GET_MEMORY(fv[qr].d) !== fv[qr].d) {
+                                                      fv[qr] = GET_MEMORY(fv[qr].d);
                                                   } else {
-                                                      for (var nv = 0; nv < V.length; nv++) {
-                                                          if (e[ee].D[ss].d == V[nv].n) {
-                                                              q.push(V[nv].v);
+                                                      for (var nov = 0; nov < V.length; nov++) {
+                                                          if (fv[qr].d == V[nov].n) {
+                                                              fv[qr] = V[nov].v;
                                                               nv = V.length;
                                                           }
                                                       }
                                                   }
                                               }
-                                          } else if (e[ee].D[ss].s) {
-                                              q.push(e[ee].D[ss].s)
-  
                                           } else {
-                                              for (var nv = 0; nv < V.length; nv++) {
-                                                  if (e[ee].D[ss] == V[nv].n) {
-                                                      q.push(V[nv].v);
-                                                      nv = V.length;
+                                              var tqt = GET_MEMORY(fv[qr]);
+                                              if (tqt !== fv[qr]) {
+                                                  fv[qr] = tqt;
+                                              }
+                                          }
+                                      }
+                                  }
+                                  var vdd = _RETURN([fn, fv, FN_ELMENT]);
+                                  if (vdd !== false) {
+                                      var vd = { n: a[x].N, v: vdd };
+                                      V.push(vd);
+                                  } else {
+                                      return false;
+                                  }
+      
+                              }
+                          } else if (a[x].T == "D") {
+                              var e = a[x].D;
+                              var vn = a[x].N;
+                              var goog = true;
+                              if (a[x].IF) {
+                                  var dos = a[x].IF[0];
+                                  var cos = a[x].IF[1];
+                                  for (let qw = 0; qw < V.length; qw++) {
+                                      var joj = qw;
+                                      if (V[joj] && V[joj].n && V[joj].n !== undefined && dos == V[joj].n) {
+                                          dos = V[joj].v;
+                                        qw = V.length + 1;
+                                      }
+                                  }
+                                  for (let qw = 0; qw < V.length; qw++) {
+                                      
+                                      var joj = qw;
+                                      if (V[joj] && V[joj].n && V[joj].n !== undefined && cos == V[joj].n) {
+                                          cos = V[joj].v;
+                                          qw = V.length + 1;
+                                      }
+                                  }
+                                  if (dos !== cos) {
+                                      goog = false;
+                                  }
+                              }
+                              if (a[x].IFN) {
+                                
+                                  var dos = a[x].IFN[0];
+                                  var cos = a[x].IFN[1];
+                                
+                                  for (let qw = 0; qw < V.length; qw++) {
+                                      var joj = qw;
+                                      if (V[joj] && V[joj].n && V[joj].n !== undefined && dos == V[joj].n) {
+                                          dos = V[joj].v;
+                                        qw = V.length + 1;
+                                      }
+                                  }
+                                  for (let qw = 0; qw < V.length; qw++) {
+                                      
+                                      var joj = qw;
+                                      if (V[joj] && V[joj].n && V[joj].n !== undefined && cos == V[joj].n) {
+                                          cos = V[joj].v;
+                                          qw = V.length + 1;
+                                      }
+                                  }
+                                  if (dos == cos) {
+                                      goog = false;
+                                  }
+                              }
+                              if (goog == true) {
+                                  for (var ee = 0; ee < e.length; ee++) {
+                                      if (e[ee].T == "F") {
+                                          var q = [];
+                                          for (var ss = 0; ss < e[ee].D.length; ss++) {
+                                              if (e[ee].D[ss].D) {
+                                                  if (e[ee].D[ss].D == "0") {
+                                                      q.push("0")
+      
                                                   } else {
-                                                      var tst = GET_MEMORY(e[ee].D[ss]);
-                                                      if (tst !== e[ee].D[ss]) {
-                                                          q.push(tst);
+                                                      if (GET_MEMORY(e[ee].D[ss].D) !== e[ee].D[ss].D) {
+                                                          
+                                                          q.push(GET_MEMORY(e[ee].D[ss].D));
+                                                      
                                                       } else {
-                                                          q.push(e[ee].D[ss]);
+      
+                                                          for (var nov = 0; nov < V.length; nov++) {
+                                                              if (e[ee].D[ss].D == V[nov].n) {
+                                                                  q.push(V[nov].v);
+                                                                  nv = V.length;
+                                                              }
+                                                          }
                                                       }
-                                                      nv = V.length;
                                                   }
+                                              } else if (e[ee].D[ss].d) {
+      
+                                                  if (e[ee].D[ss].d == "0") {
+                                                      q.push("0")
+      
+                                                  } else {
+                                                      if (GET_MEMORY(e[ee].D[ss].d) !== e[ee].D[ss].d) {
+                                                          q.push(GET_MEMORY(e[ee].D[ss].d));
+                                                      } else {
+                                                          for (var nv = 0; nv < V.length; nv++) {
+                                                              if (e[ee].D[ss].d == V[nv].n) {
+                                                                  q.push(V[nv].v);
+                                                                  nv = V.length;
+                                                              }
+                                                          }
+                                                      }
+                                                  }
+                                              } else if (e[ee].D[ss].s) {
+                                                  q.push(e[ee].D[ss].s)
+      
+                                              } else {
+                                                  for (var nv = 0; nv < V.length; nv++) {
+                                                      if (e[ee].D[ss] == V[nv].n) {
+                                                          q.push(V[nv].v);
+                                                          nv = V.length;
+                                                      } else {
+                                                          var tst = GET_MEMORY(e[ee].D[ss]);
+                                                          if (tst !== e[ee].D[ss]) {
+                                                              q.push(tst);
+                                                          } else {
+                                                              q.push(e[ee].D[ss]);
+                                                          }
+                                                          nv = V.length;
+                                                      }
+                                                  }
+      
                                               }
-  
                                           }
-                                      }
-                                      var vdd = _RETURN([e[ee].N, q, FN_ELMENT]);
-                                      if (vdd !== false) {
-                                          var vd = { n: a[x].N, v: vdd };
-                                          if (chickValue(a[x].N) == null) {
-                                              V.push(vd)
-  
+                                          var vdd = _RETURN([e[ee].N, q, FN_ELMENT]);
+                                          if (vdd !== false) {
+                                              var vd = { n: a[x].N, v: vdd };
+                                              if (chickValue(a[x].N) == null) {
+                                                  V.push(vd)
+      
+                                              } else {
+                                                  var ey = chickValue(a[x].N);
+                                                  V[ey] = vd;
+                                              }
                                           } else {
-                                              var ey = chickValue(a[x].N);
-                                              V[ey] = vd;
+                                              return false;
                                           }
-                                      } else {
-                                          return false;
-                                      }
-  
-                                  }
-                              }
-                          }
-  
-                      }
-                  }
-              } else if (D[b].T == "F") {
-                  var lv = [];
-                  var fn = D[b].N;
-                  var vk = D[b].D;
-                  var goog = true;
-                 
-                  if (D[b].IFN) {
-                      var dos = D[b].IFN[0];
-                      var cos = D[b].IFN[1];
-                      for (var qw = 0; qw < V.length; qw++) {
-  
-                          if (V[qw] && V[qw].n && V[qw].n !== undefined && dos == V[qw].n) {
-                              dos = V[qw].v;
-                              qw = V.length;
-                          }
-                          if (V[qw] && V[qw].n && V[qw].n !== undefined && cos == V[qw].n) {
-                              cos = V[qw].v;
-                          }
-  
-                      }
-                      if (dos == cos) {
-                          goog = false;
-                      }
-                  }
-                  if (D[b].IF) {
-                      var dos = D[b].IF[0];
-                      var cos = D[b].IF[1];
-                      for (var qw = 0; qw < V.length; qw++) {
-  
-                          if (V[qw] && V[qw].n && V[qw].n !== undefined && dos == V[qw].n) {
-                              dos = V[qw].v;
-                          }
-                          if (V[qw] && V[qw].n && V[qw].n !== undefined && cos == V[qw].n) {
-                              cos = V[qw].v;
-                          }
-  
-                      }
-                      if (dos !== cos) {
-                          goog = false;
-                      }
-                  }
-                  if (goog == true) {
-                      for (var kv = 0; kv < vk.length; kv++) {
-                          var isD = false;
-                          for (var nv = 0; nv < V.length; nv++) {
-                              if (vk[kv].t) {
-                                  if (vk[kv].t == "v") {
-                                      if (vk[kv].d == V[nv].n) {
-                                          isD = true;
-                                          lv.push(V[nv].v);
-                                          nv = V.length;
-                                      }
-                                  } else if (vk[kv].t == "q") {
-                                      var ndn;
-                                      if (FN_DATA) {
-                                          lv.push(FN_DATA);
-                                      } else if (vk[kv].d) {
-                                          lv.push(vk[kv].d[0]);
-                                      }
-                                      isD = true;
-                                      nv = V.length;
-                                  }
-  
-                              } else if (vk[kv].D) {
-  
-                                  if (GET_MEMORY(vk[kv].D) !== vk[kv].D) {
-                                      isD = true;
-                                      lv.push(GET_MEMORY(vk[kv].D));
-                                      nv = V.length;
-                                  } else {
-                                      if (vk[kv].D == V[nv].n) {
-                                          isD = true;
-                                          lv.push(V[nv].v);
-                                          nv = V.length;
-                                      }
-                                  }
-  
-                              } else if (vk[kv].d) {
-  
-                                  if (GET_MEMORY(vk[kv].d) !== vk[kv].d) {
-                                      isD = true;
-                                      lv.push(GET_MEMORY(vk[kv].d));
-                                      nv = V.length + 1;
-                                  } else {
-                                      if (vk[kv].d == V[nv].n) {
-                                          isD = true;
-                                          lv.push(V[nv].v);
-                                          nv = V.length;
-                                      }
-                                  }
-                              } else {
-                                  if (vk[kv] == V[nv].n) {
-  
-                                      isD = true;
-                                      lv.push(V[nv].v);
-                                      nv = V.length;
-                                  } else {
-                                      var trt = GET_MEMORY(vk[kv]);
-                                      if (trt !== vk[kv]) {
-                                          isD = true;
-                                          lv.push(trt);
-                                          nv = V.length;
+      
                                       }
                                   }
                               }
-  
+      
                           }
-                          if (!isD) {
-                              lv.push(vk[kv]);
-                          }
-  
                       }
+                  } else if (D[b].T == "F") {
+                      var lv = [];
+                      var fn = D[b].N;
+                      var vk = D[b].D;
+                      var goog = true;
                     
-                      _RETURN([fn, lv, FN_ELMENT]);
+                      if (D[b].IFN) {
+                          var dos = D[b].IFN[0];
+                          var cos = D[b].IFN[1];
+                          for (var qw = 0; qw < V.length; qw++) {
+      
+                              if (V[qw] && V[qw].n && V[qw].n !== undefined && dos == V[qw].n) {
+                                  dos = V[qw].v;
+                                  qw = V.length;
+                              }
+                              if (V[qw] && V[qw].n && V[qw].n !== undefined && cos == V[qw].n) {
+                                  cos = V[qw].v;
+                              }
+      
+                          }
+                          if (dos == cos) {
+                              goog = false;
+                          }
+                      }
+                      if (D[b].IF) {
+                          var dos = D[b].IF[0];
+                          var cos = D[b].IF[1];
+                          for (var qw = 0; qw < V.length; qw++) {
+      
+                              if (V[qw] && V[qw].n && V[qw].n !== undefined && dos == V[qw].n) {
+                                  dos = V[qw].v;
+                              }
+                              if (V[qw] && V[qw].n && V[qw].n !== undefined && cos == V[qw].n) {
+                                  cos = V[qw].v;
+                              }
+      
+                          }
+                          if (dos !== cos) {
+                              goog = false;
+                          }
+                      }
+                      if (goog == true) {
+                          for (var kv = 0; kv < vk.length; kv++) {
+                              var isD = false;
+                              for (var nv = 0; nv < V.length; nv++) {
+                                  if (vk[kv].t) {
+                                      if (vk[kv].t == "v") {
+                                          if (vk[kv].d == V[nv].n) {
+                                              isD = true;
+                                              lv.push(V[nv].v);
+                                              nv = V.length;
+                                          }
+                                      } else if (vk[kv].t == "q") {
+                                          var ndn;
+                                          if (FN_DATA) {
+                                              lv.push(FN_DATA);
+                                          } else if (vk[kv].d) {
+                                              lv.push(vk[kv].d[0]);
+                                          }
+                                          isD = true;
+                                          nv = V.length;
+                                      }
+      
+                                  } else if (vk[kv].D) {
+      
+                                      if (GET_MEMORY(vk[kv].D) !== vk[kv].D) {
+                                          isD = true;
+                                          lv.push(GET_MEMORY(vk[kv].D));
+                                          nv = V.length;
+                                      } else {
+                                          if (vk[kv].D == V[nv].n) {
+                                              isD = true;
+                                              lv.push(V[nv].v);
+                                              nv = V.length;
+                                          }
+                                      }
+      
+                                  } else if (vk[kv].d) {
+      
+                                      if (GET_MEMORY(vk[kv].d) !== vk[kv].d) {
+                                          isD = true;
+                                          lv.push(GET_MEMORY(vk[kv].d));
+                                          nv = V.length + 1;
+                                      } else {
+                                          if (vk[kv].d == V[nv].n) {
+                                              isD = true;
+                                              lv.push(V[nv].v);
+                                              nv = V.length;
+                                          }
+                                      }
+                                  } else {
+                                      if (vk[kv] == V[nv].n) {
+      
+                                          isD = true;
+                                          lv.push(V[nv].v);
+                                          nv = V.length;
+                                      } else {
+                                          var trt = GET_MEMORY(vk[kv]);
+                                          if (trt !== vk[kv]) {
+                                              isD = true;
+                                              lv.push(trt);
+                                              nv = V.length;
+                                          }
+                                      }
+                                  }
+      
+                              }
+                              if (!isD) {
+                                  lv.push(vk[kv]);
+                              }
+      
+                          }
+                        
+                          _RETURN([fn, lv, FN_ELMENT]);
+                      }
+                  } else if (D[b].T == "W") {
+      
+                      var lv = [];
+                      var fn = D[b].N;
+                      var vk = D[b].D;
+                      var rk = D[b].R;
+                      var rgt = D[b].RGT;
+                      var rgd = D[b].RGD;
+                      var rrt = D[b].RRT;
+      
+                      for (var kv = 0; kv < vk.length; kv++) {
+                          for (var nv = 0; nv < V.length; nv++) {
+                              if (vk[kv] == V[nv].n) {
+                                  lv.push(V[nv].v);
+                              }
+                          }
+                      }
+                      if (this.isCCN == true) {
+                          var R = MW_NSS({ N: fn, D: lv, R: rk, RGT: rgt, RGD: rgd, RRT: rrt });
+                      } else {
+                          var R = H_S_P(fn, "res", lv, rk.N, []);
+                      }
                   }
-              } else if (D[b].T == "W") {
-  
-                  var lv = [];
-                  var fn = D[b].N;
-                  var vk = D[b].D;
-                  var rk = D[b].R;
-                  var rgt = D[b].RGT;
-                  var rgd = D[b].RGD;
-                  var rrt = D[b].RRT;
-  
-                  for (var kv = 0; kv < vk.length; kv++) {
-                      for (var nv = 0; nv < V.length; nv++) {
-                          if (vk[kv] == V[nv].n) {
-                              lv.push(V[nv].v);
+              }
+          } else if (FN_[n].T == "F") {
+              var qd = [];
+              for (var ww = 0; ww < FN_[n].D.length; ww++) {
+                  
+                  if (FN_DATA !== "FALSE") {
+                      
+                      if (FN_[n].D[ww].t) {
+                          if (FN_[n].D[ww].t == "s") {
+                              qd.push(FN_[n].D[ww].d);
+                          } else if (FN_[n].D[ww].t == "q") {
+                              qd.push(FN_DATA);
+                          }
+                      }
+                  } else {
+                      
+                      var tvt = GET_MEMORY(FN_[n].D[ww]);
+                      if (FN_[n].D[ww].t == "q") {
+                          if (tvt !== FN_[n].D[ww]) {
+                              qd.push(tvt);
+                          } else if (tvt == FN_[n].D[ww] && FN_DATA !== false) {
+                              qd.push(FN_DATA[0]);
+                          } else if (FN_[n].D[ww].d) {
+                              qd.push(FN_[n].D[ww].d);
+                          }
+                      } else {
+                          if (tvt !== FN_[n].D[ww]) {
+                              qd.push(tvt);
+                          } else {
+                              qd.push(FN_[n].D[ww]);
                           }
                       }
                   }
-                  if (this.isCCN == true) {
-                      var R = MW_NSS({ N: fn, D: lv, R: rk, RGT: rgt, RGD: rgd, RRT: rrt });
-                  } else {
-                      var R = H_S_P(fn, "res", lv, rk.N, []);
-                  }
               }
-          }
-      } else if (FN_[n].T == "F") {
-          var qd = [];
-          for (var ww = 0; ww < FN_[n].D.length; ww++) {
               
-              if (FN_DATA !== "FALSE") {
-                  
-                  if (FN_[n].D[ww].t) {
-                      if (FN_[n].D[ww].t == "s") {
-                          qd.push(FN_[n].D[ww].d);
-                      } else if (FN_[n].D[ww].t == "q") {
-                          qd.push(FN_DATA);
-                      }
-                  }
-              } else {
-                  
-                  var tvt = GET_MEMORY(FN_[n].D[ww]);
-                  if (FN_[n].D[ww].t == "q") {
-                      if (tvt !== FN_[n].D[ww]) {
-                          qd.push(tvt);
-                      } else if (tvt == FN_[n].D[ww] && FN_DATA !== false) {
-                          qd.push(FN_DATA[0]);
-                      } else if (FN_[n].D[ww].d) {
-                          qd.push(FN_[n].D[ww].d);
-                      }
-                  } else {
-                      if (tvt !== FN_[n].D[ww]) {
-                          qd.push(tvt);
-                      } else {
-                          qd.push(FN_[n].D[ww]);
-                      }
-                  }
-              }
+              _RETURN([FN_[n].N, qd, FN_ELMENT]);
+      
           }
-          
-          _RETURN([FN_[n].N, qd, FN_ELMENT]);
-  
       }
-  }
   
   }
   const SL_P = (w) => {
@@ -2608,7 +2981,7 @@ const funcHandel = (str) => {
   let txtv = "";
   if(typeof txt === 'string'){
     txt = txt.replace(/} ,/g, '}'); 
-    txtv =  replacePattern(txt,id,data);
+    txtv =  replacePatternTxt(txt,id,data);
   }else if(isAr(txt)){
     for(var x = 0 ; x < txt.length;x++){
       const cur_txt_ob = txt[x];
@@ -2683,8 +3056,7 @@ const funcHandel = (str) => {
   let ev = ob.a.e ? ob.a.e : 'click' ;  
 
 
-    if(ob.a.fn){
-    
+
     if(typeof ob.a.fn === 'string'){
 
     
@@ -2703,9 +3075,14 @@ const funcHandel = (str) => {
             }
     
     //
-    if( ev === 'auto' ){
-    setTimeout(newFunc,300);
+    if( ev === 'auto' ||  ob.a.time){
+      let theTime = 300;
+      if(ob.a.time){
+        theTime = ob.a.time;
+      }
+    setTimeout(newFunc,theTime);
     }else {
+      
       if(ev  === 'click'){
         ob.i_e.onclick =()=>{
           newFunc();
@@ -2722,7 +3099,7 @@ const funcHandel = (str) => {
     }
   
  
-    }else  if(typeof ob.a.fn === 'function'){
+    }else  {
       const newFunc = ()=>{
         this.v = i_app_v ;
         this._ = URS();
@@ -2750,7 +3127,7 @@ const funcHandel = (str) => {
         }
       
     }
-  }
+  
   
   }
   }
@@ -2770,8 +3147,16 @@ const funcHandel = (str) => {
     if(ob && typeof ob === 'object'){
       for (const key in ob) {
         if(key !== 'I' && key !== 'offset' && key !== 'i'  && key !== 'q' && key !== 'i_e' && key !== 'e' && key !== 't' && key !== 'typ'){
-       
-          newOb[key] = ob[key];
+          if(key == 'c'){
+            const IObCls = ob.c ? ob.c : "";
+          const INObCls = newOb[key]? newOb[key]: "";
+          
+          newOb[key] = IObCls +" "+ INObCls;
+          }else{
+          
+            newOb[key] = ob[key];
+          }
+     
         }
       }
     }
@@ -2795,6 +3180,14 @@ const funcHandel = (str) => {
         }
         return `${app.dir.img}${src}`;
       
+  }
+  const getImageName = (src)=>{
+    src = src.replace(/\b(.jpg|.png|.gif)\b/g, '');
+    const srcAr = src.split('/');
+    if(srcAr.length > 0){
+       src = srcAr[srcAr.length - 1];
+    }
+    return src;
   }
   /**
   * element actions EventListner
@@ -2906,7 +3299,23 @@ const filterSearchItems = (e,data)=>{
 /**
  * select element
  */
-
+let is_dialog_open = false;
+const openOverHide =(dialog)=>{
+  if(dialog && !is_dialog_open){
+    is_dialog_open = true;
+    A_CL('i-app','OV_HIDE');
+  }else if(!dialog && !is_dialog_open){
+    A_CL('i-app','OV_HIDE');
+  }
+} 
+const closeOverHide =(dialog)=>{
+  if(dialog && is_dialog_open){
+    is_dialog_open = false;
+    D_CL(['i-app','OV_HIDE']);
+  }else if(!dialog && !is_dialog_open){
+    D_CL(['i-app','OV_HIDE']);
+  }
+} 
  const selectElement =(ob,data)=>{
  
   const holderId = `${ob.i}_holder`;
@@ -2921,15 +3330,16 @@ const filterSearchItems = (e,data)=>{
     }else if(i_app_model['sl'] ){
       
       const NewSelectElment = ()=>{
-        const fnSt = `{_.SW_CL("${ob.i}_selectScreen","D_N")}`;
-        const fnStDC = DC_(fnSt);
-       
+        const fnStOpen = `{_.D_CL(["${ob.i}_selectScreen","D_N"]);_.openOverHide(); }`;
+        const fnStOpenDC = DC_(fnStOpen);
+        const fnStClose = `{_.A_CL("${ob.i}_selectScreen","D_N");_.closeOverHide(); }`;
+        const fnStCloseDC = DC_(fnStClose);
         const selectModel = COPY_OB(i_app_model['sl']);
         selectModel.e[0].i = `${ob.i}_selectButton`;
-        selectModel.e[0].a = {fn: fnStDC}
+        selectModel.e[0].a = {fn: fnStOpenDC}
         if(ob.c){
           if(!ob.c.match(/pointer/)){
-            ob.c += ' pointer';
+            ob.c += ' pointer selectIcon pL_15 pR_15 pT_5 pB_5';
           }
           selectModel.e[0].c = ob.c;
         }
@@ -2939,7 +3349,7 @@ const filterSearchItems = (e,data)=>{
         const clearInputFnStDC = DC_(clearInputFnSt);
         const basicSearchText = ob.s ? ob.s : 'search-text';
 
-        selectModel.e[1].e[0].e[0].a =  {fn: fnStDC}
+        selectModel.e[1].e[0].e[0].a =  {fn: fnStCloseDC}
         selectModel.e[1].i = `${ob.i}_selectScreen`;
         selectModel.e[1].e[0].e[1].e[0].i = `${ob.i}_selectSearch`;
         selectModel.e[1].e[0].e[1].e[1].a ={fn: clearInputFnStDC};
@@ -2958,11 +3368,13 @@ const filterSearchItems = (e,data)=>{
           selectModel.e[1].e[0].e[2].e =ob.e;
           for(var i = 0; i < selectModel.e[1].e[0].e[2].e.length;i++){
             if(selectModel.e[1].e[0].e[2].e[i].v || selectModel.e[1].e[0].e[2].e[i].val){
-              CL_(selectModel.e[1].e[0].e[2].e[i])
-              const val =selectModel.e[1].e[0].e[2].e[i].v?selectModel.e[1].e[0].e[2].e[i].v: selectModel.e[1].e[0].e[2].e[i].val;
+            
+           
               const fnStItem = `{_.IN_V("${ob.i}","${selectModel.e[1].e[0].e[2].e[i].val}");_.CL_(_.E_I_V('${ob.i}'));_.SW_CL("${ob.i}_selectScreen","D_N");_.elmChange('${ob.i}');}`;
               const fnStItemDC = DC_(fnStItem);
                     selectModel.e[1].e[0].e[2].e[i].a = {fn:fnStItemDC};
+                    selectModel.e[1].e[0].e[2].e[i].t = 'ly';
+                    selectModel.e[1].e[0].e[2].e[i].c = 'pointer WW PD_5 ST_B_GRY8_1';
                     selectModel.e[1].e[0].e[2].e[i].i = `${i}_item`;
             }
           
@@ -3021,7 +3433,7 @@ const filterSearchItems = (e,data)=>{
               const firstImgSrc     = `flags/${firstLowerCode}.png`;
               selectModel.e[0].e    = [{t:'img',i:`${ob.i}_flag`,src: firstImgSrc ,c:'W_20'},{t:'sp',i:`${ob.i}_code`,s: data[0].dialCode ,c:'mL_5'},{t:'icon',c:'ICO-caret-down mL_5'}];
               
-              CR_(selectModel,holderId,data)
+              CR_(selectModel,holderId,false)
             }else  if( ob.mod !== 'phonecode' && ob.model ){
             
               for(var i = 0 ; i < data.length ; i++){
@@ -3095,43 +3507,99 @@ const filterSearchItems = (e,data)=>{
    */
 
   const dataQuery = (ob)=>{
-     ////
-    
-      const callback = (res,data)=>{
-       
-        res = res.res;
-        var models = [];
-        if(data.order && data.order === 'languages'){
-          setObV({languages:res});
-        }
-        
-        if(ob.model){
-          
-          models =ob.model;
 
-        }else  if(!ob.model){
-          if(ob.t && ob.t == 'sl'){
-            models = [{t:'op',vq:ob.vq,s:'q.{name}'}]
-          }
-          
-        }
-        const elmId = ob.i;
-        
-         for(var i = 0; i < res.length ; i++){
-           const obData = res[i];
-           for(var m =0 ; m < models.length;m++){
-             const model = models[m];
-             let render = true;
-             if(model.once && i > 0){
-               render = false;
-             }
-             const toElm = model.to ? model.to : elmId;
-              if(render){
-                
-                CR_(model,toElm,obData);
+     if(ob.limitAuto && ob.data && ob.data.length){
+      const DB_name = `linesNum_${ob.Q.DBId}`;
+
+        for(var o = 0 ; o < ob.data.length;o++){
+            if(ob.data[o].l){
+
+                    if(E_I_V(DB_name)){
+                      ob.data[o].limitAuto =E_I_V(DB_name);
+                    }else{
+                      ob.data[o].limitAuto = ob.limitAuto ;
+                    }
+                    if(ob.last){
+                      ob.data[o].last =ob.last;
+                    }
+                  }
               }
-           }
+      }
+
+      const callback = (res,data)=>{
+        const Qsize = res.Qsize ? res.Qsize  : 0; 
+        
+        res = res.res;
+        if(ob.limitAuto && ob.data && ob.data.length){
+
+           
+              const DB_name = `linesNum_${ob.Q.DBId}`;
+              const DB_Qsize = `Qsize_${ob.Q.DBId}`;
+              const DB_pageNo = `reasltBt_${ob.Q.DBId}`;
+
+              if( E_I_V(DB_name)){
+                const linesNumSt = `linesNum_${ob.Q.DBId}`;
+                const linesNum   = parseInt(E_I_V(linesNumSt));
+          
+                const pageClac   = Qsize /  linesNum;
+           
+                const pageNumber = pageClac > parseInt(pageClac) ? parseInt(pageClac) +1 : parseInt(pageClac);
+                let pageNumberSt = pageNumber > 1 ? `of ${pageNumber} pages` : '';
+          
+                
+               if(pageNumber < 2){
+                A_CL(`forwardBt_${ob.Q.DBId}`,"D_N");
+               }
+               In_S(DB_pageNo,pageNumberSt);
+                IN_V(DB_Qsize,Qsize);
+              }
+           
          }
+         
+        
+            var models = [];
+            if(data.order && data.order === 'languages'){
+              setObV({languages:res});
+            }
+            
+            if(ob.model){
+              
+              models =ob.model;
+
+            }else  if(!ob.model){
+              if(ob.t && ob.t == 'sl'){
+                models = [{t:'op',vq:ob.vq,s:'q.{name}'}]
+              }
+              
+            }
+            const elmId = ob.i;
+        
+              for(var i = 0; i < res.length ; i++){
+                const obData = res[i];
+                if(ob.joinQuery && ob.Q){
+                  for ( const key in ob.Q){
+                    if (Object.prototype.hasOwnProperty.call(ob.Q, key)) {
+                    if(!obData[key]){
+                      ob.Q.Qsize =Qsize;
+                      obData[key] = ob.Q[key];
+                    }
+                  }
+                  }
+                }
+                for(var m =0 ; m < models.length;m++){
+                  const model = models[m];
+                  model.offset = m;
+                  let render = true;
+                  if(model.once && i > 0){
+                    render = false;
+                  }
+                  const toElm = model.to ? model.to : elmId;
+                    if(render){
+                      
+                      CR_(model,toElm,obData);
+                    }
+                }
+              }
 
          if(ob.t && ob.t == 'sl'){
          const waitFor = ()=>{
@@ -3140,12 +3608,17 @@ const filterSearchItems = (e,data)=>{
          setTimeout(waitFor,3000);
          }
        }
+
        if(ob.data.order){
         _POST('/api',{order:ob.data.order},callback);
-      }else{
-        CL_(['dataQuery',ob.data])
-      _POST('/api',{query:ob.data},callback);
-    }
+          }else{
+        if(ob.autoLimit){
+          _POST('/api',{query:ob.data},callback);
+        }else{
+          _POST('/api',{query:ob.data},callback);
+        }
+      
+        }
   
   }
   const formTableObj = (body)=>{
@@ -3207,6 +3680,7 @@ const filterSearchItems = (e,data)=>{
     }
     return form;
   }
+
   const formObj = (body)=>{
    
     const form = {c:'TT_0 mT_37',e:[]}
@@ -3252,6 +3726,21 @@ const filterSearchItems = (e,data)=>{
     }
     return form;
   }
+
+  const permissionsQueryControl = (per,data)=>{
+  if(per.key && data[per.key]){
+    const value = data[per.key].toString();
+    if(value !== 'undefined' && value !== 'null'){
+      return true;
+    } else{
+      return false;
+    }
+    
+  }else{
+    return false;
+  }
+  }
+
   const permissionsControl = (perData)=>{
     
     if(perData.data){
@@ -3265,6 +3754,7 @@ const filterSearchItems = (e,data)=>{
     }
     return false;
   }
+
   const forKeys = (ob,data)=>{
     const obst = JDS_(ob.forkey);
     const elm = [];
@@ -3274,10 +3764,12 @@ const filterSearchItems = (e,data)=>{
         
           const newObSt = obst.replace(/key/g,key);
           const newOb   = JD_(newObSt);
-          let render = true; 
+          var render = true; 
           if(ob.notKey){
+           
             for(var k = 0 ; k < ob.notKey.length; k++){
-              if(ob.notKey[k] == key){
+      
+              if(ob.notKey[k] === key){
                 render = false;
               }
             }
@@ -3293,12 +3785,34 @@ const filterSearchItems = (e,data)=>{
  
    
   }
-  const CR_ =async (body,id,data,test=false)=>{
-if(test){
-  CL_(['holderId',id,body, data]);
-}
 
+  const makeLimitAuto = (ob,data)=>{
 
+      const holderId = `${ob.i}_limitHolder`;
+    
+        if(!i_app_model['limitAuto'] ){
+              const callback = (body,[ob,data])=>{
+                i_app_model['limitAuto'] =COPY_OB(body);
+                makeLimitAuto(ob,data);
+              }
+            G_root('limitAuto.app',callback,[ob,data]);
+          
+        }else if(i_app_model['limitAuto'] ){
+          const limitAuto = COPY_OB(i_app_model['limitAuto']);
+          let Querie = {}
+         if(ob.Q){
+          Querie = {lines:ob.limitAuto,table:ob.i,...ob.Q}
+         }else{
+          Querie = {lines:ob.limitAuto,table:ob.i}
+         }
+      
+         limitAuto.Q = Querie;
+         CR_(limitAuto,holderId,Querie);
+        }
+  }
+
+  const CR_ =async (body,id,data)=>{
+   
     if(!i_app_lang[selectLang]){
       const reload = ()=>{
         CR_(body,id,data);
@@ -3329,6 +3843,7 @@ if(test){
       return ;
     }
   }
+
  
   if(body.fonts){
     app.fonts = body.fonts;
@@ -3348,13 +3863,21 @@ if(ob.forkey){
   if(data){
    ob.Q = data;   
   }else  if(ob.Q){
-    
     data = ob.Q ;  
+  }
+
+  if(body.perQ){
+    const perTrue = permissionsQueryControl(body.perQ,data);
+   
+    if(!perTrue){
+        return;
+    }
   }
   let ob_type = null ,ob_css = null,ob_css_list = [];
   /// set ob_type
-  
+
   if(ob.t){
+
   ob_type = ob.t;
   }else if(ob.typ){
   ob_type = ob.typ;
@@ -3435,20 +3958,20 @@ if(ob.forkey){
   
   // script options 
   if(ob.script){
-  L_SCRIPT(ob.script.n,ob.script.v)
+    L_SCRIPT(ob.script.n,ob.script.v)
   }
   // css style options
   if(ob.css){
     L_CSS(ob.css)
-    }
+  }
   
  
   
   // autoBool
   // it one of slider options for to make circle toggel buttons to control silder 
   if (ob.sliBol && !ob.sliBolDone) {
-  ob.elm = SL_P(ob);
-  ob.sliBolDone = true;
+      ob.elm = SL_P(ob);
+      ob.sliBolDone = true;
   }
   //// isHideElement hide elemnent cases 
   //// when want use element with out render it
@@ -3472,14 +3995,14 @@ if(ob.forkey){
       }`; 
     const updateInputFnSTDC = DC_(updateInputFnST);
     const countryCode = {t:'sl',vq:'dialCode',i:`${ob.i}_dialCode`,c:'input F_PR F_S_12',mod:'phonecode',a:{e:'change',fn:updateInputFnSTDC}}
-   CR_(countryCode,id,false);
-   const viewInput = COPY_OB(ob);
-   viewInput.i = `${ob.i}_view`;
-   viewInput.a ={e:'input',fn:updateInputFnSTDC}
-   viewInput.mod = 'tel'
-   CR_(viewInput,id,false);
-   isHideElement =true;
-  }
+      CR_(countryCode,id,false);
+      const viewInput = COPY_OB(ob);
+      viewInput.i = `${ob.i}_view`;
+      viewInput.a = {e:'input',fn:updateInputFnSTDC}
+      viewInput.mod = 'tel';
+      CR_(viewInput,id,false);
+          isHideElement =true;
+    }
   }
   
 
@@ -3490,6 +4013,17 @@ if(ob.forkey){
   ///  for element query data
   ///  first layout options basic app div
    //img options
+   if(ob.t == 'video'){
+   if(ob.autoplay){
+    e.setAttribute('autoplay','true');
+   }
+   }
+   if(ob.width){
+    e.width = ob.width;
+   }
+   if(ob.height){
+    e.height = ob.height;
+   }
    if(ob.mod === 'languages'){
     ob.data = {order:'languages'}
   }
@@ -3499,18 +4033,17 @@ if(ob.forkey){
    if(ob.src){
     e.src = G_SRC(ob.src);
     }
+    if(ob.srcQ && data[ob.srcQ]){
+      e.src = G_SRC(data[ob.srcQ]);
+      }
     ///set global variables
   
   if(ob.v){
-  
     await setObV(ob.v);
-}
+  }
+
   if(isI_APP){
-  
-  
-  
   // set basic id
-  
     e.id =id;
     ob.i = id;
     ob.id = id;
@@ -3527,7 +4060,6 @@ if(ob.forkey){
   
     if(ob.I){
       ob.i =ob.i? ob.i : `${id}_${ob.I}`;
-      
     }
   
     if( ob.i == undefined && ob.id !== undefined){
@@ -3536,7 +4068,16 @@ if(ob.forkey){
     }else  if( ob.i  == undefined && ob.id == undefined){
         ob.i =  `${id}_${ob.offset ?ob.offset:0 }`;
     }
+  ob.i = replacePatternId(ob.i,data);
+ 
+   ob.i = ob.i.replace(/ , /g, ''); // missing comma
+  }
+
   
+  if(ob.limitAuto){
+    CR_({i:`${ob.i}_limitHolder`},id,data);
+    makeLimitAuto(ob,data);
+    
   }
   if(body.t && body.t == 'in' && body.label || body.t && body.t == 'in' && body.mod === 'checkbox'){
     const inputLabelHolder = {
@@ -3555,10 +4096,9 @@ if(ob.forkey){
         ob.data = {order:'countries'}
       }
    
-     isHideElement =true;
-        holder.t = 'span';
-        
-        holder.i = `${ob.i}_holder`;
+      isHideElement = true;
+      holder.t = 'span';
+      holder.i = `${ob.i}_holder`;
   }
   
   // up = make is the element appended to parent
@@ -3566,8 +4106,14 @@ if(ob.forkey){
   let isCheckbox = false;
   // handel element text
   let isCheckboxOverClass = '';
+  if(ob.t === 'code'){
+    e.innerHTML = styleCodeContent(ob.s);
+    const copyToClipBoard = {t:'icon',c:'ICO-copy F_S_15 PD_5  B_R_5 POS_AB RR_0 TT_0 F_B pointer tooltip',e:[{s:'Copied',c:'tooltiptext'}],a:{fn(){copyInnerTextToClipboard(e);}}};
+    ob.e = ob.e?ob.e:[];
+    ob.e.push(copyToClipBoard);
+  }else
   if(ob.s || ob.txt){
-  const st = ob.s ? ob.s : ob.txt
+  const st = ob.s ? ob.s : ob.txt;
   const txt = eTxt(st,ob.i,data);
     if(ob_type == "in" ){
       e.placeholder = txt !== undefined ? txt : '';
@@ -3591,7 +4137,7 @@ if(ob.forkey){
         let userClass = "";
        
         
-        if(!isCheckbox && ob.val){
+        if(!isCheckbox && ob.val || !isCheckbox && ob.vq){
           displayLabel = ""
         }
         if(ob.labelClass){
@@ -3604,7 +4150,7 @@ if(ob.forkey){
           if(!isCheckbox){
             ob_css_list.push('inputLabel');
             ob_css += ' inputLabel';
-            labelTop = ' TT_0 mT_-37 POS_AB '; 
+            labelTop = ' TT_-8 BB_0 mT_-12 POS_AB '; 
           }
 
         }
@@ -3680,7 +4226,22 @@ if(ob.forkey){
     }
     
   }
- 
+ if(ob.t === 'img'){
+  if(ob.alt){
+    e.setAttribute("alt",ob.alt);
+    e.alt = ob.alt;
+  }else{
+    if(ob.src){
+      const imageName = getImageName(ob.src);
+      e.setAttribute("alt",`From ${app.name} Image Name ${imageName}`);
+      e.alt = `From ${app.name} Image Name ${imageName}`;
+    }else{
+      e.setAttribute("alt",`Image From ${app.name} `);
+      e.alt = `Image From ${app.name} `;
+    }
+    
+  }
+ }
   /// handel element style
   if(ob.style){
     set_style(e,ob.style);
@@ -3774,7 +4335,7 @@ if(ob.forkey){
   up =true;
   
   }
-  
+
    /**
   * 
   * ob options 
@@ -3783,6 +4344,7 @@ if(ob.forkey){
   */
   
     e.setAttribute('i',ob.i);//for develope {{{delete me for porduction}}}
+
     ob.i_e = e;// link html elm to the ob 
     I_OB[ob.i] = ob;//set the ob in i-app objects tree define by i 
     if(isHideElement){
@@ -3846,7 +4408,17 @@ if(ob.forkey){
      for (const key in ob) {
      
       if(key !== 'I' && key !== 'offset' && key !== 'i' && key !== 'i_e'){
-        I_R[key] = ob[key];
+        if(key == 'c'){
+          const IObCls = ob.c ? ob.c : "";
+          const INObCls = I_R[key]? I_R[key]: "";
+          
+          I_R[key] = IObCls +" "+ INObCls;
+        }else{
+         
+          I_R[key] = ob[key];
+        }
+     
+
       }
     }
       CR_(I_R,ob.i,data);
@@ -3893,8 +4465,15 @@ if(ob.forkey){
     CR_(model,ob.i,dataOb);
   }
   }
- 
+  if(I_OB[ob.i] && I_OB[id]){
+    if(I_OB[id].children){
+      I_OB[id].children.push(ob.i);
+    }else{
+      I_OB[id].children = [ob.i];
+    }
   }
+  }
+
   const IS_EMAIL = (em) => {
     var ema = em.split("@");
     var dema = em.split(".");
@@ -3904,7 +4483,8 @@ if(ob.forkey){
         res = true;
     }
     return res;
-}
+  }
+
   const IS_USERNAME = (un)=>{
     // Remove non-alphanumeric characters and ensure lowercase
     var filteredUsername = un.replace(/[^a-z0-9]/g, "").toLowerCase();
@@ -3915,6 +4495,7 @@ if(ob.forkey){
     // Return valid username or false
     return isValid ? filteredUsername : false;
   }
+  
   const F_LO = ([i_route]) => {
 
     window.history.pushState({ page: window.location.pathname }, window.location.pathname, i_route);
@@ -3931,7 +4512,7 @@ if(ob.forkey){
   }
   const openRoot = (i_route) => {
     const appRoot = app.dir.start.replace(/.app/g,'');
-
+    window.history.pushState({ page: window.location.pathname }, window.location.pathname, i_route);
     i_root_();
     
     E_I("i-app").remove();
@@ -3968,17 +4549,19 @@ const getBrowserLang = ()=>{
   }
 
 const createAppTxt =async(lang)=>{
-  
+
     if(!lang){
       if(GTD('lang')){
         selectLang = GTD('lang');
       }else{
       let browserLang = getBrowserLang();
+      if(app.lang){
           if(app.lang.includes(browserLang)){
             selectLang = browserLang;
           }else{
             selectLang = app.lang[0]
           }
+        }
       }
     }else if(lang && lang !== undefined){
       selectLang =  isAr(lang) ? lang[0] : lang;
@@ -4082,7 +4665,54 @@ const createAppTxt =async(lang)=>{
 
 
   }
+  function styleCodeContent(code) {
+    // Escape < and > characters for HTML display
+    code = code.replace(/^\s*,|,\s*$/g, '');
   
+    code = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    code = code.replace(/\n/g, '<br>');
+
+    // Strings (including template literals)
+    code = code.replace(/(".*?")|('.*?')|(`.*?`)/g, '<span class="string">$1$2$3</span>');
+
+    // Keywords
+    code = code.replace(/\b(if|else|for|while|function|return|var|let|const|npm)\b/g, '<span class="keyword">$1</span>');
+    // legacy
+    code = code.replace(/\b(i-app-create|i-app)\b/g, '<span class="legacy">$1</span>');
+    code = code.replace(/\b(start|projectName)\b/g, '<span class="special_chars">$1</span>');
+    // Numbers
+    code = code.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
+
+    // Functions
+    code = code.replace(/\b([a-zA-Z_]\w*)\s*\(/g, '<span class="function">$1</span>(');
+
+    // Comments for JavaScript
+    code = code.replace(/(\/\/.*)/g, '<span class="comment">$1</span>');
+
+    // Comments for PHP
+    code = code.replace(/(\/\*.*?\*\/)/g, '<span class="comment">$1</span>'); // Multiline
+    code = code.replace(/(\#.*?)/g, '<span class="comment">$1</span>'); // Single line starting with #
+
+    // Square Brackets with different color and line break
+    code = code.replace(/([\[\]])/g, '<span class="brackets_square">$1</span><br>');
+
+    // Curly Braces with different color and line break
+    code = code.replace(/([\{\}])/g, '<span class="brackets_curly">$1</span><br>');
+
+    // Round Brackets with different color
+    code = code.replace(/([()])/g, '<span class="brackets_round">$1</span>');
+
+    // Special Characters with different color
+    code = code.replace(/([:#!])/g, '<span class="special_chars">$1</span>');
+
+    // Special Characters with different color and line break
+    code = code.replace(/([,])/g, '<span class="special_chars">$1</span><br>');
+    code = code.replace(/<br>/g, '</br><span class="tab_indent"></span>');
+
+    return '<span class="codeHolder">'+code+'</span>';
+}
+
+
   const G_CSS = (cs) => {
   const c = cs.split("_");
   let borderProps, borderStyle;
@@ -4350,16 +4980,18 @@ const createAppTxt =async(lang)=>{
                             '';
       case "BG":
             switch (c[2]) {
+              case "X":
+                return (c.length === 3) ? `.${cs} {background-color:var(--${c[1]});background-image: linear-gradient(to right bottom,#fff ,  var(--${c[1]}) 45%, #000 );}`: '';
               case "W":
-                return (c.length === 3) ? `.${cs} {background-image: linear-gradient(to right, var(--${c[1]}) 0%, #ffffff 51%, var(--${c[1]}) 100%)}` : '';
+                return (c.length === 3) ? `.${cs} {background-image: linear-gradient(to right, var(--${c[1]}) 0%, #ffffff 51%, var(--${c[1]}) 100%);}` : '';
               case "B":
-                return (c.length === 3) ? `.${cs} {background-image: linear-gradient(to right, var(--${c[1]}) 0%, #000000 51%, var(--${c[1]}) 100%)}` : '';
+                return (c.length === 3) ? `.${cs} {background-image: linear-gradient(to right, var(--${c[1]}) 0%, #000000 51%, var(--${c[1]}) 100%);}` : '';
               case "BL":
-                return (c.length === 3) ? `.${cs} {background-image: linear-gradient(to right, var(--${c[1]}) 0%, #0300c0 51%, var(--${c[1]}) 100%)}` : '';
+                return (c.length === 3) ? `.${cs} {background-image: linear-gradient(to right, var(--${c[1]}) 0%, #0300c0 51%, var(--${c[1]}) 100%);}` : '';
               case "YL":
-                return (c.length === 3) ? `.${cs} {background-image: linear-gradient(to right, var(--${c[1]}) 0%, #f7fb00 51%, var(--${c[1]}) 100%)}` : '';
+                return (c.length === 3) ? `.${cs} {background-image: linear-gradient(to right, var(--${c[1]}) 0%, #f7fb00 51%, var(--${c[1]}) 100%);}` : '';
               case "GR":
-                return (c.length === 3) ? `.${cs} {background-image: linear-gradient(to right, var(--${c[1]}) 0%, #04ff00 51%, var(--${c[1]}) 100%)}` : '';
+                return (c.length === 3) ? `.${cs} {background-image: linear-gradient(to right, var(--${c[1]}) 0%, #04ff00 51%, var(--${c[1]}) 100%);}` : '';
               default:
                 return '';
               }
@@ -4632,8 +5264,42 @@ const createAppTxt =async(lang)=>{
     }
   
   }
+  const inCssCls =(name,cls)=>{
+    var isNew = true;
+    
+    for (const style of document.styleSheets) {
+      if (style.ownerNode && style.ownerNode.id && style.ownerNode.id == "F_ASS") {
+       
   
+          for (const rule of style.rules) {
+              if (rule.selectorText == `.${cls}`) {
+                  isNew = false;
+              }
+          }
+
+          if (isNew) {
+                if (style.cssRules) {
+                  
+                    style.insertRule(cls, style.cssRules.length);
+                }else{
+                  style.insertRule(cls, 0);
+                }
+                CL_(['found',style.ownerNode.id ]);
+              }
+
+          
+        }
+      }
+  }
   
+  const divScreenShot = (id,srcBack)=>{
+    const element = E_I_S(id);
+    html2canvas(element).then(canvas => {
+      const imgData = canvas.toDataURL();
+
+      E_I_S(srcBack).src = imgData;
+    })
+  }
   const scrollDir = () => {
   var lastSc = this.lastScroll;
   var crD = window.scrollY;
@@ -4917,13 +5583,29 @@ const createAppTxt =async(lang)=>{
      * load bassc app colors
      * i.app dir{css:'/css/'}
      */
-    let urlColors =`${app.dir.css}colors.json`;
-    let urlStyle =`${app.dir.css}style.json`;
+    const curePageLink = window.location.pathname.replace(/\//g,"");
+
+    let urlColors =`/dev_colors.json`;
+    let urlStyle =`/dev_style.json`;
+    if(app.dir.css && curePageLink !== 'dev'){
+       urlColors =`${app.dir.css}colors.json`;
+       urlStyle =`${app.dir.css}style.json`;
+    }
+  
     G_Json(urlColors,(c)=>{i_app_colors =c;G_Json(urlStyle,(s)=>{i_app_style =s;createAppTheme();});});
     return true;
     
   }
-
+  function copyInnerTextToClipboard(element) {
+    const textToCopy = element.innerText;
+    navigator.clipboard.writeText(textToCopy)
+        .then(() => {
+            console.log("Text copied to clipboard successfully!");
+        })
+        .catch(err => {
+            console.error("Failed to copy text to clipboard: ", err);
+        });
+}
 
   function handleHistoryChange(event) {
     // Check if the user navigated backward or forward
@@ -4959,7 +5641,7 @@ const createAppTxt =async(lang)=>{
     setDateTime();
     // If the current root name is 'start', load the 'start.app' file
     app = i_a;
-    CL_(['app',app])
+   
     setObV({app:app})
     setUserState();
     /**
@@ -5006,10 +5688,13 @@ const createAppTxt =async(lang)=>{
      * This is the basic config file to start the i-app.
      */
   
-
+    // If the app directory is defined, load the i-app
+    if (app.dir) {
+      i_app_load();
+    } else {
       // Otherwise, load the app directory data using the G_root function
       G_root(I_APP_DIR, i_app_load);
-    
+    }
   };
   
     const _=()=>{
