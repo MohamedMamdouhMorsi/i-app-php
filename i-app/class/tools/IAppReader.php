@@ -84,6 +84,7 @@ class IAppReader {
     }
 
     private function convertStrToOb($str) {
+
         $str = preg_replace('/(\r\n|\n|\r)/', '', $str); // remove newlines
         $str = $this->escapeKeysSym($str);
         $str = $this->funcHandel($str);
@@ -98,12 +99,12 @@ class IAppReader {
         $str = preg_replace('/,\s*}/', '}', $str); // remove trailing commas
 
         // Add missing commas
+
         $str = str_replace('" "', '" , "', $str); // missing comma
         $str = str_replace('] "', '] , "', $str); // missing comma
         $str = str_replace('} "', '} , "', $str); // missing comma
         $str = str_replace('} {', '} , {', $str); // missing comma
         $str = str_replace('" {', '" , {', $str); // missing comma
-
         $str = str_replace('""', '" , "', $str); // missing comma
         $str = str_replace(']"', '] , "', $str); // missing comma
         $str = str_replace('}"', '} , "', $str); // missing comma
@@ -113,6 +114,7 @@ class IAppReader {
         $str = preg_replace('/([a-z0-9A-Z_]+) "/', '$1 , "', $str); // delete last comma comma
 
         return $str;
+        
     }
 
     public function __construct($str) {

@@ -17,8 +17,11 @@ class AssetFileHandler
                 return 'image/png';
             case 'gif':
                 return 'image/gif';
+            case 'mp4':
+                return 'image/mp4';
+            case 'mp3':
+                return 'image/mp3';
             case 'jpg':
-           
                 return 'image/jpeg';
             case 'ico':
                 return 'image/x-icon';
@@ -28,7 +31,7 @@ class AssetFileHandler
     }
 
 
-    public function __construct($req_url,$extname, $userDir, $swScript, $userData)
+    public function __construct($req_url,$extname, $userDir, $swScript, $userData , $i_app)
     {
         $filePath = null;
         $backBody = null;
@@ -37,12 +40,42 @@ class AssetFileHandler
      
         if ($req_url === '/sw.js') {
             $contentType = 'text/javascript';
-            $backBody = $swScript;
+           
+            if(isset($i_app['dir']) && isset($i_app['dir']['main'])){
+                $projectDir = $userDir.''.$i_app['dir']['main'];
+                
+                if (file_exists($projectDir)) {
+                     $tree     = DirectoryTree::getDirectoryTree($projectDir);
+                     $assetArr = DirectoryArray::getDirectoryArray($tree,"");
+                     $assetArray = ["/","/manifest.json","/i.app","/sw.js","/i-app-basic.min.css","/i-app-ui.min.js","/icofont.css"];
+                     for($i = 0 ; $i < sizeof($assetArr); $i++){
+                        array_push($assetArray,$assetArr[$i]);
+                     }
+
+                     $contentType = $this->getContentType($extname);
+                     header('Content-Type: text/javascript;');
+                     
+                     $swScript = 'const assete = '.json_encode($assetArray).';';
+                     $swPath   = __DIR__."/swTemplate.js";
+                     $template = file_get_contents($swPath,true); 
+                     $swScript = $swScript.''.$template;
+                        echo $swScript;
+                        exit();
+                }
+            }
+            
+     
         } elseif (preg_match('/\/img\/flags\//', $req_url)) {
          
             $img = str_replace('/img/flags/', '', $req_url);
             $filePath = __DIR__ . '/../../asset/img/flags/' . $img;
-        } elseif ($req_url === '/i-app-ui.js') {
+       
+        }  elseif (preg_match('/\/img\/install\//', $req_url)) {
+         
+            $img = str_replace('/img/install/', '', $req_url);
+            $filePath = __DIR__ . '/../../asset/img/install/' . $img;
+       
+        }  elseif ($req_url === '/i-app-ui.js') {
             $filePath = __DIR__ . '/../../asset/js/i-app-ui.js';
             $isUiJs = true;
         }  elseif ($req_url === '/i-app-ui.min.js') {
@@ -88,7 +121,7 @@ class AssetFileHandler
            
                 if ($isUiJs && $userData !== 'FALSE') {
                     $userDataSt = 'const userData = ' . json_encode($userData);
-                    $regex = '/\/\/\*\*userDataArea\*\*\/\/?\n?/';
+                    $regex = 'const userData = {};';
                     $data = preg_replace($regex, $userDataSt, $data);
                 }
 

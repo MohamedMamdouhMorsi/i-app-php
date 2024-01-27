@@ -41,7 +41,7 @@ class AppFileHandler
             $fileNamedev = end($dev_);
             $filePath = __DIR__ . '/../../asset/elements/' . $fileNamedev;
         } elseif ($req_url === '/manifest.json') {
-            $backBody = json_encode($manifest);
+            $backBody = $manifest;
         
         } elseif ($backBody == null && $req_url === '/i.app') {
             $backBody = $i_app_st;
@@ -53,14 +53,9 @@ class AppFileHandler
                 $filePath = __DIR__ . '/../../asset/elements/dev.app';
             } else {
                 if ($filePath == null && $backBody == null && $ext === 'app') {
-                    if ($i_app['mode'] && $i_app['mode'] == 'dev') {
+                
                         $filePath = $userDir . '/public_html' . $req_url;
-                    } else {
-                        $app_file_test = $fileName . '.app';
-                        // You need to implement the searchFiles function that searches for the file in the $tree array
-                       // $is_app_file = $this->searchFiles($tree, $app_file_test);
-                      //  $backBody = $is_app_file['fileData'];
-                    }
+                   
                 } elseif ($filePath == null && $backBody == null && $ext === 'json') {
                     $isApp = true;
                     $filePath = $userDir . '/public_html' . $req_url;
