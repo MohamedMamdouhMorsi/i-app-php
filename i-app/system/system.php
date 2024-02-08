@@ -12,15 +12,16 @@ class system {
             $i_app_file    = file_get_contents($loadeAppFile,true);
             $cleanedObject = new IAppReader($i_app_file);
             $appData       = json_decode($cleanedObject,true);
+            
             if(file_exists($dbAppFile)){
                 
                 $dbConnection  = new db($dbAppFile);
-                new middleWare($appData,$dir,$cleanedObject ,$dbConnection);
+                new middleWare($appData,$dir,$cleanedObject ,$dbConnection,$loadeAppFile);
 
             }else{
 
                 $dbConnection  = false;
-                new middleWare($appData,$dir,$cleanedObject ,$dbConnection);
+                new middleWare($appData,$dir,$cleanedObject ,$dbConnection,$loadeAppFile);
             
             }
         

@@ -29,11 +29,15 @@ class insertQuery {
     }
 
     function insertValues($op) {
+        
         if (is_array($op[0])) {
             $opTextAll = "";
             $i = 0 ;
+
             foreach ($op as $opT) {
+
                 $opText = "";
+
                 foreach ($opT as $value) {
                     $opText .= " '" . $value . "'";
                     $nextOp = isset($opT[$i + 1]) || $opT[$i + 1] == '0' ? true : false;
@@ -41,12 +45,16 @@ class insertQuery {
                         $opText .= ", ";
                     }
                 }
+
                 $opTextAll .= "($opText)";
+
                 if (next($op)) {
                     $opTextAll .= ", ";
                 }
+
                 $i= $i +1 ;
             }
+
             return $opTextAll;
         } else {
             $opTextA = "";

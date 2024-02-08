@@ -4,8 +4,8 @@ class DirectoryTree {
     public static   function getDirectoryTree($rootDir) {
        
         $tree = array();
-        $tree['name'] = basename($rootDir);
-        $tree['children'] = array();
+        $tree['name']       = basename($rootDir);
+        $tree['children']   = array();
         
         if (!is_dir($rootDir)) {
             throw new Exception("\"$rootDir\" is not a directory");
@@ -15,6 +15,7 @@ class DirectoryTree {
    
 
         foreach ($files as $file) {
+
             if ($file === '.' || $file === '..') {
                 continue;
             }
@@ -29,12 +30,13 @@ class DirectoryTree {
                 $fileEx = end($fileStrArr);
 
                 if ($fileEx === 'app') {
-                    $data = file_get_contents($filePath);
-                    $fileConfigTx =new iAppReader($data);
+
+                    $data           = file_get_contents($filePath);
+                    $fileConfigTx   = new iAppReader($data);
                      
                     $fileConfig = json_decode($fileConfigTx,true);
-                    $isPage = isset($fileConfig['page']);
-                    $saveCoby = new IAppFileMaker($fileConfig);
+                    $isPage     = isset($fileConfig['page']);
+                    $saveCoby   = new IAppFileMaker($fileConfig);
 
                     $tree['children'][] = [
                         'name' => $file,

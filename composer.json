@@ -36,6 +36,14 @@
                         "i-app/class/middelWare",
                         "i-app/class/models", 
                         "i-app/class/query" , 
+                        "i-app/class/api" ,
+                        "i-app/class/orders" ,
+                        "i-app/class/sessions" ,
+                        "i-app/class/tokens" ,  
+                        "i-app/class/orders" ,  
+                        "i-app/class/orders/app" ,
+                        "i-app/class/orders/servers" ,
+                        "i-app/class/orders/users" ,  
                         "i-app/class/query/class" 
                     ]
     },

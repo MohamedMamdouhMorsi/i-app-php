@@ -1,6 +1,7 @@
 <?php
 
 class IAppFileMaker {
+    public $fileOut = "{}";
     public function __construct($str)
     {
         $str = $this->fixString($str);
@@ -9,7 +10,7 @@ class IAppFileMaker {
         $str = str_replace(':  {', ':{', $str);
         $str = str_replace(':  [', ': [', $str);
         $str = str_replace(":  '", ":'", $str);
-        return $str;
+       $this->fileOut = $str;
     }
     public function convertStrToOb($str) {
         $str = preg_replace('/(\r\n|\n|\r)/', '', $str); // remove newlines
@@ -46,7 +47,10 @@ class IAppFileMaker {
         }
     }
     
-
+    function __toString()
+    {
+        return (string) $this->fileOut;
+    }
      
 }
 
