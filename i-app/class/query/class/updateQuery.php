@@ -9,10 +9,10 @@ class updateQuery {
 
             $orAndOptionText = new orAndOption($ob['q'], $tables[$tableName]);
             $upData          = self::setUpData($ob['d'], $tables[$tableName]);
-            $limit           = $ob['l'] && $ob['l'] == 0 ? '' : "LIMIT {$ob['l']}";
+            $limit           = $ob['l'] && $ob['l'] == 0 ? '' : "LIMIT ".$ob['l'];
 
             $this->getText = "UPDATE $tableName SET $upData WHERE $orAndOptionText $limit";
-
+          
         } else {
 
             echo "Table $tableName is not exist";

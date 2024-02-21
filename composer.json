@@ -19,32 +19,25 @@
         },
         
         "files": [  "i-app/i-app.php",
-                     "i-app/class/tokens/getToken.php", 
-                     "i-app/class/tokens/test.php", 
-                     "i-app/class/tools/I-Function.php",  
-                     "i-app/class/query/db.php", 
-                     "i-app/class/tools/IAppReader.php", 
-                     "i-app/class/tools/IAppFileMaker.php",  
-                     "i-app/class/tools/I-DirectoryTree.php",
-                     "i-app/class/tools/I-DirectoryArray.php",   
-                     "i-app/class/tools/I-AppHeadGenerator.php",  
-                     "i-app/class/tools/I-ManifestMaker.php"
+                    "i-app/class/tools/I-Function.php"
                 ],
         "classmap": [
                         "i-app/class", 
                         "i-app/system",
                         "i-app/class/middelWare",
                         "i-app/class/models", 
-                        "i-app/class/query" , 
+                        "i-app/class/query" ,  
+                        "i-app/class/query/class" , 
                         "i-app/class/api" ,
                         "i-app/class/orders" ,
                         "i-app/class/sessions" ,
-                        "i-app/class/tokens" ,  
+                        "i-app/class/tokens" , 
+                        "i-app/class/dataBaseSetup" , 
+                        "i-app/class/tools" ,  
                         "i-app/class/orders" ,  
                         "i-app/class/orders/app" ,
                         "i-app/class/orders/servers" ,
-                        "i-app/class/orders/users" ,  
-                        "i-app/class/query/class" 
+                        "i-app/class/orders/users" 
                     ]
     },
     "license": "MIT",

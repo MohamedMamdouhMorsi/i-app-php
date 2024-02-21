@@ -2,7 +2,8 @@
 
 class orders {
 
-    public static function __construct($order, $i_app, $dir, $i_app_st, $dbConnection,$userData,$i_app_path) {
+   function __construct($order,$msgData, $i_app, $dir, $i_app_st, $dbConnection,$userData,$i_app_path) {
+    
         if ($order === 'countries') {
             return new countries();
         } elseif ($order === 'languages') {
@@ -16,11 +17,11 @@ class orders {
         } elseif ($order === 'getAnswer') {
             return new getAnswer($dbConnection,$userData );
         } elseif ($order === 'addUser') {
-            return new addUser($dbConnection);
+            return new addUser($dbConnection,$msgData);
         } elseif ($order === 'checkUser') {
-            return new checkUser($dbConnection,$userData);
+            return new checkUser($dbConnection,$msgData);
         } elseif ($order === 'logUser') {
-            return new logUser($dbConnection,$userData );
+            return new logUser($dbConnection,$msgData );
         } elseif ($order === 'setUserOffline') {
             return new setUserOffline($dbConnection );
         } elseif ($order === 'speechSynthesisData') {

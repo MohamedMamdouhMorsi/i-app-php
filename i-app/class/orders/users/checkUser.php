@@ -1,22 +1,22 @@
 <?php 
 
 class checkUser {
-
-    function __construct($dbConnection , $userData){
-        if(isset($_POST["phonenumber"])){
-            $phoneNumber_ = $_POST["phonenumber"];
-
+    public $userData = [];
+    function __construct($dbConnection , $msgData){
+        if(isset($msgData["phonenumber"])){
+            $phoneNumber_ = $msgData["phonenumber"];
+          
             return $this->phoneNumber($phoneNumber_,$dbConnection );
-        }else if(isset($_POST["deviceToken"])){
-            $deviceToken_ = $_POST["deviceToken"];
+        }else if(isset($msgData["deviceToken"])){
+            $deviceToken_ = $msgData["deviceToken"];
 
             return $this->deviceToken($deviceToken_,$dbConnection );
-        }else if(isset($_POST["email"])){
-            $email_ = $_POST["email"];
+        }else if(isset($msgData["email"])){
+            $email_ = $msgData["email"];
 
             return $this->email($email_,$dbConnection );
-        }else if(isset($_POST["username"])){
-            $username_ = $_POST["username"];
+        }else if(isset($msgData["username"])){
+            $username_ = $msgData["username"];
 
             return $this->username($username_,$dbConnection );
         }
@@ -34,7 +34,7 @@ class checkUser {
                                             [
                                                 [
                                                     "deviceToken",
-                                                    $deviceId ,
+                                                    "$deviceId" ,
                                                     "eq"
                                                 ]
                                             ]
@@ -42,13 +42,14 @@ class checkUser {
                                 ]
                             ]
                         ]);
-
+                       
         if(sizeof($data) > 0){
 
                 $sessionData = $data[0];
+              
                 $userId   = $sessionData['userId'];
 
-                $userData = $dbConnection->query([
+                $userData_ = $dbConnection->query([
 
                     "query"=> [
                                 [
@@ -67,13 +68,18 @@ class checkUser {
                             ]
                         ]
                 ]);
-                
-                $userData["userToken"]     = $sessionData["userToken"];
-                $userData["deviceToken"]   = $sessionData["deviceToken"];
-                $userData["scureToken"]    = $sessionData["scureToken"];
-                $userData["connectToken"]  = $sessionData["connectToken"];
-
-                return $userData;
+                if(sizeof($userData_) > 0){
+                    $this->userData = $userData_[0];
+                    $this->userData["userToken"]     = $sessionData["userToken"];
+                    $this->userData["deviceToken"]   = $sessionData["deviceToken"];
+                    $this->userData["scureToken"]    = $sessionData["scureToken"];
+                    $this->userData["connectToken"]  = $sessionData["connectToken"];
+                    
+                    
+                    return  $this->userData;
+                }else{
+                    return false;
+                }
 
         }else{
 
@@ -88,7 +94,7 @@ class checkUser {
     public function phoneNumber($phonenumber ,$dbConnection){
 
 
-                $userData = $dbConnection->query([
+                $this->userData = $dbConnection->query([
 
                     "query"=> [
                                 [
@@ -99,7 +105,7 @@ class checkUser {
                                             [
                                                 [
                                                     "phonenumber",
-                                                    $phonenumber ,
+                                                    "$phonenumber" ,
                                                     "eq"
                                                 ]
                                             ]
@@ -108,20 +114,24 @@ class checkUser {
                         ]
                 ]);
 
-                if(sizeof($userData) > 0){
-                    return true;
+                $res        = [];
 
-                } else{
-                    return false;
+                if(sizeof($this->userData) > 0){
+                    $res["res"] = true;
+                }else{
+                    $res["res"] = false;
                 }
+                
+                echo json_encode($res);
+                exit();
  
     }
 
     
-    public function email($email ,$dbConnection){
+     function email($email ,$dbConnection){
 
 
-                $userData = $dbConnection->query([
+                $this->userData = $dbConnection->query([
 
                     "query"=> [
                                 [
@@ -132,7 +142,7 @@ class checkUser {
                                             [
                                                 [
                                                     "email",
-                                                    $email ,
+                                                    "$email" ,
                                                     "eq"
                                                 ]
                                             ]
@@ -141,19 +151,22 @@ class checkUser {
                         ]
                 ]);
 
-                if(sizeof($userData) > 0){
-                    return true;
+                $res        = [];
 
-                } else{
-                    return false;
+                if(sizeof($this->userData) > 0){
+                    $res["res"] = true;
+                }else{
+                    $res["res"] = false;
                 }
- 
+                
+                echo json_encode($res);
+                exit();
     }
 
-    public function username($username ,$dbConnection){
+     function username($username ,$dbConnection){
 
 
-                $userData = $dbConnection->query([
+                $this->userData = $dbConnection->query([
 
                     "query"=> [
                                 [
@@ -164,7 +177,7 @@ class checkUser {
                                             [
                                                 [
                                                     "username",
-                                                    $username ,
+                                                    "$username" ,
                                                     "eq"
                                                 ]
                                             ]
@@ -173,13 +186,17 @@ class checkUser {
                         ]
                 ]);
 
-                if(sizeof($userData) > 0){
-                    return true;
+               
+                $res        = [];
 
-                } else{
-                    return false;
+                if(sizeof($this->userData) > 0){
+                    $res["res"] = true;
+                }else{
+                    $res["res"] = false;
                 }
- 
+                
+                echo json_encode($res);
+                exit();
     }
 
 }

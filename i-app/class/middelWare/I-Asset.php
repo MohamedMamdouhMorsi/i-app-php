@@ -23,6 +23,10 @@ class AssetFileHandler
                 return 'image/mp3';
             case 'jpg':
                 return 'image/jpeg';
+            case 'mjs':
+                    return 'text/javascript';
+            case 'jpeg':
+                    return 'image/jpeg';
             case 'ico':
                 return 'image/x-icon';
             default:
@@ -37,7 +41,7 @@ class AssetFileHandler
         $backBody = null;
         $contentType = null;
         $isUiJs = false;
-     
+        $is_Module = false;
         if ($req_url === '/sw.js') {
             $contentType = 'text/javascript';
            
@@ -70,32 +74,43 @@ class AssetFileHandler
             $img = str_replace('/img/flags/', '', $req_url);
             $filePath = __DIR__ . '/../../asset/img/flags/' . $img;
        
-        }  elseif (preg_match('/\/img\/install\//', $req_url)) {
+        } elseif (preg_match('/\/img\/install\//', $req_url)) {
          
             $img = str_replace('/img/install/', '', $req_url);
             $filePath = __DIR__ . '/../../asset/img/install/' . $img;
        
-        }  elseif ($req_url === '/i-app-ui.js') {
+        } elseif ($req_url === '/i-app-ui.js') {
             $filePath = __DIR__ . '/../../asset/js/i-app-ui.js';
             $isUiJs = true;
-        }  elseif ($req_url === '/i-app-ui.min.js') {
+        } elseif  ($req_url === '/three.js') {
+            $filePath = __DIR__ . '/../../asset/js/WEBGL/three.module.min.js';
+       
+        } elseif (preg_match('/\/WEBGL\//', $req_url)) {
+            $filePP = str_replace('/WEBGL/', '', $req_url);
+            if($filePP === '/WEBGL/three.js'){
+                $filePP = 'three.module.js';
+            }
+            $filePath = __DIR__ . '/../../asset/js/WEBGL/'.$filePP;
+          
+            $is_Module = true;
+        } elseif($req_url === '/i-app-ui.min.js') {
             $filePath = __DIR__ . '/../../asset/js/i-app-ui.min.js';
             $isUiJs = true;
-        } elseif ($req_url === '/icofont.css') {
+        }  elseif ($req_url === '/icofont.css') {
             $filePath = __DIR__ . '/../../asset/css/icofont.css';
         } elseif ($req_url === '/app.png') {
             $filePath = __DIR__ . '/../../img/app.png';
         } elseif ($req_url === '/i-app-basic.css') {
             $filePath = __DIR__ . '/../../asset/css/i-app-basic.css';
 
-        }  elseif ($req_url === '/i-app-basic.min.css') {
+        } elseif ($req_url === '/i-app-basic.min.css') {
             $filePath = __DIR__ . '/../../asset/css/i-app-basic.min.css';
 
         } else {
-            $is_get = false;
+            $is_get  = false;
             $lastUrl = $req_url;
             $getBody = '';
-            $urlArr = explode('?', $req_url);
+            $urlArr  = explode('?', $req_url);
             if (count($urlArr) > 1) {
                 $lastUrl  = $urlArr[0];
                 $is_get   = true;
@@ -120,13 +135,17 @@ class AssetFileHandler
                 $data = file_get_contents($filePath,true);
            
                 if ($isUiJs && $userData !== 'FALSE') {
-                    $userDataSt = 'const userData = ' . json_encode($userData);
+                    $userDataEC = json_encode($userData);
+                    $userDataSt = str_replace('\"', '"', $userDataEC);
+                    $userDataSt = "const userData = $userDataSt ;"  ;
+                    $userDataSt = str_replace('"{', '{', $userDataSt);
+                        $userDataSt = str_replace('}"', '}', $userDataSt);
                     $regex = 'const userData = {};';
-                    $data = preg_replace($regex, $userDataSt, $data);
+                    $data = str_replace($regex, $userDataSt, $data);
                 }
 
                
-                if($extname === 'png' || $extname === 'jpg' ||  $extname === 'gif' ){
+                if($extname === 'png' || $extname === 'jpg' || $extname === 'jpeg' ||  $extname === 'gif' ){
                   
 
                  header('Content-Type: ' . $contentType.';');
@@ -139,6 +158,9 @@ class AssetFileHandler
                  readfile($filePath);
                  exit();
                   }else{
+                    if($is_Module){
+                        $contentType = 'text/javascript';
+                    }
                     header('Content-Type: ' . $contentType.';');
                     echo($data);
                     exit();

@@ -7,20 +7,19 @@ class middleWare {
     private $manifest;
     private $tree;
     public  $userDir;
-    public  $dbConnection;
+    public  $dbConnection_;
     private $i_app_st;
     private $swScript;
     private $AppThemecolors;
     private $AppThemecolorsPR;
     public $data         = "No Data ";
     public $loadeAppFile = " ";
-    public $userData     = [];
+    public $userData     ;
 
     function __construct($iapp,$dir,$i_app_tx,$dbConnection,$loadeAppFile_) {
        
-        $this->req = $_REQUEST; // Assume required data is passed as URL parameters
-        $this->res = new stdClass(); // Dummy response object for demonstration purposes
         $this->i_app = $iapp;
+        $this->dbConnection_ = $dbConnection;
         $this->AppThemecolors   = $this->getAppStyleColor();
         $this->AppThemecolorsPR = $this->getPRColor( $this->AppThemecolors );
         $this->colorPR_D        = $this->AppThemecolorsPR['PR_D'];
@@ -45,14 +44,13 @@ class middleWare {
                 $url =$_SERVER['REQUEST_URI'] ;
 
                 // $destroy = "";
-
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $is_api = $this->is_api($url);
                 
-                        $is_api = $this->is_api($url);
-                        
-                            if($is_api) {
-                                new api($this->i_app,$this->userDir,$this->i_app_st,$this->dbConnection,$this->userData,$this->loadeAppFile);
-                            }
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_api) {
+                
+                      
+                                new api($this->i_app,$this->userDir,$this->i_app_st,$this->dbConnection_,$this->userData,$this->loadeAppFile);
+                            
                     }
                 
                 if (isset($_GET['url'])) {
@@ -64,6 +62,13 @@ class middleWare {
                     if (!$userRouter) {
 
                         $extname  = pathinfo($url, PATHINFO_EXTENSION);
+                        if($extname !== ''){
+                            $testScript = explode('?', $extname);
+                             if(count($testScript) > 1){
+                                $extname = $testScript[0];
+                             }
+                         
+                        }
                         $is_app   = $this->is_app($extname);
                         $is_asset = $this->is_asset($extname);
                         $is_route = $this->is_route($url ,$extname);
@@ -78,8 +83,9 @@ class middleWare {
 
                         //   return asset file img , js , css and others      
                             $assetUserData = "FALSE";
-                            if(isset( $this->userData["id"])){
-                                $assetUserData = json_encode( $this->userData);
+                            if(isset( $this->userData->userData["id"])){
+                                $assetUserData = json_encode( $this->userData->userData);
+                           
                             }
                         
                         
@@ -109,8 +115,10 @@ class middleWare {
           
                 //  isUser 
 
-                $this->userData = new userInfo($dbConnection);
-
+                $this->userData = new userInfo( $this->dbConnection_);
+         
+                
+            
                 $appWare();
 
             } else {

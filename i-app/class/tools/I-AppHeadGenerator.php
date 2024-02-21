@@ -12,6 +12,10 @@ class AppHeadGenerator {
                 $lang =$app['lang'][0];
             }
         }
+        $is_three = false;
+        if(isset($app['three'])){
+            $is_three = true;
+        }
         $this->innerHTML = '<!DOCTYPE html><html lang="' . $lang . '"> <head>';
         $this->innerHTML .= '<title>' . $app['title'] . '</title>';
         $this->innerHTML .= '<meta name="type" content="' . $app['type'] . '">';
@@ -31,6 +35,9 @@ class AppHeadGenerator {
         $this->innerHTML .= '<meta property="og:url" content="' . $app['domain'] . '" />';
         $this->innerHTML .= '<meta property="og:image" content="' . $app['dir']['icon'] . 'favicon-96x96.png" />';
         $this->innerHTML .= self::META_TAG;
+        if($is_three){
+            $this->innerHTML .= '<script type="importmap">{"imports": {"three": "./three.js"}}</script>';
+        }
         $this->innerHTML .= '<script type="application/javascript" src="' . ($devMode ? '/i-app-ui.js' : '/i-app-ui.min.js') . '" async defer ></script>';
         $this->innerHTML .= '</head> <body></body> </html>';
 

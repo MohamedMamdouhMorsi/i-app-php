@@ -5,7 +5,9 @@ class icons{
         $dirBasic = realpath(__DIR__ . '/../..');
         $dir      = $dirBasic."/asset/db/icons.json";
         $file     = file_get_contents($dir,true);
-        echo $file;
+        $res=[];
+        $rea["res"] = json_decode($file,true);
+        echo json_encode($res);
         exit();
     }
 }

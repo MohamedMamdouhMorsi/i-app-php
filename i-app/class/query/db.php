@@ -15,7 +15,8 @@ class db {
             if(isset($dbConfigOb['mysql']) && isset($dbConfigOb['mysql'][0]) ){
 
                 $this->i_app    = $dbConfigOb['mysql'][0];
-            
+
+               
                 
             }else{
 
@@ -49,12 +50,14 @@ class db {
 
         
         }
-
+        function setIappTables($tables){
+            $this->i_app['tables']       = $tables;
+        }
         function getColumn($body,$tables){
 
                 $queryOB = $body['query'];
                 $selectColumn = [];
-
+               
                 foreach ($queryOB as $cureOB) {
 
                     $querySelect = ["A"]; 
@@ -152,7 +155,21 @@ class db {
         
             return false;
         }
+        function isCreateQuery($ob) {
 
+            $query = $ob['query'];
+        
+            foreach ($query as $q => $queryItem) {
+
+                $cureAction = $queryItem['a'];
+        
+                if ($cureAction === 'create' ) {
+                    return true;
+                }
+            }
+        
+            return false;
+        }
         function isDeleteQuery($ob) {
 
             $query = $ob['query'];
@@ -177,7 +194,7 @@ class db {
 
                 $cureAction = $queryItem['a'];
         
-                if ($cureAction === 'del' ) {
+                if ($cureAction === 'up' ) {
                     return true;
                 }
             }
@@ -189,25 +206,28 @@ class db {
                     
                     
             $tables         = $this->i_app['tables'];
-    
-            $columns        = $this->getColumn($qureyObj, $tables);
-            $qureyTxt       = new makeQuery($qureyObj, $tables);
-            $queryTextUp    = new makeQuery(["query"=>[["a"=>"checkUpTime","ob"=>$qureyObj]]], $tables);
-        
+
             $isGet          = $this->isGetQuery($qureyObj);
             $isInsert       = $this->isInsertQuery($qureyObj);
             $isDelete       = $this->isDeleteQuery($qureyObj);
             $isUpdate       = $this->isUpdateQuery($qureyObj);
+            $isCreate       = $this->isCreateQuery($qureyObj);
+            $columns        = [];
+          
+           
+            $qureyTxt       = new makeQuery($qureyObj, $tables);
+            $queryTextUp    = new makeQuery(["query"=>[["a"=>"checkUpTime","ob"=>$qureyObj]]], $tables);
         
+      
             if($isGet){
-
-                    $connection         = $this->connect();
+                $columns        = $this->getColumn($qureyObj, $tables);
+                    $connectionA         = $this->connect();
                 
-                    $queryConnectUp     = mysqli_query($connection, $queryTextUp);
+                    $queryConnectUp     = mysqli_query($connectionA, $queryTextUp);
                 
                     $upadteTime         = [];
 
-                    if( isset($queryConnectUp)  && $queryConnectUp != null && mysqli_num_rows($queryConnectUp) > 0){
+                    if( isset($queryConnectUp)  && !is_bool($queryConnectUp)  && mysqli_num_rows($queryConnectUp) > 0){
 
                         while($row = mysqli_fetch_array($queryConnectUp)) {
                             
@@ -222,9 +242,9 @@ class db {
                         $upadteTime         = [];
                     }
 
-                    mysqli_close($connection);
+                    mysqli_close($connectionA);
 
-                    $connection        = $this->connect();
+                    $connectionB        = $this->connect();
                     $makeUpTodateData  = $this->makeUpTodate($upadteTime);
             
                     if(isset($queryOBJ["upTime"])){
@@ -238,11 +258,11 @@ class db {
 
                         }else{
 
-                                $queryConnect       = mysqli_query($connection, $qureyTxt);
+                                $queryConnect       = mysqli_query($connectionB, $qureyTxt);
                                 $result             = [];
                                 
 
-                                if(isset($queryConnect)  && mysqli_num_rows($queryConnect) > 0){
+                                if(isset($queryConnect)  &&!is_bool($queryConnect) &&  mysqli_num_rows($queryConnect) > 0){
 
                                     $querySize      = mysqli_num_rows($queryConnect);
                                     
@@ -266,7 +286,7 @@ class db {
                                             }
                                     }
 
-                                        mysqli_close($connection);
+                                        mysqli_close($connectionB);
 
                                         return $result;
                             }
@@ -275,12 +295,12 @@ class db {
                     
                     }else{
 
-                        $connection         = $this->connect();
-                        $queryConnect       = mysqli_query($connection, $qureyTxt);
+                        $connectionC         = $this->connect();
+                        $queryConnect       = mysqli_query($connectionC, $qureyTxt);
                         $result             = [];
+                       
                         
-
-                        if(isset($queryConnect)  && mysqli_num_rows($queryConnect) > 0){
+                        if(isset($queryConnect)  && !is_bool($queryConnect) && mysqli_num_rows($queryConnect) > 0){
 
                             $querySize      = mysqli_num_rows($queryConnect);
                             
@@ -304,7 +324,7 @@ class db {
                                     }
                             }
 
-                            mysqli_close($connection);
+                            mysqli_close($connectionC);
 
                             return $result;
                     }
@@ -314,8 +334,9 @@ class db {
                     $connection         = $this->connect();
                     $queryConnect       = mysqli_query($connection, $qureyTxt);
                     $insertedId         = mysqli_insert_id($connection);
+                    mysqli_close($connection);
                     return $insertedId ;
-                }elseif($isUpdate || $isDelete){
+                }elseif($isUpdate || $isDelete || $isCreate){
                     $connection         = $this->connect();
                     $queryConnect       = mysqli_query($connection, $qureyTxt);
                     mysqli_close($connection);
@@ -323,5 +344,11 @@ class db {
                 }
             }
         }
-
+        function chickDB(){
+            if(isset($this->i_app["tables"])){
+                return true;
+            }else{
+                return false;
+            }
+        }
     }

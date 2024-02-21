@@ -1,8 +1,8 @@
 <?php
 
-class IAppFileMaker {
+class AppFileMaker {
     public $fileOut = "{}";
-    public function __construct($str)
+     function __construct($str)
     {
         $str = $this->fixString($str);
         $str = $this->convertStrToOb($str);
@@ -38,7 +38,7 @@ class IAppFileMaker {
                 }
             }
             return json_encode($strOb);
-        } elseif (is_object($strOb) && $strOb instanceof Traversable) {
+        } elseif (is_object($strOb) && $strOb ) {
             // Handle the case where $strOb is an object implementing Traversable
             // You can iterate over it using foreach or handle it accordingly.
         } else {

@@ -5,8 +5,8 @@ class countries{
         $dirBasic = realpath(__DIR__ . '/../..');
         $dir      = $dirBasic."/asset/db/countries.json";
         $file     = file_get_contents($dir,true);
-        
-        echo $file;
+      
+        echo '{"res":'.$file.'}';
         exit();
     }
 }

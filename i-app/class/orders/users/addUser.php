@@ -1,30 +1,33 @@
 <?php
 class addUser{
 
-    function __construct($db)
+    function __construct($db,$msgData)
     {
-        if(isset($_POST["username"]) && isset($_POST["firstname"]) && isset($_POST["lastname"])){
+        if(isset($msgData["username"]) && isset($msgData["firstname"]) && isset($msgData["lastname"])){
 
-            $username       = $_POST["username"];
-            $firstname      = $_POST["firstname"];
-            $lastname       = $_POST["lastname"];
-            $email          = $_POST["email"];
-            $phonenumber    = $_POST["phonenumber"];
-            $accountType    = $_POST["accountType"];
+            $username       = $msgData["username"];
+            $firstname      = $msgData["firstname"];
+            $lastname       = $msgData["lastname"];
+            $email          = $msgData["email"];
+            $phonenumber    = $msgData["phonenumber"];
+            $accountType    = $msgData["accountType"];
 
    
             $insertUser = $db->query([
-                "query"=>[
+                "query"=>[[
                     "a"=>"in",
                     "n"=>"answers",
                     "d"=>[$username,$firstname , $lastname,$email ,$phonenumber , $accountType,'1']
-                ]
+                ]]
             ]);
-            $inseredtUserId = $insertUser; 
+            
             $res        = [];
-            $res["res"] = true;
+            $res["res"] = $insertUser;
             echo json_encode($res);
             exit();
+        }else{
+            echo json_encode($msgData);
+            exit(); 
         }
 
 

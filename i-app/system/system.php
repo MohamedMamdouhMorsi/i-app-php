@@ -16,8 +16,11 @@ class system {
             if(file_exists($dbAppFile)){
                 
                 $dbConnection  = new db($dbAppFile);
+                if(!$dbConnection->chickDB()){
+                    new dataBaseUpddate($dbConnection,$dir,$appData);
+                }
+              
                 new middleWare($appData,$dir,$cleanedObject ,$dbConnection,$loadeAppFile);
-
             }else{
 
                 $dbConnection  = false;

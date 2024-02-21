@@ -1,12 +1,12 @@
 <?php 
 
 class userInfo {
-
+    public $userData = ['id' => 0];
     function __construct($dbConnection)
     {
 
-        $userData = ['id' => 0];
-        $timestamp_  = new DateTime('now');
+        
+        $timestamp_  = time();
         
         $sessionData = new sessionInfo();
         $deviceInfo  = $sessionData->getDeviceInfo();
@@ -23,50 +23,39 @@ class userInfo {
 
             $authSt       = "$fingerPrint-$timestamp";
 
-            $cureDeviceId = createAuth($authSt);
+            $cureDeviceId = new CreatAUTH($authSt);
 
             
             // Validate device ID
-
-            if ($deviceId === $cureDeviceId) {
+            $stcureDeviceId = "$cureDeviceId";
+            if ($deviceId == $stcureDeviceId) {
 
                     // Check User Data in DB
 
-                    $checkUserData = new checkUser();
+                    $checkUserData = new checkUser($dbConnection,["deviceToken"=>$stcureDeviceId]);
+              
+                  
 
-                    $userData      = $checkUserData->deviceToken($deviceId , $dbConnection);  
-
-                    if(!$userData){
+                    if(!$checkUserData){
 
                         new destroySession("Try To Login again #1");
                     }else{
-                        return $userData;
+                        $this->userData = $checkUserData->userData;
+                     
                     }
 
                 }else{
 
-                    // Check User Data in DB
-
-                    $checkUserData = new checkUser();
-
-                    $userData      = $checkUserData->deviceToken($deviceId , $dbConnection);  
-
-                    if(!$userData){
-
-                        new destroySession("Try To Login again #2");
-                    
-                    }else{
-
-                        return $userData;
-                    
-                    }
-                    
+                      new destroySession("Try To Login again #2");
+                  
                 }
 
-        }else{
-            return $userData;
         }
     
+    }
+    function __destruct()
+    {
+        return $this->userData;
     }
     
 }

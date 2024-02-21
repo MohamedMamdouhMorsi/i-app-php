@@ -15,7 +15,7 @@ class updateTxt{
         $i_app_langDir     =  $dir."/public/". $i_app["dir"]["txt"]."/".$lang.".json";
         $langData          = file_get_contents($i_app_langDir,true);
         $langDataJ         = json_decode($langData,true);
-        $tree              = $this->getDirectoryTree($i_app_src);
+        $tree              = new getDirectoryTree($i_app_src);
         $this->copyFolder($i_app_src,$i_app_src_temp);
         if(isset($tree["children"]) && sizeof($tree["children"]) > 0){
             new   readAndUpdate($tree["children"],$langDataJ,$i_app_langDir);
@@ -62,60 +62,6 @@ class updateTxt{
         }
     }
 
-    function getDirectoryTree($rootDir) {
-        // Check if the root directory exists
-        if (!is_dir($rootDir)) {
-            throw new Exception("{$rootDir} is not a directory");
-        }
-    
-        $tree = [];
-        $tree['name'] = basename($rootDir);
-        $tree['children'] = [];
-    
-        $files = scandir($rootDir);
-    
-        // Remove . and .. from the list
-        $files = array_diff($files, array('.', '..'));
-    
-        foreach ($files as $file) {
-            $filePath = $rootDir . '/' . $file;
-            $fileStats = stat($filePath);
-    
-            if (is_dir($filePath)) {
-                // Recursively get the directory tree
-                $aFile = $this->getDirectoryTree($filePath);
-                $tree['children'][] = $aFile;
-            } else {
-                $fileStrArr = explode('.', $file);
-                $fileEx = end($fileStrArr);
-    
-                if ($fileEx === 'app') {
-                    $data = file_get_contents($filePath);
-                    $fileConfigTx = new iAppReader($data);
-                    $fileConfig = json_decode($fileConfigTx,true);
-                    $isPage = isset($fileConfig['page']) ? true : false;
-                    $saveCoby = new iAppFileMaker(json_encode($fileConfig));
-    
-                    $tree['children'][] = [
-                        'name' => $file,
-                        'type' => 'file',
-                        'path' => $rootDir,
-                        'ext' => $fileEx,
-                        'fileData' => $saveCoby,
-                        'page' => $isPage
-                    ];
-                } else {
-                    $tree['children'][] = [
-                        'name' => $file,
-                        'type' => 'file',
-                        'path' => $rootDir,
-                        'ext' => $fileEx
-                    ];
-                }
-            }
-        }
-        $tree['type'] = "folder";
-        return $tree;
-    }
+
     
 }
