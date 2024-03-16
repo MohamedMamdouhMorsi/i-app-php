@@ -11,9 +11,9 @@ class orders {
         } elseif ($order === 'icons') {
             return new icons();
         } elseif ($order === 'serverOffer') {
-            return new serverOffer($dbConnection,$userData );
+            return new serverOffer($dbConnection,$userData,$msgData  );
         } elseif ($order === 'serverAnswer') {
-            return new serverAnswer($dbConnection,$userData  );
+            return new serverAnswer($dbConnection,$userData,$msgData);
         } elseif ($order === 'getAnswer') {
             return new getAnswer($dbConnection,$userData );
         } elseif ($order === 'addUser') {
@@ -23,7 +23,7 @@ class orders {
         } elseif ($order === 'logUser') {
             return new logUser($dbConnection,$msgData );
         } elseif ($order === 'setUserOffline') {
-            return new setUserOffline($dbConnection );
+            return new setUserOffline($dbConnection,$userData );
         } elseif ($order === 'speechSynthesisData') {
          //   return new speechSynthesisData($body );
         } elseif ($order === 'dataBaseReport') {

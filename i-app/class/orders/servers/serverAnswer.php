@@ -1,20 +1,21 @@
 <?php
 class serverAnswer{
 
-    function __construct($db,$userData)
+    function __construct($db,$userData,$msgData )
     {
-        if(isset($_POST["oid"]) && isset($_POST["dns"]) && isset($_POST["owner"])){
+        if(isset($msgData["oid"]) && isset($msgData["dns"]) && isset($msgData["owner"])){
 
-            $OId       = $_POST["oid"];
-            $DNS       = $_POST["dns"];
-            $owner     = $_POST["owner"];
-            $token   = $userData["deviceToken"];
+            $OId       = $msgData["oid"];
+            $DNS       = $msgData["dns"];
+            $owner     = $msgData["owner"];
+            $token     = $userData["deviceToken"];
+
             $insertAnswer = $db->query([
-                "query"=>[
+                "query"=>[[
                     "a"=>"in",
                     "n"=>"answers",
                     "d"=>[$OId,$owner, $token,$DNS]
-                ]
+                ]]
             ]);
      
             $res        = [];

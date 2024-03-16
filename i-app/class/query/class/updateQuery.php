@@ -11,7 +11,7 @@ class updateQuery {
             $upData          = self::setUpData($ob['d'], $tables[$tableName]);
             $limit           = $ob['l'] && $ob['l'] == 0 ? '' : "LIMIT ".$ob['l'];
 
-            $this->getText = "UPDATE $tableName SET $upData WHERE $orAndOptionText $limit";
+            $this->getText = "UPDATE $tableName SET $upData WHERE $orAndOptionText $limit ;";
           
         } else {
 

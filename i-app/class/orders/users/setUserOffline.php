@@ -1,21 +1,21 @@
 <?php
 class setUserOffline{
 
-    function __construct($db)
+    function __construct($db,$userData)
     {
-        if(isset($_POST["id"])){
+        if(isset($userData["id"])){
 
-            $userId       = $_POST["id"];
+            $userId       = $userData["id"];
 
    
             $insertUser = $db->query([
-                "query"=>[
+                "query"=>[[[
                     "a"=>"up",
                     "n"=>"usersSessions",
-                    "d"=>[[5,"FALSE"]],
+                    "d"=>[[5,"FALSE"],5,"FALSE"]],
                     "q"=>[[[1,$userId ,'eq']]],
                     "l"=>"1"
-                ]
+                ]]
             ]);
            
             $res        = [];

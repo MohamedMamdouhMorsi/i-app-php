@@ -7,7 +7,7 @@ class checkQuery {
     function __construct($ob){
 
         $tableName = $ob['n'];
-        $this->getText =  "show tables like $tableName";
+        $this->getText =  "show tables like $tableName ;";
      
     }
     function __toString(){

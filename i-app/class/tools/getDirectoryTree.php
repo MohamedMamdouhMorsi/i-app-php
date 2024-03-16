@@ -4,10 +4,10 @@ class getDirectoryTree{
     public $tree = [];
     function __construct($rootDir)
     {
-        $this->tree = $this-> getDirectoryTreeFunc($rootDir);
+        $this->tree = $this-> getDirectoryTreeFunc_($rootDir);
     }
 
-    function getDirectoryTreeFunc($rootDir) {
+    function getDirectoryTreeFunc_($rootDir) {
         // Check if the root directory exists
         if (!is_dir($rootDir)) {
             throw new Exception("{$rootDir} is not a directory");
@@ -28,7 +28,7 @@ class getDirectoryTree{
     
             if (is_dir($filePath)) {
                 // Recursively get the directory tree
-                $aFile = $this->getDirectoryTreeFunc($filePath);
+                $aFile = $this->getDirectoryTreeFunc_($filePath);
                 $tree['children'][] = $aFile;
             } else {
                 $fileStrArr = explode('.', $file);
@@ -62,8 +62,9 @@ class getDirectoryTree{
         $tree['type'] = "folder";
         return $tree;
     }
-    function __destruct()
+    function __toString()
     {
-        return $this->tree;
+        $data = json_encode($this->tree);
+        return (string)  $data;
     }
 }

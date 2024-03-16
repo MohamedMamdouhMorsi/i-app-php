@@ -140,7 +140,11 @@ class ManifestMaker {
         $this->base["id"] = $i_app["id"];
         $this->base["start_url"] = "/?v=".$i_app["id"];
         $this->base["description"] = $i_app["description"];
-        $this->base["theme_color"] = $style["PR_D"];
+        $themeColor =  $style["PR_D"];
+        if(isset($style["theme"])){
+            $themeColor =  $style["theme"];
+        }
+        $this->base["theme_color"] =  $themeColor;
         $this->base["background_color"] = $style["PR"];
 
     }

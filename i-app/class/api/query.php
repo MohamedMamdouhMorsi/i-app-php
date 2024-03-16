@@ -2,8 +2,17 @@
 
 class query {
 
-    function __construct($query, $i_app,$dir,$i_app_st,$dbConnection){
-        
+    function __construct($dbConnection , $msgJson,$dir,$i_app){
+
+       $updateVal = new updateQueryInput($msgJson,$dir,$i_app);
+       $res = $dbConnection->queryApi( ["query"=>$updateVal->query]);
+      
+      
+       
+       //$res["report"] =  $updateVal  ;
+       echo json_encode($res);
+
+        exit();
     }
     
 }

@@ -33,15 +33,15 @@ class AssetFileHandler
                 return 'application/app';
         }
     }
-
-
-    public function __construct($req_url,$extname, $userDir, $swScript, $userData , $i_app)
+ 
+    public function __construct($req_url,$extname, $userDir, $swScript, $userData , $i_app,$db)
     {
         $filePath = null;
         $backBody = null;
         $contentType = null;
         $isUiJs = false;
         $is_Module = false;
+    
         if ($req_url === '/sw.js') {
             $contentType = 'text/javascript';
            
@@ -49,17 +49,28 @@ class AssetFileHandler
                 $projectDir = $userDir.''.$i_app['dir']['main'];
                 
                 if (file_exists($projectDir)) {
-                     $tree     = DirectoryTree::getDirectoryTree($projectDir);
-                     $assetArr = DirectoryArray::getDirectoryArray($tree,"");
+                   
+                     $treeST     = new getDirectoryTree($projectDir);
+            
+                     $treeJson = json_decode($treeST,true);
+              
+                     $assetArr = new getDirectoryArray($treeJson,""); 
+                   
+                     $assetArrDecode = json_decode( $assetArr,true);
+                 
                      $assetArray = ["/","/manifest.json","/i.app","/sw.js","/i-app-basic.min.css","/i-app-ui.min.js","/icofont.css"];
-                     for($i = 0 ; $i < sizeof($assetArr); $i++){
-                        array_push($assetArray,$assetArr[$i]);
+                     if(is_array(  $assetArrDecode )){
+                     for($i = 0 ; $i < sizeof($assetArrDecode ); $i++){
+                      
+                        array_push($assetArray,$assetArrDecode[$i]);
                      }
-
+                    }
+                    
                      $contentType = $this->getContentType($extname);
                      header('Content-Type: text/javascript;');
-                     
-                     $swScript = 'const assete = '.json_encode($assetArray).';';
+                     $assetArrData = json_encode($assetArray);
+                     $tru =  str_replace("\/","/", $assetArrData);
+                     $swScript = 'const assete = '.$tru .';';
                      $swPath   = __DIR__."/swTemplate.js";
                      $template = file_get_contents($swPath,true); 
                      $swScript = $swScript.''.$template;
@@ -93,13 +104,18 @@ class AssetFileHandler
             $filePath = __DIR__ . '/../../asset/js/WEBGL/'.$filePP;
           
             $is_Module = true;
+        } elseif (preg_match('/server.js/', $req_url)) {
+              
+            $filePath = __DIR__ . '/../../asset/js/server.js';
+          
+            $is_Module = true;
         } elseif($req_url === '/i-app-ui.min.js') {
             $filePath = __DIR__ . '/../../asset/js/i-app-ui.min.js';
             $isUiJs = true;
         }  elseif ($req_url === '/icofont.css') {
             $filePath = __DIR__ . '/../../asset/css/icofont.css';
         } elseif ($req_url === '/app.png') {
-            $filePath = __DIR__ . '/../../img/app.png';
+            $filePath = __DIR__ . '/../../asset/img/app.png';
         } elseif ($req_url === '/i-app-basic.css') {
             $filePath = __DIR__ . '/../../asset/css/i-app-basic.css';
 
@@ -132,16 +148,24 @@ class AssetFileHandler
             $contentType = $this->getContentType($extname);
           
             if (file_exists($filePath)) {
+
                 $data = file_get_contents($filePath,true);
            
                 if ($isUiJs && $userData !== 'FALSE') {
-                    $userDataEC = json_encode($userData);
-                    $userDataSt = str_replace('\"', '"', $userDataEC);
-                    $userDataSt = "const userData = $userDataSt ;"  ;
-                    $userDataSt = str_replace('"{', '{', $userDataSt);
-                        $userDataSt = str_replace('}"', '}', $userDataSt);
-                    $regex = 'const userData = {};';
-                    $data = str_replace($regex, $userDataSt, $data);
+
+                    $datajson    = json_decode($userData,true);
+
+                    $connection  = new checkUser($db ,["getConnectionOffer"=>$datajson]);
+                    
+                    $permissions = new checkUser($db ,["getPermissions"=>$datajson]);
+
+                    $datajson["connect"]        = $connection->userConnection;
+                    $datajson["permissions"]    = $permissions;
+                    $userData_                  = json_encode($datajson);
+                    $userDataSt                 = "const userData = $userData_ ;"  ;
+                    $regex                      = 'const userData = {};';
+                    $data                       = str_replace($regex, $userDataSt, $data);
+
                 }
 
                
@@ -158,9 +182,11 @@ class AssetFileHandler
                  readfile($filePath);
                  exit();
                   }else{
+
                     if($is_Module){
                         $contentType = 'text/javascript';
                     }
+
                     header('Content-Type: ' . $contentType.';');
                     echo($data);
                     exit();
@@ -168,7 +194,7 @@ class AssetFileHandler
              
             } else {
                 http_response_code(404);
-                echo '<h1>404 Not Found</h1><p>file_exists The requested URL ' . $filePath . ' was not found on this server.</p>';
+                echo '<h1>404 Not Found</h1><p>file_exists The requested URL  was not found on this server.</p>';
                 exit();
             }
             
@@ -181,7 +207,7 @@ class AssetFileHandler
                 exit();
             } else {
                http_response_code(404);
-                echo '<h1>404 Not Found</h1><p>backBody The requested URL ' . $filePath . ' was not found on this server.</p>';
+                echo '<h1>404 Not Found</h1><p>backBody The requested URL  was not found on this server.</p>';
                 exit();
             }
         }

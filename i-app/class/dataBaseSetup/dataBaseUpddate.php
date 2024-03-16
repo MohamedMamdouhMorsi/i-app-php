@@ -88,7 +88,7 @@ class dataBaseUpddate{
                     $basicDataBase = $jsonData['mysql'][0];
                     $basicTables = isset($basicDataBase['tables']) ? $basicDataBase['tables'] : false;
                 
-                    $basicDB     = ["users", "answers","usersSessions", "usersPasswords", "usersApps", "usersType", "typesApps", "permissions", "appsPermissions", "usersPermissions"];
+                    $basicDB     = ["users", "answers","usersSessions", "usersPasswords", "usersApps", "usersType",  "permissions", "appsPermissions"];
                     $insertDB    = [
                         "usersApps" => ["users", "Basic Users App"],
                         "usersType" => ["admin", "Basic Admin User"],
@@ -100,8 +100,7 @@ class dataBaseUpddate{
                             ["view",   "Ability to view order details"],
                             ["approve","Ability to approve orders"]
                         ],
-                        "appsPermissions" => [[1, 1], [1, 2], [1, 3], [1, 4], [1, 5]],
-                        "usersPermissions" => [[1, 1, 1], [1, 1, 2], [1, 1, 3], [1, 1, 4], [1, 1, 5]]
+                        "appsPermissions" => [[1, 1, 1], [1, 1, 2], [1, 1, 3], [1, 1, 4], [1, 1, 5]]
                     ];
 
                     $needDB = [];

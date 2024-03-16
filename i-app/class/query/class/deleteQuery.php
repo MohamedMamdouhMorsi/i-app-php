@@ -11,7 +11,7 @@ class deleteQuery {
         $orAndOptionText = new orAndOption($ob['q'], $tables[$tableName]);
         $limit = $ob['l'] && $ob['l'] == 0 ? '' : "LIMIT ".$ob['l'];
 
-        $this->getText = "DELETE FROM $tableName WHERE $orAndOptionText $limit";
+        $this->getText = "DELETE FROM $tableName WHERE $orAndOptionText $limit ;";
         
     } else {
         echo "Table $tableName is not exist";

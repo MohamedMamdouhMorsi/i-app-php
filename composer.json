@@ -18,8 +18,7 @@
             "i-app\\": "i-app"
         },
         
-        "files": [  "i-app/i-app.php",
-                    "i-app/class/tools/I-Function.php"
+        "files": [  "i-app/i-app.php"
                 ],
         "classmap": [
                         "i-app/class", 

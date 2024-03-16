@@ -20,8 +20,8 @@ class insertQuery {
             $selectedColumn     = new selectColumn($notId);
             $insertValuesData   = $this->insertValues($ob['d']);
 
-            $this->getText = "INSERT INTO $tableName ($selectedColumn) VALUES $insertValuesData";
-            
+            $this->getText = "INSERT INTO $tableName ($selectedColumn) VALUES $insertValuesData ;";
+           
         } else {
 
             echo "Table $tableName is not exist";

@@ -12,7 +12,7 @@ class getQuery{
         
             $orAndOptionText = new orAndOption($ob['q'], $tables[$tableName]);
             $limit = self::getLimit($ob);
-
+           
             if (!isset($ob['s'])) {
                 $ob['s'] = ["A"];
             }
@@ -24,7 +24,7 @@ class getQuery{
             } else {
 
                 $selectedColumn = new selectColumn($ob['s']);
-                $this->getText = "SELECT " . $selectedColumn . " FROM " . $tableName . " WHERE " . $orAndOptionText . " " . $limit;
+                $this->getText = "SELECT " . $selectedColumn . " FROM " . $tableName . " WHERE " . $orAndOptionText . " " . $limit ." ;";
                
             }
 
@@ -38,8 +38,8 @@ class getQuery{
     
         $limit = '';
     
-        if(isset($ob['limitAuto'])) {
-            if ($ob['last']) {
+        if(isset($ob['limitAuto']) && $ob['limitAuto'] !== false) {
+            if (isset($ob['last'])) {
                 $limit = "LIMIT " . (int)$ob['last'] . " , " . (int)$ob['limitAuto'];
             } else {
                 $limit = "LIMIT 0 , " . (int)$ob['limitAuto'];

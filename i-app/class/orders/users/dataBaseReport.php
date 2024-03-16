@@ -5,22 +5,18 @@ class dataBaseReport{
     {
 
             $insertUser = $db->query([
-                "query"=>[
+                "query"=>[[
                     "a"=>"check",
-                    "n"=>"users" ]
+                    "n"=>"users" ]]
             ]);
 
             
-
-            $res        = [];
-
-            if(sizeof($insertUser) > 0){
-                $res["res"] = true;
+            if($insertUser){
+                echo '{"res":"true"}';
             }else{
-                $res["res"] = false;
+                echo '{"res":"false"}';
             }
             
-            echo json_encode($res);
             exit();
         
 

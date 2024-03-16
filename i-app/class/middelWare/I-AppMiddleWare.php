@@ -2,110 +2,50 @@
 
 class middleWare {
 
-    private $i_app;
-    private $colorPR_D;
-    private $manifest;
-    private $tree;
-    public  $userDir;
+    public $i_app;
+    public $colorPR_D;
+    public $manifest=[];
+    public $tree;
+    public  $userDir = "dir";
     public  $dbConnection_;
-    private $i_app_st;
-    private $swScript;
-    private $AppThemecolors;
-    private $AppThemecolorsPR;
+    public $i_app_st;
+    public $swScript;
+    public $AppThemecolors;
+    public $AppThemecolorsPR;
     public $data         = "No Data ";
     public $loadeAppFile = " ";
-    public $userData     ;
+    public $userData = array("userData"=>array());
 
     function __construct($iapp,$dir,$i_app_tx,$dbConnection,$loadeAppFile_) {
-       
-        $this->i_app = $iapp;
-        $this->dbConnection_ = $dbConnection;
-        $this->AppThemecolors   = $this->getAppStyleColor();
-        $this->AppThemecolorsPR = $this->getPRColor( $this->AppThemecolors );
-        $this->colorPR_D        = $this->AppThemecolorsPR['PR_D'];
-        $this->manifest         =  new ManifestMaker($iapp,$this->AppThemecolorsPR);
+      
+        $this->i_app            = $iapp;
+        $this->dbConnection_    = $dbConnection;
         $this->tree             = 'tree';
         $this->userDir          = $dir;
         $this->i_app_st         = $i_app_tx;
         $this->swScript         = 'swScript';
         $this->loadeAppFile     = $loadeAppFile_;
+        
         ////////////////////////////////////
 
+        $this->AppThemecolors   = $this->getAppStyleColor();
+        $this->AppThemecolorsPR = $this->getPRColor( $this->AppThemecolors );
+        $this->colorPR_D        = $this->AppThemecolorsPR['PR_D'];
+
+
+        if(isset($this->AppThemecolorsPR['theme'])){
+            $this->colorPR_D    = $this->AppThemecolorsPR['theme'];
+        }
+
+        
+        $this->manifest         =  new ManifestMaker($iapp,$this->AppThemecolorsPR);
+
+
+        //////////////////////////////////////
         $is_user = new GetToken('userId');
        
 
-        $appWare = function () {
-
-                
-            $isAttack = $this->checkForSqlInjection($_SERVER['REQUEST_URI']);
-
-            if(!$isAttack){
-
-                $url =$_SERVER['REQUEST_URI'] ;
-
-                // $destroy = "";
-                $is_api = $this->is_api($url);
-                
-                if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_api) {
-                
-                      
-                                new api($this->i_app,$this->userDir,$this->i_app_st,$this->dbConnection_,$this->userData,$this->loadeAppFile);
-                            
-                    }
-                
-                if (isset($_GET['url'])) {
-
-                    //  $userRouter = router::match($req, $res);
-                
-                    $userRouter = false;
-
-                    if (!$userRouter) {
-
-                        $extname  = pathinfo($url, PATHINFO_EXTENSION);
-                        if($extname !== ''){
-                            $testScript = explode('?', $extname);
-                             if(count($testScript) > 1){
-                                $extname = $testScript[0];
-                             }
-                         
-                        }
-                        $is_app   = $this->is_app($extname);
-                        $is_asset = $this->is_asset($extname);
-                        $is_route = $this->is_route($url ,$extname);
-                        $fileName = $this->getfileName($url);
-                    
-                        if ($is_app) {
-                        //  return app files
-                    
-                            new AppFileHandler($url,$extname , $fileName, $this->manifest,$this->i_app_st, $this->tree, $this->userDir, $this->i_app);
-                        
-                        } else if ($is_asset) {
-
-                        //   return asset file img , js , css and others      
-                            $assetUserData = "FALSE";
-                            if(isset( $this->userData->userData["id"])){
-                                $assetUserData = json_encode( $this->userData->userData);
-                           
-                            }
-                        
-                        
-                            new AssetFileHandler($url,$extname,$this->userDir,$this->swScript, $assetUserData , $this->i_app);
-                
-                        } else if ($is_route) {
-
-                            //   return route app file
-                            new view($this->i_app,$this->colorPR_D);
-                    
-                        } else {
-
-                            echo  "<h1>500 Internal Server Error</h1>";
-                            exit();
-                            
-                        }
-                    }
-                }
-            }
-        };
+      
 
         if (isset($this->i_app['users'])) {
 
@@ -119,13 +59,13 @@ class middleWare {
          
                 
             
-                $appWare();
+                $this->appWare();
 
             } else {
 
                 // !isUser 
                 
-                $appWare();
+                $this->appWare();
             
             }
 
@@ -133,28 +73,46 @@ class middleWare {
 
                 // public app
 
-                $appWare();
+                $this->appWare();
 
         }
     
     }
 
+    function deleteFirstSlash($str) {
+        // Find the position of the first forward slash
+        $pos = strpos($str, '/');
+        
+        // If a forward slash is found
+        if ($pos !== false) {
+            // Remove the first forward slash
+            $str = substr_replace($str, '', $pos, 1);
+        }
+        
+        return $str;
+    }
     public function checkForSqlInjection($postData) {
-
+        // SQL injection pattern
         $sqlInjectionPattern = '/\b(ALTER|CREATE|DELETE|DROP|EXEC(UTE)?|INSERT(INTO)?|MERGE|SELECT|UPDATE)\b/i';
     
+        // Check if $postData is an array
         if (is_array($postData)) {
+            // Iterate through each element of the array
             foreach ($postData as $value) {
-                if (is_string($value) && preg_match($sqlInjectionPattern, $value)) {
-                    // Potential SQL injection detected
-                    return true;
+                // Check if $value is a string and matches the SQL injection pattern
+                if (is_string($value) && preg_match($sqlInjectionPattern, $value, $matches)) {
+                    // Potential SQL injection detected, return the matched attack keyword
+                    return $matches[0];
                 }
             }
-        } elseif (is_string($postData) && preg_match($sqlInjectionPattern, $postData)) {
-                    // Potential SQL injection detected
-                    return true;
+        } 
+        // Check if $postData is a string and matches the SQL injection pattern
+        elseif (is_string($postData) && preg_match($sqlInjectionPattern, $postData, $matches)) {
+            // Potential SQL injection detected, return the matched attack keyword
+            return $matches[0];
         }
     
+        // No potential SQL injection detected, return false
         return false;
     }
     
@@ -203,7 +161,100 @@ class middleWare {
         }
 
     }
+ 
+    function appWare () {
     
+     
+
+        $isAttack = $this->checkForSqlInjection($_SERVER['REQUEST_URI']);
+    
+        if(!$isAttack){
+            $is_logout = false;
+
+            if($_SERVER['REQUEST_URI'] == "/logout"){
+                $is_logout = true;
+            }
+            if(isset($this->userData->userData) && $is_logout){
+                new logoutUser($this->dbConnection_,$this->userData->userData);
+            }
+            $url =$_SERVER['REQUEST_URI'] ;
+
+            // $destroy = "";
+            $is_api = $this->is_api($url);
+            
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_api) {
+                if(isset($_POST)){
+                    $msgPost = base64_decode($_POST['msg']);
+                    $isAttack = $this->checkForSqlInjection($msgPost );
+                }
+                if(!$isAttack){
+                                $lastUserData = [];
+                                if(isset($this->userData->userData)){
+                                    $lastUserData =$this->userData->userData;
+                                }
+                  
+                            new api($this->i_app,$this->userDir,$this->i_app_st,$this->dbConnection_,$lastUserData,$this->loadeAppFile);
+                }else{
+
+                    echo  "<h1> 500 Internal Server Error $isAttack</h1>";
+                    exit();
+
+                }
+                }
+            
+            if (isset($_GET['url'])) {
+
+                //  $userRouter = router::match($req, $res);
+            
+                $userRouter = false;
+
+                if (!$userRouter) {
+
+                    $extname  = pathinfo($url, PATHINFO_EXTENSION);
+                    if($extname !== ''){
+                        $testScript = explode('?', $extname);
+                         if(count($testScript) > 1){
+                            $extname = $testScript[0];
+                         }
+                     
+                    }
+                    $is_app   = $this->is_app($extname);
+                    $is_asset = $this->is_asset($extname);
+                    $is_route = $this->is_route($url ,$extname);
+                    $fileName = $this->getfileName($url);
+                
+                    if ($is_app) {
+                    //  return app files
+                
+                        new AppFileHandler($url,$extname , $fileName, $this->manifest,$this->i_app_st, $this->tree, $this->userDir, $this->i_app);
+                    
+                    } else if ($is_asset) {
+
+                    //   return asset file img , js , css and others      
+                        $assetUserData = "FALSE";
+                        if(isset( $this->userData->userData)){
+                            $assetUserData = json_encode( $this->userData->userData);
+                       
+                        }
+                    
+                    
+                        new AssetFileHandler($url,$extname,$this->userDir,$this->swScript, $assetUserData , $this->i_app, $this->dbConnection_);
+            
+                    } else if ($is_route) {
+
+                        //   return route app file
+                        new view($this->i_app,$this->colorPR_D);
+                
+                    } else {
+
+                        echo  "<h1>500 Internal Server Error 2</h1>";
+                        exit();
+                        
+                    }
+                }
+            }
+        }
+    }
     
     public function  is_app($ext){
 
@@ -215,15 +266,18 @@ class middleWare {
 
     public function  getAppStyleColor(){
 
-       
-        $styleDir = $this->userDir.$this->i_app['dir']['style'];
+     
+        $styleDir = $this->deleteFirstSlash($this->i_app['dir']['style']);
+        $mainDir  = $this->i_app['dir']['main'];
+       $styleDir_ = $this->userDir.$mainDir.$styleDir;
+   
+      if(file_exists($styleDir_)){
 
-        if(file_exists($styleDir)){
-
-            $styleDataSt = file_get_contents($styleDir,true); 
-            $styleData   = json_decode($styleDataSt,true);
-
-            return   $styleData;
+            $styleDataSt_ = file_get_contents($styleDir_ ,true); 
+          
+            $styleData_   = json_decode($styleDataSt_  ,true);
+         
+           return   $styleData_;
 
         }else{
 
@@ -236,12 +290,14 @@ class middleWare {
        
      }
 
-     public function getPRColor($styleData){
 
+
+     public function getPRColor($styleData){
+     
         $theme      = $styleData['theme'];
         $themeData  = [];
         $colorPR    = [];
-
+       
             if($theme == "dark"){
 
                 $themeData  = $styleData['dc'];
@@ -250,7 +306,7 @@ class middleWare {
 
                 $themeData  = $styleData['lc'];
             }
-               
+       
         for($c = 0 ; $c < sizeof($themeData);$c++){
 
                 $color = $themeData[$c];
@@ -264,9 +320,14 @@ class middleWare {
 
                     $colorPR['PR'] = $color['v'];
                 }
-        }
+                if($color['k'] == "theme"){
 
+                    $colorPR['theme'] = $color['v'];
+                }
+        }
+    
        return $colorPR;
      }
 
-}
+
+    }

@@ -35,7 +35,7 @@ class makeQuery{
                 }
                 
             } elseif ($queryAction === "checkUpTime") {
-                $this->queryText = new checkQueryUptime($cureOB);
+                $this->queryText = new checkQueryUptime($cureOB["ob"],$cureOB["db"]);
             } elseif ($queryAction === "create") {
                 $this->queryText = $cureOB['d'];
             }

@@ -1,13 +1,13 @@
 <?php 
 class getDirectoryArray{
-    public $getArray;
+    public $getArray = [];
     function __construct($treeA, $pathDA)
     {
-        $this->getArray = $this->getDirectoryArray($treeA, $pathDA); 
+        $this->getArray = $this->getDirectoryArray_($treeA, $pathDA); 
     }
    
 
-function getDirectoryArray($tree, $pathD)
+function getDirectoryArray_($tree, $pathD)
 {
     $ar = [];
     $lastPath = '';
@@ -16,7 +16,7 @@ function getDirectoryArray($tree, $pathD)
 
     if ($tree['type'] == "folder") {
 
-        if ($tree['name'] !== '' && $tree['name'] !== 'public') {
+        if ($tree['name'] !== '' && $tree['name'] !== 'public_html') {
             $lastPath = $pathD . '/' . $tree['name'];
         }
 
@@ -24,7 +24,7 @@ function getDirectoryArray($tree, $pathD)
 
             if ($child['type'] == "folder") {
 
-                $children = $this->getDirectoryArray($child, $lastPath);
+                $children = $this->getDirectoryArray_($child, $lastPath);
                 foreach ($children as $childpath) {
                     array_push($ar, $childpath);
                 }
@@ -45,8 +45,10 @@ function getDirectoryArray($tree, $pathD)
 
     return $ar;
 }
-function __destruct()
+function __toString()
+
 {
-    return  $this->getArray ;
+    $data = json_encode($this->getArray );
+    return  (string) $data;
 }
 }
