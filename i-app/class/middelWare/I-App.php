@@ -4,11 +4,11 @@ class AppFileHandler
     
     function __construct($req_url, $ext, $fileName, $manifest, $i_app_st, $tree, $userDir, $i_app)
     {
-        $backBody = null;
-        $filePath = null;
-        $isApp    = $this->isUrlFilleApp($req_url);
-        $isDevUrl = $this->isUrlDevApp($req_url);
-        $dev_ = explode('/', $req_url);
+        $backBody    = null;
+        $filePath    = null;
+        $isApp       = $this->isUrlFilleApp($req_url);
+        $isDevUrl    = $this->isUrlDevApp($req_url);
+        $dev_        = explode('/', $req_url);
         $fileNamedev = end($dev_);
         $isJson = false;
 
@@ -24,6 +24,7 @@ class AppFileHandler
             $backBody = $i_app_st;
           
         } else if($filePath == null && $backBody == null) {
+
             if ($req_url === '/limitAuto.app') {
                 $filePath = __DIR__ . '/../../asset/elements/limitAuto.app';
                 $isApp = true;
@@ -44,21 +45,31 @@ class AppFileHandler
                         $filePath = $userDir . '/public_html' . $req_url;
                 }
             }
+            
         }
 
         if ($backBody == null && $filePath !== null) {
-            $extname = pathinfo($filePath, PATHINFO_EXTENSION);
+
+            $extname     = pathinfo($filePath, PATHINFO_EXTENSION);
             $contentType = $this->getContentType($extname);
 
             if (file_exists($filePath)) {
               
                 $data       = file_get_contents($filePath,true);
                 $is_Json    = json_decode($data,true);
+
                 if($is_Json){
                     $isJson = true;
                 }
-                $appDataSt  =  new IAppReadSave($data,$fileName);
-                $appData    = json_decode($appDataSt,true);
+
+                $userSrcDir =  false;
+
+                if(isset($i_app["dir"]) && isset($i_app["dir"]["src"])){
+                    $userSrcDir =  $i_app["dir"]["src"];
+                }
+
+                $appDataSt  =  new IAppReadSave($data,$req_url,$userSrcDir);
+                $appData    =  json_decode($appDataSt,true);
 
                 if ($isJson) {
 

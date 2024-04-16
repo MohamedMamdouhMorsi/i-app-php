@@ -16,13 +16,13 @@ class middleWare {
     public $loadeAppFile = " ";
     public $userData = array("userData"=>array());
 
-    function __construct($iapp,$dir,$i_app_tx,$dbConnection,$loadeAppFile_) {
+    function __construct($iapp,$dir,$dbConnection,$loadeAppFile_) {
       
         $this->i_app            = $iapp;
         $this->dbConnection_    = $dbConnection;
         $this->tree             = 'tree';
         $this->userDir          = $dir;
-        $this->i_app_st         = $i_app_tx;
+        $this->i_app_st         = json_encode($iapp);
         $this->swScript         = 'swScript';
         $this->loadeAppFile     = $loadeAppFile_;
         

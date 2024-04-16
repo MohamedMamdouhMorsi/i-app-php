@@ -4,14 +4,29 @@
 use function PHPSTORM_META\type;
 
 class IAppReadSave {
+
     public $fileData = "No File Data";
     public $fileName = "File Name";
-    public $funcKey = 0;
-    public function __construct($str,$fileName_) {
-        $this->fileName = $fileName_;
-        $strA = $this->removeComments($str);
-        $strB = $this->convertStrToOb($strA);
+    public $funcKey  = 0;
+
+    public function __construct($str,$fileName_,$userSrcDir) {
+
+        $fileNameV = str_replace('.app', '', $fileName_);
+
+        if ($userSrcDir) {
+
+            
+            $fileNameV   = str_replace($userSrcDir, '', $fileNameV);
+
+        }
+
+        $this->fileName =  $fileNameV;
+
+        $strA           = $this->removeComments($str);
+        $strB           = $this->convertStrToOb($strA);
+
         $this->fileData = $strB;
+
      
     }
     
@@ -217,7 +232,7 @@ class IAppReadSave {
                 $res .=  $car; 
             }
         }
-    return $res;
+         return $res;
     }
     function getPostObj($model,$key,$per){
 
@@ -281,7 +296,6 @@ class IAppReadSave {
             
 
     }
-  
     function convertQueryObj($jsonString,$key) {
     
      
@@ -343,13 +357,11 @@ class IAppReadSave {
             return $jsonString;
         }
     }
-
     function isNumber($input) {
         // Using the unary plus operator to convert the input to a number
         // If the input is not a valid number, is_numeric() will return false
         return is_numeric($input);
     }
-    
     function fixAndParseJSON($inputString) {
         // Replace variable names with double quoted strings
         $fixedString = preg_replace_callback('/(?<=[:,\[\s])\b[\w.]+\b(?=[,\]\s}])/', function($match) {
@@ -367,7 +379,6 @@ class IAppReadSave {
         // Parse the fixed string as JSON
         return $fixedString;
     }
-
     function convertQueryFun($jsonString,$key) {
 
         $jsonString = str_replace("'", '"', $jsonString); 
@@ -456,7 +467,7 @@ class IAppReadSave {
                    
                     $value = $andOB[1];
                    
-                    if(is_object( $value  )){
+                    if(is_array( $value  ) || is_object( $value  )){
                      
                         if(isset($value["t"]) !== "q"){
                             array_push($result,$value);

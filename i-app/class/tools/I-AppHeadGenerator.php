@@ -38,6 +38,7 @@ class AppHeadGenerator {
         if($is_three){
             $this->innerHTML .= '<script type="importmap">{"imports": {"three": "./three.js"}}</script>';
         }
+        $this->innerHTML .= '<script type="application/javascript">const appData = '.json_encode($app).';</script/>';
         $this->innerHTML .= '<script type="application/javascript" src="' . ($devMode ? '/i-app-ui.js' : '/i-app-ui.min.js') . '" async defer ></script>';
         $this->innerHTML .= '</head> <body></body> </html>';
 

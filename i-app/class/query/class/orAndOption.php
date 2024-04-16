@@ -36,9 +36,13 @@ class orAndOption{
                 }
     
                 $realtionText = $andOp[2];
-                $realtion = isset($realationSympole[$realtionText]) ? $realationSympole[$realtionText] : 'false';
+                $realtion     = isset($realationSympole[$realtionText]) ? $realationSympole[$realtionText] : 'false';
                 $value = $andOp[1];
-    
+                if(is_array($value)){
+                    echo json_encode( $value);
+                    echo json_encode($op);
+                    exit();
+                }
                 if (is_string($value)) {
                     $value = "'$value'";
                 }

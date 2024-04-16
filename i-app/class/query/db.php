@@ -458,6 +458,7 @@ class db {
                                         $res["res"]        = $result;
                                         $result["upTime"]  = $upadteTime;
                                         $res["Qsize"]      = $QSize;
+                                         $res["Q"]       = $qureyTxt;
                                         return $res;
                             }
                     
@@ -513,6 +514,7 @@ class db {
                             $res["res"]         = $result;
                             $result["upTime"]   = $upadteTime;
                             $res["Qsize"]       = $QSize;
+                            $res["Q"]       = $qureyTxt;
                             return $res;
                     }
 

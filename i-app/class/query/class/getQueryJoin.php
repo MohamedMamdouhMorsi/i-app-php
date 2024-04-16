@@ -27,11 +27,16 @@ class getJQuery {
        
             $selectedColumn = $ob['s'] && $ob['s'][0] !== 'A' ? $this->selectColumnJoin($ob['s'], $tableName, $newColumnSelectName) : $tableName . '.* ';
             $joinSting = '';
-            $testJoin_ = $this->testJoin($ob['j']);
+            
             if (isset($ob['j'])) {
+                
                 for ($o = 0; $o < sizeof($ob['j']); $o++) {
                     if (isset($ob['j'][$o]['s'])) {
-
+                        $joinJson =  false;
+                        
+                        if(!isset($ob['j'][$o]['rel'] ) && isset($ob['j'][$o]['l']) && $ob['j'][$o]['l'] == "0"){
+                            $joinJson =  true;
+                        }
                         $cureTableName           = $ob['j'][$o]['n'];
                         $newColumnSelectNameJoin = [];
                         $cureTableCol            = $tables[$cureTableName];  
@@ -40,22 +45,20 @@ class getJQuery {
                             $newColumnSelectNameJoin =$ob['j'][$o]['sn'] ;
                         }
 
-                        $selectedColumnJoin = isset($ob['j'][$o]['s'] ) && $ob['j'][$o]['s'][0] !== "A" ? $this->selectColumnJoin($ob['j'][$o]['s'], $cureTableName, $newColumnSelectNameJoin) : $cureTableName . '.* ';
-                        
-                        if(isset($ob['j'][$o]['l']) && $ob['j'][$o]['l'] !== "0"){
-                            $selectedColumn .= ' , ' . $selectedColumnJoin;
-                            //normal
-                        }else  if(isset($ob['j'][$o]['l']) && $ob['j'][$o]['l'] == "0"){
-                            //array
-                            if($testJoin_ ){
-                               
-                                $selectedColumn .= ' , '.$cureTableName.'.'.$cureTableName;
+                        $selectedColumnJoin = $cureTableName . '.* ';
+                        if( isset($ob['j'][$o]['s'] ) && $ob['j'][$o]['s'][0] !== "A" ){
+                            if( isset($ob['j'][$o]['rel'] )){
+                                $selectedColumnJoin = $this->selectRelColumnJoin($ob['j'][$o]['rel'],$ob['j'][$o]['s'], $cureTableName, $newColumnSelectNameJoin) ;
                             }else{
-                                $selectAllColumnsJoin_      = $this->selectAllColumnsJoin($cureTableCol , $cureTableName);
-                                $selectedColumn            .= ", JSON_ARRAYAGG(JSON_OBJECT($selectAllColumnsJoin_ )) AS $cureTableName ";
+                                $selectedColumnJoin = $this->selectColumnJoin($ob['j'][$o]['s'], $cureTableName, $newColumnSelectNameJoin) ;
                             }
                         }
-                       
+                        
+                        if($joinJson ){
+                            $selectedColumn .= ' , '.$cureTableName.'.'.$cureTableName;
+                        }else{
+                            $selectedColumn .= ' , ' . $selectedColumnJoin;
+                        }
 
                         if ($ob['j'][$o]['q']) {
 
@@ -66,8 +69,14 @@ class getJQuery {
                             }
 
                             $multiArraySelect         = "";
-                            if($testJoin_){
-                                    $selectAllColumnsJoin_B   = $this->selectAllColumnsJoinKata($cureTableCol , $cureTableName);
+                            if($joinJson){
+                                    $selectJoinArray = [];
+                                    if($ob['j'][$o]['s'][0] == "A"){
+                                        $selectJoinArray = $cureTableCol;
+                                    }else{
+                                        $selectJoinArray = $ob['j'][$o]['s'];
+                                    }
+                                    $selectAllColumnsJoin_B   = $this->selectAllColumnsJoinKata($selectJoinArray,$newColumnSelectNameJoin);
                                     $multiArraySelect         = " (SELECT $pointerData , JSON_ARRAYAGG(JSON_OBJECT($selectAllColumnsJoin_B )) AS $cureTableName FROM $cureTableName GROUP BY $pointerData ) AS ";
                             }
 
@@ -201,6 +210,39 @@ class getJQuery {
         }
         return $columnName;
     }
+    public static function selectRelColumnJoin($rel ,$op, $tableName, $sn) {
+
+        $opText = "";
+      
+        for ($i = 0; $i < sizeof($op); $i++) {
+            if($rel[$i] == "sum"){
+                $selectColumnName =  ' AS ' . $op[$i];
+                
+                if(isset( $sn[$i] )  &&  $sn[$i]  !== false ){
+                    $selectColumnName =  ' AS ' . $sn[$i];
+                }
+            
+                $opText          .= 'COALESCE(SUM('.$tableName . '.' . $op[$i] .'),0) '. $selectColumnName . ' ';
+
+                if (isset($op[$i + 1])) {
+                    $opText .= ', ';
+                }
+            }else{
+                $selectColumnName ='';
+                if(isset( $sn[$i] ) &&  $sn[$i]  !== false ){
+                    $selectColumnName =  ' AS ' . $sn[$i];
+                }
+            
+                $opText          .= $tableName . '.' . $op[$i] . $selectColumnName . ' ';
+    
+                if (isset($op[$i + 1])) {
+                    $opText .= ', ';
+                }
+            }
+        }
+
+        return $opText;
+    }
     public static function selectColumnJoin($op, $tableName, $sn) {
 
         $opText = "";
@@ -282,28 +324,31 @@ class getJQuery {
         
         return $opText;
     }
-    public static function selectAllColumnsJoinKata($op, $tableName) {
-     
-        $opText = "";
-    
-        for ($i = 0; $i < sizeof($op); $i++) {
+    public static function selectAllColumnsJoinKata($op,$sn) {
+        
+            $opText = "";
+        
+            for ($i = 0; $i < sizeof($op); $i++) {
 
-            $opKeyName        = $op[$i];
-         
-            $opText          .= "'".$opKeyName."' ,". $opKeyName ;
+                $opKeyName        = $op[$i];
+                $opKeyValue        = $op[$i];
+                if(isset($sn[$i])){
+                    $opKeyName        = $sn[$i];
+                }
+                $opText          .= "'".$opKeyName."' ,".  $opKeyValue;
 
-            if (isset($op[$i + 1])) {
+                if (isset($op[$i + 1])) {
 
-                $opText .=  " , " ;
+                    $opText .=  " , " ;
+
+                }
 
             }
-
-        }
+            
+            $opText .="";
         
-        $opText .="";
-    
-    return $opText;
-}
+        return $opText;
+    }
     public  function getLimit($ob) {
 
         $limit = '';

@@ -13,6 +13,7 @@ class updateQueryInput {
 
                 if(isset($query_["id"])){
                         $funcId = $query_["id"];
+                        $funcId = str_replace('\\', '', $funcId);
                         $idAr = explode("_",$query_["id"]);
                        
                         if(sizeof($idAr) == 4 || sizeof($idAr) == 5 && $idAr[0] == 'dev'){
@@ -39,12 +40,13 @@ class updateQueryInput {
                                
                                 $fileDir = __DIR__ . '/../../../asset/elements/'.$filename.".app";
                             }
+                            $fileDir = str_replace('//', '/', $fileDir);
                            
-
                             if(file_exists($fileDir)){
                              
                                 $template     = file_get_contents($fileDir,true); 
                                 $object       = new IAppReadQuery($template ,$filename, $funcId);
+                              
                                 if(isset($query_["limitAuto"])){
                                     $object->objectSt_["limitAuto"] = $query_["limitAuto"];
                                 }
@@ -53,7 +55,7 @@ class updateQueryInput {
                                     $object->objectSt_["last"] = $query_["last"];
                                 }
                                 $updatedQuery = $this->updateQuery($object->objectSt_,$object->QMAP,$object->QJMAP,$object->DMAP ,$query_);
-                               
+                            
                                 array_push($this->query, $updatedQuery);
 
                             }else{

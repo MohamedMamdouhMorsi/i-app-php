@@ -9,7 +9,10 @@ class deleteQuery {
 
     if (isset($tables[$tableName])) {
         $orAndOptionText = new orAndOption($ob['q'], $tables[$tableName]);
-        $limit = $ob['l'] && $ob['l'] == 0 ? '' : "LIMIT ".$ob['l'];
+        $limit = '';
+        if(isset($ob['l']) && $ob['l'] != 0 &&  $ob['l'] != '0'){
+            $limit = "LIMIT ".$ob['l'];
+        }
 
         $this->getText = "DELETE FROM $tableName WHERE $orAndOptionText $limit ;";
         
