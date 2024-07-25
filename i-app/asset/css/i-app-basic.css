@@ -23,6 +23,57 @@ body {
     -moz-osx-font-smoothing: grayscale;
  
 }
+
+#VRButton{
+    display: none;
+}
+
+.iconStep{
+    position: absolute;
+    margin-top: 7px;
+    top:0;
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    left: 0;
+    margin-left: 0;
+}
+
+.divStep{
+    display: inline-block;
+    left: 0;
+    float: left;
+    height: 35px;
+}
+.lineGStep{
+    background-color: #c8c8c8;
+    position: absolute;
+    width: 100%;
+    margin-top: 12px;
+    opacity: 0.5;
+    left: 12px;
+    margin-bottom: 12px;
+    height: 5px;
+}
+.lineWStep{
+    background-color: #ffffff;
+    position: absolute;
+    width: 100%;
+    margin-top: 12px;
+    left: 12px;
+    margin-bottom: 12px;
+    height: 5px;
+}
+
+.linePStep{
+    background-color: var(--PR);
+    top: 0;
+    margin-top: 12px;
+    position: absolute;
+    left: 12px;
+    height: 5px;
+}
+
 /*
 code style
 */
@@ -36,14 +87,17 @@ code{
     font-size: 16px;            /* font size */
     color:var(--AC);
 }
+
 .codeHolder{
     
     padding: 5px 10px;   
 }
+
 .tab_indent {
     display: inline-block;
     width: 2em;  /* Adjust this value based on the desired "tab" width */
 }
+
 .keyword {
     color:#5d5dff;
 }
@@ -55,9 +109,11 @@ code{
 .number {
     color: red;
 }
+
 .legacy{
     color: var(--PR);
 }
+
 .function {
     color: rgb(241, 67, 241);
 }
@@ -69,18 +125,21 @@ code{
 .brackets_square{
     color: rgb(174, 87, 236);
 } 
+
 .brackets_curly{
     color: rgb(82, 59, 255);
 } 
+
 .brackets_round{
     color: rgb(114, 137, 221);
 } 
+
 .special_chars{
     color: rgb(7, 220, 0);
 }
 
-  
-  .tooltip .tooltiptext {
+
+.tooltip .tooltiptext {
     visibility: hidden;
     width: 50px;
     background-color: #555;
@@ -98,7 +157,7 @@ code{
     transition: opacity 0.3s;
   }
   
-  .tooltip .tooltiptext::after {
+.tooltip .tooltiptext::after {
     content: "";
     position: absolute;
     top: 100%;
@@ -109,7 +168,7 @@ code{
     border-color: #555 transparent transparent transparent;
   }
   
-  .tooltip:active .tooltiptext {
+.tooltip:active .tooltiptext {
     visibility: visible;
     opacity: 1;
   }
@@ -200,10 +259,13 @@ font-family: 'Cairo'
     font-family:monospace;
 }
 .FF_sansserif{
-    font-family:sans-serif;
+    font-family:'Roboto', sans-serif;
 }
 .FF_serif{
     font-family:serif;
+}
+.FF_sys{
+    font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 body::-webkit-scrollbar {
@@ -266,7 +328,20 @@ svg:not(:root) {
     overflow: hidden;
 }
 
-
+/*
+Button Basic
+BT
+B_PR_D F_WHITE B_R_5 pT_5 pB_5 pR_10 pL_10 mT_10 ST_WHITE_2 MD
+*/
+.BT{
+    border-radius: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: none;
+  
+}
 button,
 html input[type="button"],
 input[type="reset"],
@@ -358,7 +433,9 @@ hr {
     bottom: 0;
     margin-bottom: 5px;
 }
-
+.B_N{
+    border: none;
+}
 .table tr:nth-of-type(2n){
  
     filter: brightness(90%);
@@ -367,6 +444,7 @@ hr {
  
     filter: brightness(70%);
 }
+
 .table thead{
    
     filter: brightness(80%);
@@ -387,10 +465,19 @@ hr {
         display: block;
 
     }
+    .table >tbody> td {
+        width: 100%;
+        display: block;
+
+    }
     .table td::before {
        content: attr(model_data) " : ";
        font-weight: 700;
     }
+    .table tbody td::before {
+        content: attr(model_data) " : ";
+        font-weight: 700;
+     }
     .table .settings {
         width: 10px;
         display: block;
@@ -421,11 +508,13 @@ dragable
 .hovTW:hover,
 .hovTW:focus{
 width: auto;
+
 filter: brightness(100%);
 }
 .hovTW{
     width: 10px;
     height: 30px;
+    transition: width 1s ease, filter 1s ease; 
 }
 .hovTW{
     overflow: hidden;
@@ -434,7 +523,8 @@ filter: brightness(100%);
     content: '\22EE';
     font-size: 14px;
     line-height: 0;
-    color: var(--B);
+    
+    cursor: pointer;
 }
 .selectIcon::after{
     content: '\25be';
@@ -444,7 +534,7 @@ filter: brightness(100%);
 }
 .hovTW:hover:before,
 .hovTW:hover:focus{
-   display: none;
+  display: none;
 }
 .HOV:hover ,
 .HOV:focus  {
@@ -481,6 +571,10 @@ filter: brightness(100%);
 .HOVCPRD:hover ,
 .HOVCPRD:focus  {
     color: var(--PR_D);
+}
+.HOVBPRD:hover ,
+.HOVBPRD:focus  {
+    background: var(--PR_D);
 }
 .HOVCWHITE:hover ,
 .HOVCWHITE:focus  {
@@ -702,7 +796,9 @@ tringB{
 /***
 GLASS
 **/
-
+.NOBG{
+    background-color: transparent;
+}
 .BBGLASS{
     background-color:rgba(0, 0, 0, 0.432);
     backdrop-filter: blur(2px);
@@ -748,6 +844,10 @@ GLASS
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+.BBST{
+    background: rgb(0,0,0);
+background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(241,241,241,0) 100%);
+}
 /****************************************************
 auto class
 */
@@ -757,6 +857,9 @@ cursor
 */
 .pointer {
     cursor: pointer;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }
 .move {
     cursor: move;
@@ -783,9 +886,7 @@ display
 .D_INB {
     display: inline-block;
 }
-.D_FLR {
-    display: flow-root;
-}
+
 .D_FLOWROOT,.D_FR,.D_FLR {
     display: flow-root;
 }
@@ -922,6 +1023,13 @@ overflow
 }
 
 
+
+.SCROLLER::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+   
+}
+
 .SCROLLER::-webkit-scrollbar-thumb {
   
     background: var(--PR);
@@ -932,11 +1040,14 @@ overflow
     background: var(--W);
     position: absolute;
 }
-.SCROLLER ::-webkit-scrollbar-track {
-    background: var(--W);
-    position: absolute;
-}
 
+
+
+.overAutoX::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+   
+}
 .overAutoX ::-webkit-scrollbar-thumb {
     background: var(--PR);
     border-radius: 10px;
@@ -975,7 +1086,7 @@ custom element
     border: none;
     border-bottom: 4px solid var(--PR);
     color:var(--B);
-    padding: 5px 10px;
+    padding: 4px 10px;
 
 }
 .inputLabel{
@@ -987,7 +1098,7 @@ custom element
 .switch {
     position: relative;
     display: inline-block;
-    width: 45px;
+    width: 100px;
     height: 22px;
 }
 
@@ -1009,6 +1120,7 @@ custom element
     width: 45px;
     height: 22px;
     top: 0;
+    padding: 5px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -1038,13 +1150,19 @@ custom element
 
 .slider.round:before {
     border-radius: 50%;
+    position: absolute;
 }
 
 .Ztop {
-    z-index: 10;
+    z-index: 11999;
 }
 
 /* @media */
+.mHO{
+    overflow-x: hidden;
+    height: 60%;
+    
+}
 .main,.FLX_C{
     width: 80%;
     max-width: 1200px;
@@ -1068,6 +1186,9 @@ custom element
 .pc{
     display: none;
 }
+.mHO{
+    height: 80%;
+}
 .mob{
     display: unset;
 }
@@ -1083,7 +1204,9 @@ custom element
     width: 100%;
     
 }
-
+.mHO{
+    height: 80%;
+}
 .labtob{
     display: none;
 }
@@ -1092,7 +1215,11 @@ custom element
 }
   }
 
-
+.center{
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
 /*lazyCards */
   .lazyCards {
     width: 100vw;
@@ -1237,6 +1364,20 @@ animation class
 /**
 */
 
+.closeSlide{
+    animation: anmiCloseSlide 6000 ease-in;
+    overflow: hidden;
+    height: 0px;
+}
+
+@keyframes anmiCloseSlide{
+    0%{
+        height: auto;
+    }
+    100%{
+        height: 0px;
+    }
+}
 .ani_maxHight{
     -webkit-transition: max-height 1s; 
     -moz-transition: max-height 1s; 
@@ -1307,6 +1448,9 @@ control degree
 
 .rotate_90{
     transform: rotate(90deg);
+}
+.rotate_m90{
+    transform: rotate(-90deg);
 }
 .rotate_180{
     transform: rotate(180deg);
@@ -1611,14 +1755,21 @@ Drop Btn
 /*
 img Cover 
 */
+
+
 /*
 to control view area use  overflow hidden holder
 */
+
 .imgHolder {
     width: 100%;
     overflow: hidden;
 }
-
+.imgCoverAll {
+    width: 100%;
+    
+    height: 100%;
+}
 .imgCover {
     width: 100%;
     
@@ -1636,7 +1787,12 @@ to control view area use  overflow hidden holder
     margin-right: -50%;
 
 }
+.imgCoverAll {
+    width: 400%;
+    margin-left: -150%;
+    margin-right: -150%;
 
+}
 .imgCoverL {
     width: 200%;
     margin-right: -100%;
@@ -1647,6 +1803,12 @@ to control view area use  overflow hidden holder
 .imgCover {
     width: 200%;
     margin-left: -50%;
+   
+}
+.imgCover {
+    width: 200%;
+    margin-left: -50%;
+    margin-right: -50%;
    
 }
 .imgCoverL {
@@ -2005,3 +2167,277 @@ margin: 30px auto 0 auto;
         background-color: hsl(200, 20%, 95%);
     }
 }
+.VRICON{
+    position: fixed;
+    bottom: 10px;
+    right: 5%;
+    cursor: pointer;
+    font-size: 50px;
+    color: #fff;
+}
+
+.toast {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    animation: fadeInOut 3s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 1;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+.OV_YAH{
+    overflow-y:auto ;
+    height: 100vh;
+}
+.OV_YA{
+    overflow-y:auto ;
+    height: 80vh;
+}
+
+.IC3{
+   color: #ffffff;
+   font-size: 20px;
+   text-align: center;
+   align-content: center;
+   display: inline-block;
+   padding: 5px;
+   border: 1px #fff solid;
+   background-color:rgba(0, 0, 0, 0.432);
+   backdrop-filter: blur(2px);
+   border-radius: 50%;
+}
+.ICDIVH {
+    font-weight: bold;
+    font-size: 16px;
+ 
+}
+.ICDIVP {
+    padding: 10px;
+   text-align: start;
+    font-size: 16px;
+
+}
+.ICDIV{
+    font-size: 12px;
+    position: absolute;
+    text-align: center;
+    align-content: center;
+    left: 0;
+    top: 30px;
+    width: max-content;
+    padding:10px 5px ;
+    background-color:rgba(0, 0, 0, 0.432);
+    backdrop-filter: blur(2px);
+    border-radius: 15px;
+    
+}
+.light {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+    animation: fade-out 2s linear infinite; /* Loop forever */
+  }
+  @keyframes fade-out {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+.IC2{
+   font-size: 18px;
+   position: absolute;
+   text-align: center;
+   cursor: pointer;
+   background-color:rgba(0, 0, 0, 0.432);
+   backdrop-filter: blur(2px);
+   align-content: center;
+   left: 0;
+   top: 0;
+   width:30px;
+   height:30px;
+
+   border-radius: 50%;
+}
+.ICX{
+
+    position: absolute;
+
+    border-radius: 50%;
+ 
+    align-content: center;
+   
+    width:50px;
+    height:50px;
+ 
+    border-radius: 50%;
+ }
+.ICOAC{
+padding: 10px;
+border-radius: 50%;
+font-size: 20px;
+cursor: pointer;
+}
+
+.OV_YA::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+   
+}
+
+.OV_YA::-webkit-scrollbar-thumb {
+    background: var(--PR);
+    border-radius: 10px;
+}
+
+.OV_YA::-webkit-scrollbar-track {
+    background: var(--W);
+    position: absolute;
+}
+
+
+.OV_YAV{
+    overflow-y: auto;
+    height: 87%;
+    max-height: 570px;
+}
+.OV_YAV::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+   
+}
+
+.OV_YAV::-webkit-scrollbar-thumb {
+    background: var(--PR);
+    border-radius: 10px;
+}
+
+.OV_YAV::-webkit-scrollbar-track {
+    background: var(--W);
+    position: absolute;
+}
+
+.slideC {
+    width: 100%; /* Set the width of the container */
+    overflow: hidden; /* Hide any content that overflows the container */
+}
+
+.slideW {
+    display: flex; /* Use flexbox for horizontal layout */
+    transition: transform 0.5s ease; /* Smooth transition for sliding effect */
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.slideI {
+    flex: 0 0 auto; /* Prevent items from growing or shrinking */
+    width: 20%; /* Set width of each slide */
+    min-width: 200px;
+    margin-right: 10px; /* Adjust spacing between slides */
+}
+
+/* Optional: Hide horizontal scrollbar */
+
+
+div.slideW::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+   
+}
+
+div.slideW::-webkit-scrollbar-thumb {
+    background: var(--PR);
+    border-radius: 10px;
+}
+
+div.slideW::-webkit-scrollbar-track {
+    background: var(--W);
+    position: absolute;
+    display:flow-root;
+}
+.dragC{
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.dragIcon{
+    cursor: grab;
+    display: block;
+    width: 100%;
+}
+
+.notDrag.notDragStart{
+    pointer-events: none;
+    
+}
+.noClick{
+    pointer-events: none;
+    
+}
+.dragI.dragging {
+    opacity: 0.5;
+   
+}
+
+/*
+slide range
+*/
+/* The slider itself */
+.slider_ {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+  
+    height: 10px; /* Specified height */
+    background: #d3d3d3; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+  }
+  
+  /* Mouse-over effects */
+  .slider_:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+  }
+  
+  /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+  .slider_::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 15px; /* Set a specific slider handle width */
+    height: 15px; /* Slider handle height */
+    background: #6c6c6c; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
+  
+  .slider_::-moz-range-thumb {
+    width: 15px; /* Set a specific slider handle width */
+    height: 15px; /* Slider handle height */
+    background: #6c6c6c; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }

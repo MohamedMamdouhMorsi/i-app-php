@@ -24,7 +24,6 @@ class AppFileHandler
             $backBody = $i_app_st;
           
         } else if($filePath == null && $backBody == null) {
-
             if ($req_url === '/limitAuto.app') {
                 $filePath = __DIR__ . '/../../asset/elements/limitAuto.app';
                 $isApp = true;
@@ -45,12 +44,11 @@ class AppFileHandler
                         $filePath = $userDir . '/public_html' . $req_url;
                 }
             }
-            
         }
 
         if ($backBody == null && $filePath !== null) {
 
-            $extname     = pathinfo($filePath, PATHINFO_EXTENSION);
+            $extname = pathinfo($filePath, PATHINFO_EXTENSION);
             $contentType = $this->getContentType($extname);
 
             if (file_exists($filePath)) {

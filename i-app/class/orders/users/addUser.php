@@ -15,8 +15,8 @@ class addUser{
             $email          = $msgData_["email"];
             $phonenumber    = $msgData_["phonenumber"];
             $accountType    = $msgData_["accountType"];
-            $passwordSt     = $msgData_["password"];
-            $password       = new CreatAUTH($passwordSt);
+            $passwordSt    = $msgData_["password"];
+            $password        = new CreatAUTH($passwordSt);
    
             $insertUser = $db->query([
                 "query"=>[[

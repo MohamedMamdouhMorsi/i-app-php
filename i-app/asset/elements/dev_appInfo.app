@@ -1,12 +1,33 @@
         {
                             c:'main '
-
+                             i:'appInfo'
                             e:[
-                    
-                                {
+                    {
+                        c:'WW'
+                        e:[
+                            {
+                                c:'WW PD_10 B_GRY5 F_WHITE B_R_15'
+                                s:'You Can mange your App from here or edit your i.app file '
+                                e:[
+                                    {
+                                        t:'a'
+                                        c:'F_PR'
+                                        hr:{https:'github.com/MohamedMamdouhMorsi/i-app'}
+                                        s:'Read More ...'
+                                    }
+                                ]
+                            }
+                            
+                        ]
+                    }
+                              
+                              {
+                                I:'dev_logoIcon'
+                              } 
+                               {
                                     t:'t'
                                     c:'WW'
-                                    i:'appInfo'
+                                  
                                     a:{
                                         e:'auto'
                                         fn:{
@@ -41,7 +62,7 @@
                                                                     e:'change',
                                                                     fn(){
                                                                         if(_.E_I_S('pwa').checked){
-                                                                        
+                                                                      
                                                                             }else{
                                                                             _.CL_('Not checked');
                                                                             }
@@ -62,7 +83,7 @@
                                                         t:'in',
                                                         i:'isUsers',
                                                         s:'users',
-                                                        val:v.app.users?true:false,
+                                                        val:v.app.users ?true:false,
                                                         mod:'checkbox',
                                                              a:{
                                                                     e:'change',
@@ -70,11 +91,13 @@
                                                                         if(_.E_I_S('isUsers').checked){
                                                                             v.app.users = 'true';
                                                                             _.D_CL(['usersTab','D_N']);
+                                                                          
                                                                               _.D_CL(['users','D_N']);
                                                                             }else{
                                                                                 _.A_CL('usersTab','D_N');
                                                                                   _.A_CL('users','D_N');
-                                                                                _.AL_('You will  deactivate users option that will deactivate  users system and will not effect or delete your database you can take the necessary action for this')
+                                                                                _.AL_('You will  deactivate users option that will deactivate  users system and will not effect or delete your database you can take the necessary action for this');
+
                                                                               v.app.users = 'false';
                                                                             }
                                                                         }
@@ -93,35 +116,41 @@
                                                             {
                                                         t:'in',
                                                         i:'devMode',
-                                                        val:v.app.mode?true:false,
+                                                        val:v.app.mode  === 'dev'?true:false,
                                                         s:'dev',
                                                         mod:'checkbox',
                                                              a:{
                                                                     e:'change',
                                                                     fn(){
                                                                         if(_.E_I_S('devMode').checked){
+                                                                        
                                                                              v.app.mode = 'dev';
                                                                             }else{
-                                                                                _.AL_('You will switch the dev mode To return the application to development mode,  mode:dev  must be added to the i.app file')
+                                                                                _.AL_('You will switch the dev mode To return the application to development mode,  mode:dev  must be added to the i.app file');
                                                                               delete  v.app.mode;
                                                                             }
                                                                         }
                                                                     }
-                                                     },
-                                                     {
+                                                            },
+                                                            {
                                                                 t:'tx',
                                                                 s:'Development mode is the default when starting a project, if you are ready to deploy and use your application on the server, please make sure that development mode is deactivated'
 
-                                                            },
-                                                            {
-                                                                t:'b',
-                                                                c:'F_RE7',
-                                                                s:'Note: To return the application to development mode,  mode:dev  must be added to the i.app file'
+                                                            },{
+                                                                  c:'WW PD_10 B_RE5 F_WHITE B_R_15',
+                                                                  e:[
+                                                                        {
+                                                                            t:'b',
+                                                                            c:'F_WHITE',
+                                                                            s:'Note if You disable the Dev Mode To return the application to development mode,  mode:dev  must be added to the i.app file'
+                                                                        }
+                                                                  ]
                                                             }
+                                                           
                                                         ]
                                                      }
                                                 ]
-                                            }
+                                            };
                                              _.CR_( pwa,'appInfo',false);
                                             }
                                         }

@@ -4,11 +4,11 @@ import {
 
 import {
 	XRHandPrimitiveModel
-} from './XRHandPrimitiveModel.js';
+} from '/WEBGL/XRHandPrimitiveModel.js';
 
 import {
 	XRHandMeshModel
-} from './XRHandMeshModel.js';
+} from '/WEBGL/XRHandMeshModel.js';
 
 class XRHandModel extends Object3D {
 

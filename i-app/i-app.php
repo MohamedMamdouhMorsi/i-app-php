@@ -29,7 +29,8 @@ class i_app{
     }
 
     public function post($apiUrl){
-        return  new IappPost($apiUrl);
+        $postArray =  new IappPost($apiUrl);
+        return $postArray->postArray;
     }
 
 

@@ -31,7 +31,7 @@ private static function setUpData($data, $table) {
         $columnName = $table[$columnIndex];
         $value = $data[$i][1];
 
-        if (is_string($value)) {
+        if (is_string($value) && $value !== "now()" ) {
             $upData .= "$columnName = '$value'";
         } else {
             $upData .= "$columnName = $value";

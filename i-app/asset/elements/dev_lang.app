@@ -2,7 +2,16 @@
                     
                     i:'lang'
                     c:'main  D_N'
-                    e:[  {
+                    e:[ 
+                        {
+                            t:'h1'
+                            s:'Text languages'
+                        }
+                        {
+                            t:'p'
+                            s:'You can choose the default language by clicking on the star'
+                        }
+                         {
                             i:'alllangHolder'
                             e:[
                                 {I:'dev_selectLang'}
@@ -10,19 +19,26 @@
                         }
                       
                        
+                        
                         {
-                            t:'br'
+                            c:'WW PD_5'
+                            e:[
+                                {
+                                    t:'b'
+                                    s:'Select More Languages : '
+                                }
+                            ]
                         }
                         {
-                            t:'b'
-                            s:'Select More Languages : '
-                        }
+                            c:'WW PD_5'
+                            e:[
+                                       
                        {
                                 t:'sl'
-                                s:'q.{name}'
+                                s:'Search in Languages'
                                 mod:'languages'
                                 vq:'code'
-                                c:'ST_PR_2 PD_5'
+                                c:'ST_PR_2 mT_20'
                                 i:'langSelect'
                                 a:{
                                     e:'change' 
@@ -53,6 +69,58 @@
                                         }
                                     ]
                         }
+
+                          {
+                            c:'WW'
+                            e:[
+                                {
+                                    t:'h2'
+                                    s:'Extract'
+
+                                }
+                                {
+                                    t:'p'
+                                    s:'Extract texts from application files and Update your application default language file just click'
+                                }
+                                {
+                                    t:'bt'
+                                    c:'W_200 mT_50 B_PR F_WHITE'
+                                    s:'Extract & Update'
+                                    a:{
+                                        fn:{
+                                            _._POST('/api',{order:'updateTxt'},false);
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                        {
+                            c:'WW'
+                            e:[
+                                {
+                                    t:'h2'
+                                    s:'Translate'
+                                }
+                                {
+                                    t:'p'
+                                    s:'Translate the default version of the translation file into the languages you chose above. This will take some time, so be careful not to close the browser until the program finishes translating. just click'
+                                }
+                                {
+                                    t:'bt'
+                                    c:'W_200 mT_50 B_PR F_WHITE'
+                                    s:'Update Lang'
+                                    a:{
+                                        fn:{
+                                            _.dev_translate('app');
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                      
+                            ]
+                        }
+                 
                     ]
                    
                 }
