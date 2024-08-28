@@ -14,7 +14,10 @@ class IappPost{
                  
                     $msgObj = json_decode($msgSt,true);
                     $msgIsSave = $this->checkForSqlInjection_($msgObj);
+<<<<<<< HEAD
                     
+=======
+>>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
                     if(!$msgIsSave){
                         $this->postArray = $msgObj;
                     }

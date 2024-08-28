@@ -24,11 +24,15 @@ class AppFileHandler
             $backBody = $i_app_st;
           
         } else if($filePath == null && $backBody == null) {
+<<<<<<< HEAD
 
             if ($req_url === '/countryFlags.json') {
                 $filePath = __DIR__ . '/../../asset/img/flags/countryFlags.json';
                 $isApp = true;
             } elseif  ($req_url === '/limitAuto.app') {
+=======
+            if ($req_url === '/limitAuto.app') {
+>>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
                 $filePath = __DIR__ . '/../../asset/elements/limitAuto.app';
                 $isApp = true;
             } elseif  ($req_url === '/sl.app') {
@@ -48,12 +52,11 @@ class AppFileHandler
                         $filePath = $userDir . '/public_html' . $req_url;
                 }
             }
-            
         }
 
         if ($backBody == null && $filePath !== null) {
 
-            $extname     = pathinfo($filePath, PATHINFO_EXTENSION);
+            $extname = pathinfo($filePath, PATHINFO_EXTENSION);
             $contentType = $this->getContentType($extname);
 
             if (file_exists($filePath)) {

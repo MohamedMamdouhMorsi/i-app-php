@@ -25,10 +25,11 @@
 
                     // do query
 
-                        new query( $dbConnection , $msgJson,$dir,$i_app);
+                    
+                   
+                    new query( $dbConnection , $msgJson,$dir,$i_app);
                 
-                }else{
-
+            }else{
                 echo '{ "message": "Invalid request method" , "error":'.$msg.' }';
                 
                 exit();

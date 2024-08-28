@@ -1,5 +1,5 @@
 # i-app 
-> BETA  ( javascript , PHP, mysql) dev-master
+> V-X1  ( javascript , PHP, mysql) dev-master
 
 
 ## i-app is a full-stack language designed to simplify the development of web applications. It is built with pure JavaScript and can be easily integrated into your project. i-app supports multiple technologies, including JavaScript, Node.js, PHP, and Python.
@@ -9,9 +9,7 @@
 [![Contribute](https://img.shields.io/badge/help-contribute-551A8B.svg)](https://github.com/MWN-S/i-app)
 
 [<img src="https://i-app.org/img/i-app.gif" width="128"/>](https://i-app.org)
-#VR
-https://m-w-n.com/mwn/3/examples/#webgl_panorama_dualfisheye
-https://m-w-n.com/mwn/3/examples/#webgl_panorama_cube
+
 
 ## Welcome To  i-app Revolution .
 ### Build the Future  Build the Next Big Thing

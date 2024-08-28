@@ -39,7 +39,11 @@ class AppHeadGenerator {
                     $appScreen = $app['dir']['screen'];
                     $appScreen ='https://' . $app['domain'] . '' .  $appScreen ;
                 }else{ 
+<<<<<<< HEAD
                     $appScreen = 'https://' . $app['domain'] . '' .$app['dir']['icon'] . 'favicon-96x96.png';
+=======
+                    $appScreen = $app['dir']['icon'] . 'favicon-96x96.png';
+>>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
                 }
             }
         
@@ -65,11 +69,16 @@ class AppHeadGenerator {
         $this->innerHTML .= '<meta property="twitter:card" content="summary_large_image"  />';
        
 
+<<<<<<< HEAD
         $this->innerHTML     .= self::META_TAG;
 
+=======
+        $this->innerHTML .= self::META_TAG;
+>>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
         if($is_three){
             $this->innerHTML .= '<script type="importmap">{"imports": {"three": "https://' . $app['domain'] . '/three.js"}}</script>';
         }
+<<<<<<< HEAD
 
         if(isset($app['opencv'])){
             $this->innerHTML .= '<script async src="https://docs.opencv.org/master/opencv.js"></script>';
@@ -77,6 +86,13 @@ class AppHeadGenerator {
 
         $this->innerHTML .= '<script type="application/javascript">const appData = '.json_encode($app).';</script/>';
         $this->innerHTML .= '<script type="application/javascript" src="https://' . $app['domain'] . '' . ($devMode ? '/i-app-ui.js' : '/i-app-ui.min.js') . '" async defer ></script>';
+=======
+        if(isset($app['opencv'])){
+         $this->innerHTML .= '<script async src="https://docs.opencv.org/master/opencv.js"></script>';
+        }
+        $this->innerHTML .= '<script type="application/javascript">const appData = '.json_encode($app).';</script/>';
+        $this->innerHTML .= '<script type="application/javascript" src="' . ($devMode ? '/i-app-ui.js' : '/i-app-ui.min.js') . '" async defer ></script>';
+>>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
         $this->innerHTML .= '</head> <body>'.$imgBody.'</body> </html>';
 
        

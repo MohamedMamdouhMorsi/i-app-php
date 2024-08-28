@@ -18,18 +18,18 @@ class logUser{
 
             $userExist = $db->query([
                 "query"=>[ [
-                                "n"=> "users",
-                                "a"=> "get",
-                                "l"=> "1",
-                                "q"=>[
-                                        [
-                                            [
-                                                "username",
-                                                $username ,
-                                                "eq"
-                                            ]
+                                        "n"=> "users",
+                                        "a"=> "get",
+                                        "l"=> "1",
+                                        "q"=>[
+                                                [
+                                                    [
+                                                        "username",
+                                                        $username ,
+                                                        "eq"
+                                                    ]
+                                                ]
                                         ]
-                                ]
                                 ]]
                             ]);
 
