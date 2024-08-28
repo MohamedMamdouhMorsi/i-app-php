@@ -94,26 +94,28 @@ class logUser{
                 
                         if(sizeof($userSessions) > 0){
                             $updateCureSession = $db->query([
-                                "query"=>[  [
-                                    "n"=> "usersSessions",
-                                    "a"=> "up",
-                                    "l"=> "1",
-                                    "d"=>[[3,$cureDeviceId],[4,$cureUserId],[5,'FALSE']],
-                                    "q"=>[
-                                            [
-                                                [
-                                                    "userId",
-                                                    $userId ,
-                                                    "eq"
-                                                ]
-                                            ]
-                                        ]
-                                ]]
-                        ]);
+                                                    "query"=>[ 
+                                                                [
+                                                                    "n"=> "usersSessions",
+                                                                    "a"=> "up",
+                                                                    "l"=> "1",
+                                                                    "d"=>[ [3,$cureDeviceId], [4,$cureUserId], [5,'FALSE'] ],
+                                                                    "q"=>[
+                                                                            [
+                                                                                [
+                                                                                    "userId",
+                                                                                    $userId ,
+                                                                                    "eq"
+                                                                                ]
+                                                                            ]
+                                                                        ]
+                                                                ] 
+                                                            ]
+                                                    ]);
                        
-                        $setDeviceId     = new setSession("deviceId",$cureDeviceId);
-                        $setUserId       = new setSession("userId",$cureUserId);
-                        $setTimestamp    = new setSession("timestamp",$timestamp);
+                        $setDeviceId     = new setSession("deviceId", $cureDeviceId);
+                        $setUserId       = new setSession("userId", $cureUserId);
+                        $setTimestamp    = new setSession("timestamp", $timestamp);
 
                         $res        = [];
                         $res["res"] = true;

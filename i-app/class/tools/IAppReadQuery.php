@@ -137,12 +137,14 @@ class IAppReadQuery {
         $str = str_replace('] "', '] , "', $str); // missing comma
         $str = str_replace('} "', '} , "', $str); // missing comma
         $str = str_replace('} {', '} , {', $str); // missing comma
+        $str = str_replace('] [', '] , [', $str); // missing comma
         $str = str_replace('" {', '" , {', $str); // missing comma
         $str = str_replace('""', '" , "', $str); // missing comma
         $str = str_replace(']"', '] , "', $str); // missing comma
         $str = str_replace('}"', '} , "', $str); // missing comma
         $str = str_replace('}{', '} , {', $str); // missing comma
         $str = str_replace('"{', '" , {', $str); // missing comma
+        $str = str_replace('aaa@aaa', ':' , $str); // missing comma
         $str = preg_replace('/([a-z0-9A-Z_]+) "/', '$1 , "', $str); // delete last comma comma
         $str = $this->updateQueryRender($str,"obj");
         return $str;
@@ -284,7 +286,7 @@ class IAppReadQuery {
             $queryId = $this->fileName."_".$key."_".$i."_obj";
             if($this->func_id == $queryId){
                 $this->objectSt_ =  $query ;
-            }
+            
                 if(isset($query["a"])){
                 
                         $action = $query["a"];
@@ -324,6 +326,7 @@ class IAppReadQuery {
 
                         }
                 }  
+            }
         }
 
         if(sizeof($queryArray) > 0){
@@ -382,7 +385,7 @@ class IAppReadQuery {
             $queryId = $this->fileName."_".$key."_".$i."_fun";
             if($this->func_id == $queryId){
                 $this->objectSt_ =  $query ;
-            }
+            
                 if(isset($query["a"])){
                 
                         $action = $query["a"];
@@ -411,7 +414,7 @@ class IAppReadQuery {
                             array_push($queryArray ,$newQ);
                         }
                 }  
-            
+            }
         }
 
         if(sizeof($queryArray) > 0){
@@ -458,11 +461,13 @@ class IAppReadQuery {
                             
                             array_push($this->QMAP,$position);
                             array_push($result,$value);
+                          
                         }
                     }else if($this->isJsVar($value)){
                        
                         array_push($this->QMAP,$position);
                         array_push($result,$value);
+                   
                     }
             }
         }
@@ -492,11 +497,13 @@ class IAppReadQuery {
                             if($value["t"] !== "q"){
                                 array_push($this->QJMAP,$position);
                                 array_push($result,$value);
+                              
                             }
                         }else if($this->isJsVar($value)){
                             array_push($this->QJMAP,$position);
                             array_push($result,$value);
                         }
+                     
                 }
             }
         }

@@ -9,6 +9,7 @@ class makeQuery{
        
 
         foreach ($queryOB as $cureOB) {
+            if(isset($cureOB['a'])){
             $queryAction = $cureOB['a'];
 
             if ($queryAction === "get") {
@@ -39,7 +40,10 @@ class makeQuery{
             } elseif ($queryAction === "create") {
                 $this->queryText = $cureOB['d'];
             }
-            
+        }else{
+            echo "itsMe";
+            exit();
+        }
         }
 
   

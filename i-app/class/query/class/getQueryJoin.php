@@ -76,8 +76,10 @@ class getJQuery {
                                     }else{
                                         $selectJoinArray = $ob['j'][$o]['s'];
                                     }
+                                    $pointerDataStr = $pointerData["str"];
+                                    $pointerDataKey = $pointerData["key"];
                                     $selectAllColumnsJoin_B   = $this->selectAllColumnsJoinKata($selectJoinArray,$newColumnSelectNameJoin);
-                                    $multiArraySelect         = " (SELECT $pointerData , JSON_ARRAYAGG(JSON_OBJECT($selectAllColumnsJoin_B )) AS $cureTableName FROM $cureTableName GROUP BY $pointerData ) AS ";
+                                    $multiArraySelect         = " (SELECT $pointerDataStr  JSON_ARRAYAGG(JSON_OBJECT($selectAllColumnsJoin_B )) AS $cureTableName FROM $cureTableName GROUP BY $pointerDataKey ) AS ";
                             }
 
                             $orAndOptionText_ = self::orAndOptionJoin($ob['j'][$o]['q'], $tables, $cureTableName, $tableName);
@@ -113,7 +115,7 @@ class getJQuery {
     }
     public static function valueFN($ob, $master) {
         $val = '';
-        if ($ob['t'] === 'q') {
+        if ($ob !== null && $ob['t'] === 'q') {
             $name =  $master . '.';
             if(isset($ob['n'])){
                 $name = $ob['n'] . '.' ;
@@ -189,26 +191,47 @@ class getJQuery {
         }
 
     }
-    public static function getPointer($ob,$tableName,$table){
-        $columnIndex = $ob[0][0][0];
-        $columnName  = "";
 
-        if (is_string($columnIndex)) {
+    public function getPointer(array $ob, string $tableName, array $table): array {
+        $columnName = "";
+        $DataKeys = [];
 
-            $coulmnExist = in_array($columnIndex, $table);
+        foreach ($ob as $ORD_) {
+            foreach ($ORD_ as $ANDD) {
+                $columnIndex = $ANDD[0];
 
-            if ($coulmnExist) {
-                $columnName = $columnIndex;
-            }else{
-                echo "Error";
-                exit();
+                if (is_string($columnIndex)) {
+                    // Check if the column index exists in the table
+                    if (in_array($columnIndex, $table)) {
+                        $columnName .= $columnIndex . ", ";
+                        $DataKeys[] = $columnIndex;
+                    } else {
+                        error_log("Error: Column $columnIndex does not exist in the table");
+                        return [];
+                    }
+                } elseif (is_int($columnIndex)) {
+                    // Adjust the column index to be zero-based
+                    $columnIndex -= 1;
+                    if ($columnIndex >= 0 && $columnIndex < count($table)) {
+                        $columnName .= $table[$columnIndex] . ", ";
+                        $DataKeys[] = $table[$columnIndex];
+                    } else {
+                        error_log("Error: Column index $columnIndex is out of range");
+                        return [];
+                    }
+                }
             }
-
-        } elseif (is_numeric($columnIndex)) {
-            $columnIndex = $columnIndex - 1;
-            $columnName = $table[$columnIndex];
         }
-        return $columnName;
+
+        // Trim the trailing comma and space from the columnName
+        //$columnName = rtrim($columnName, ", ");
+
+        $Back = [
+            'str' => $columnName,
+            'key' => end($DataKeys)  // Get the last element in the DataKeys array
+        ];
+
+        return $Back;
     }
     public static function selectRelColumnJoin($rel ,$op, $tableName, $sn) {
 
@@ -250,7 +273,7 @@ class getJQuery {
         for ($i = 0; $i < sizeof($op); $i++) {
 
             $selectColumnName =  '';
-            if(isset( $sn[$i] )){
+            if(isset( $sn[$i] )  &&  $sn[$i]  !== false){
                 $selectColumnName =  ' AS ' . $sn[$i];
             }
         
@@ -332,7 +355,7 @@ class getJQuery {
 
                 $opKeyName        = $op[$i];
                 $opKeyValue        = $op[$i];
-                if(isset($sn[$i])){
+                if(isset($sn[$i])  &&  $sn[$i]  !== false){
                     $opKeyName        = $sn[$i];
                 }
                 $opText          .= "'".$opKeyName."' ,".  $opKeyValue;

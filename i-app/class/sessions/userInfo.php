@@ -31,6 +31,7 @@ class userInfo {
             if ($deviceId == $stcureDeviceId) {
 
                     // Check User Data in DB
+                   
 
                     $checkUserData = new checkUser($dbConnection,["deviceToken"=>$stcureDeviceId]);
               
@@ -46,7 +47,7 @@ class userInfo {
 
                 }else{
 
-                      new destroySession("Try To Login again #2");
+                      new destroySession("Try To Login again #2".$deviceId."_".$stcureDeviceId);
                   
                 }
 

@@ -41,8 +41,35 @@ class AssetFileHandler
         $contentType = null;
         $isUiJs = false;
         $is_Module = false;
-    
-        if ($req_url === '/sw.js') {
+        $dateTime = new DateTime();
+
+        // Subtract 10 minutes from the current time
+        $dateTime->modify('-10 minutes');
+
+        // Format the time as needed
+        $timestamp = $dateTime->format('Y-m-d\TH:i:sP');
+        if($req_url === '/robots.txt'){
+            $host = $_SERVER['HTTP_HOST'];
+            $host = $_SERVER['HTTP_HOST'];
+            $txt  = "# * \n";
+            $txt .= "User-agent: * \n";
+            $txt .= "Allow: / \n\n";  // Added extra new line for separation
+            
+            $txt .= "User-agent: SemrushBot \n";
+            $txt .= "Crawl-delay: 60 \n\n";  // Added extra new line for separation
+            
+            $txt .= "# Host \n";
+            $txt .= "Host: https://".$host."\n\n";  // Added extra new line for separation
+            
+            $txt .= "# Sitemaps \n";
+            $txt .= "Sitemap: https://".$host."/sitemap.xml\n";
+            
+            // Example: Output the content
+            echo nl2br($txt);
+            
+          
+            exit();
+        }else if ($req_url === '/sw.js') {
             $contentType = 'text/javascript';
            
             if(isset($i_app['dir']) && isset($i_app['dir']['main'])){
@@ -50,20 +77,22 @@ class AssetFileHandler
                 
                 if (file_exists($projectDir)) {
                    
-                     $treeST     = new getDirectoryTree($projectDir);
+                     $treeST         = new getDirectoryTree($projectDir);
             
-                     $treeJson = json_decode($treeST,true);
-              
-                     $assetArr = new getDirectoryArray($treeJson,""); 
+                     $treeJson       = json_decode($treeST,true);
+                     $treeST         = "";
+
+                     $assetArr       = new getDirectoryArray($treeJson,""); 
                    
                      $assetArrDecode = json_decode( $assetArr,true);
                  
-                     $assetArray = ["/","/manifest.json","/i.app","/sw.js","/i-app-basic.min.css","/i-app-ui.min.js","/icofont.css"];
+                     $assetArray     = ["/","/manifest.json","/i.app","/sw.js","/i-app-basic.min.css","/i-app-ui.min.js","/icofont.css"];
+
+
                      if(is_array(  $assetArrDecode )){
-                     for($i = 0 ; $i < sizeof($assetArrDecode ); $i++){
-                      
-                        array_push($assetArray,$assetArrDecode[$i]);
-                     }
+                            for($i = 0 ; $i < sizeof($assetArrDecode ); $i++){
+                                array_push($assetArray,$assetArrDecode[$i]);
+                            }
                     }
                     
                      $contentType = $this->getContentType($extname);
@@ -75,6 +104,74 @@ class AssetFileHandler
                      $template = file_get_contents($swPath,true); 
                      $swScript = $swScript.''.$template;
                         echo $swScript;
+                        exit();
+                }
+            }
+            
+     
+        } else if($req_url === '/sitemap.xml'){
+            $host = $_SERVER['HTTP_HOST'];
+        
+            $txtMap  = '<sitemapindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">';
+            $txtMap .= '<sitemap>';
+            $txtMap .= '<loc>https://'.$host.'/sitemap/main.xml</loc>';
+            $txtMap .= '<lastmod>' . $timestamp . '</lastmod>';
+            $txtMap .= '</sitemap>';
+            
+            if (isset($i_app['WP_BLOG'])) {
+                $txtMap .= '<sitemap>';
+                $txtMap .= '<loc>https://'.$host.'/blog/sitemap_index.xml</loc>';
+                $txtMap .= '<lastmod>' . $timestamp . '</lastmod>';
+                $txtMap .= '</sitemap>';
+            }
+            
+            $txtMap .= '</sitemapindex>';
+            
+            header('Content-Type: text/xml;');
+            
+            echo $txtMap;
+            exit();
+            
+
+        }else if($req_url === '/sitemap/main.xml') {
+            $contentType = 'text/javascript';
+           
+            if(isset($i_app['dir']) && isset($i_app['dir']['main'])){
+                $projectDir = $userDir.''.$i_app['dir']['main'];
+                
+                if (file_exists($projectDir)) {
+                   
+                     $treeST         = new getDirectoryTree($projectDir);
+            
+                     $treeJson       = json_decode($treeST,true);
+                     $treeST         = "";
+                     $assetArr       = new getPagesArray($treeJson,""); 
+                   
+                     $assetArrDecode = json_decode( $assetArr,true);
+                 
+                    $mainMap = '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:pagemap="http://www.google.com/schemas/sitemap-pagemap/1.0" xmlns:xhtml="http://www.w3.org/1999/xhtml" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">';
+
+
+                     if(is_array(  $assetArrDecode )){
+                            for($i = 0 ; $i < sizeof($assetArrDecode ); $i++){
+                                $host     = $_SERVER['HTTP_HOST'];
+                                $page     = $assetArrDecode[$i];
+                                $link     = 'https://'.$host.'/'.$page;
+                                $mainMap .='<url>';
+                                $mainMap .='<loc>'.$link.'</loc>';
+                            
+                                $mainMap .= '<lastmod>' . $timestamp . '</lastmod>';
+                                $mainMap .='<changefreq>weekly</changefreq>';
+                                $mainMap .='<priority>0.5</priority>';
+                                $mainMap .='</url>';
+                            }
+                    }
+
+                    $mainMap .='</urlset>';
+                   
+                     header('Content-Type: text/xml;');
+                    
+                        echo $mainMap ;
                         exit();
                 }
             }
@@ -156,7 +253,6 @@ class AssetFileHandler
                     $datajson    = json_decode($userData,true);
 
                     $connection  = new checkUser($db ,["getConnectionOffer"=>$datajson]);
-                    
                     $permissions = new checkUser($db ,["getPermissions"=>$datajson]);
 
                     $datajson["connect"]        = $connection->userConnection;

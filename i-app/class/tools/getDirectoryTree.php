@@ -39,7 +39,7 @@ class getDirectoryTree{
                     $fileConfigTx = new iAppReader($data);
                     $fileConfig = json_decode($fileConfigTx,true);
                     $isPage = isset($fileConfig['page']) ? true : false;
-                    
+                    $isSEO = isset($fileConfig['SEO']) ? true : false;
     
                     $tree['children'][] = [
                         'name' => $file,
@@ -47,7 +47,8 @@ class getDirectoryTree{
                         'path' => $rootDir,
                         'ext' => $fileEx,
                         'fileData' => $data,
-                        'page' => $isPage
+                        'page' => $isPage,
+                        'SEO' =>$isSEO
                     ];
                 } else {
                     $tree['children'][] = [

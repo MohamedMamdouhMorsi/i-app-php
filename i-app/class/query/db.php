@@ -196,12 +196,13 @@ class db {
             $query = $ob['query'];
         
             foreach ($query as $q => $queryItem) {
-
+                if(isset($queryItem['a'])){
                 $cureAction = $queryItem['a'];
         
                 if ($cureAction === 'get' || $cureAction === 'getJ') {
                     return true;
                 }
+            }
             }
         
             return false;
@@ -211,12 +212,13 @@ class db {
             $query = $ob['query'];
         
             foreach ($query as $q => $queryItem) {
-
+                if(isset($queryItem['a'])){
                 $cureAction = $queryItem['a'];
         
                 if ( $cureAction === 'getJ') {
                     return true;
                 }
+             }
             }
         
             return false;
@@ -226,12 +228,13 @@ class db {
             $query = $ob['query'];
         
             foreach ($query as $q => $queryItem) {
-
+                if(isset($queryItem['a'])){
                 $cureAction = $queryItem['a'];
         
                 if ($cureAction === 'in' ) {
                     return true;
                 }
+            }
             }
         
             return false;
@@ -241,12 +244,13 @@ class db {
             $query = $ob['query'];
         
             foreach ($query as $q => $queryItem) {
-
+                if(isset($queryItem['a'])){
                 $cureAction = $queryItem['a'];
         
                 if ($cureAction === 'create' ) {
                     return true;
                 }
+            }
             }
         
             return false;
@@ -256,12 +260,13 @@ class db {
             $query = $ob['query'];
         
             foreach ($query as $q => $queryItem) {
-
+                if(isset($queryItem['a'])){
                 $cureAction = $queryItem['a'];
         
                 if ($cureAction === 'del' ) {
                     return true;
                 }
+            }
             }
         
             return false;
@@ -272,12 +277,13 @@ class db {
             $query = $ob['query'];
         
             foreach ($query as $q => $queryItem) {
-
+                if(isset($queryItem['a'])){
                 $cureAction = $queryItem['a'];
         
                 if ($cureAction === 'up' ) {
                     return true;
                 }
+            }
             }
         
             return false;
@@ -287,12 +293,13 @@ class db {
             $query = $ob['query'];
         
             foreach ($query as $q => $queryItem) {
-
+                if(isset($queryItem['a'])){
                 $cureAction = $queryItem['a'];
         
                 if ($cureAction === 'check' ) {
                     return true;
                 }
+            }
             }
         
             return false;
@@ -303,12 +310,15 @@ class db {
             $back  = [];
             foreach ($query as $q => $queryItem) {
 
-                $cureAction = $queryItem['j'];
-                foreach ($cureAction as $c => $queryItem_) {
+                if(isset($queryItem['j'])){
+                    $cureAction = $queryItem['j'];
+                    foreach ($cureAction as $c => $queryItem_) {
 
-                    $cureTableName = $queryItem_['n'];
-                    array_push($back,$cureTableName);
+                        $cureTableName = $queryItem_['n'];
+                        array_push($back,$cureTableName);
+                    }
                 }
+                
             }
         
             return $back;
@@ -458,7 +468,7 @@ class db {
                                         $res["res"]        = $result;
                                         $result["upTime"]  = $upadteTime;
                                         $res["Qsize"]      = $QSize;
-                                         $res["Q"]       = $qureyTxt;
+                                       //  $res["Q"]       = $qureyTxt;
                                         return $res;
                             }
                     
@@ -514,7 +524,7 @@ class db {
                             $res["res"]         = $result;
                             $result["upTime"]   = $upadteTime;
                             $res["Qsize"]       = $QSize;
-                            $res["Q"]       = $qureyTxt;
+                         //   $res["Q"]       = $qureyTxt;
                             return $res;
                     }
 

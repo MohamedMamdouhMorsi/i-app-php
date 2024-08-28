@@ -101,11 +101,22 @@ class updateQueryInput {
             if($action == "get"){
                 if(isset($queryFile["q"]) && isset($queryData["q"])){
                    for($q = 0 ; $q < sizeof($queryData["q"]); $q++){
+                   
                         $data = $queryData["q"][$q];
                         $position = $QMAP[$q];
                         $or = $position [0];
                         $and = $position [1];
-                        $queryFile["q"][$or][$and][1] = $data;
+                        if($data !== null){
+                           
+                            $queryFile["q"][$or][$and][1] = $data;
+                          
+                        }else{
+                           unset($queryFile["q"][$or][$and]);
+                        if(sizeof($queryFile["q"][$or]) == 0){
+                            unset($queryFile["q"][$or]);
+                        }
+                        }
+                       
                    }
                 }
 
@@ -116,7 +127,16 @@ class updateQueryInput {
                          $position = $QMAP[$q];
                          $or = $position [0];
                          $and = $position [1];
-                         $queryFile["q"][$or][$and][1] = $data;
+                         if($data !== null){
+                           
+                            $queryFile["q"][$or][$and][1] = $data;
+                          
+                        }else{
+                           unset($queryFile["q"][$or][$and]);
+                        if(sizeof($queryFile["q"][$or]) == 0){
+                            unset($queryFile["q"][$or]);
+                        }
+                        }
                     }
                  }
                  if(isset($queryFile["j"]) && isset($queryData["j"])){
@@ -130,7 +150,17 @@ class updateQueryInput {
                                 $or       = $position[1];
                                 $and      = $position[2];
 
-                                $queryFile["q"][$join][$or][$and][1] = $data;
+                               
+                                if($data !== null){
+                           
+                                    $queryFile["q"][$join][$or][$and][1] = $data;
+                                  
+                                }else{
+                                   unset($queryFile["q"][$or][$and]);
+                                if(sizeof($queryFile["q"][$join][$or]) == 0){
+                                    unset($queryFile["q"][$join][$or]);
+                                }
+                                }
                         
                     }
                  }

@@ -8,8 +8,14 @@ class destroySession{
         $this->errorTxt = $msg;
      
         if(isset($_SESSION["deviceId"]) ){
-            $_SESSION = array();
-            session_destroy();  
+            if (session_status() == PHP_SESSION_ACTIVE) {
+                $_SESSION = array();
+                session_destroy();  
+                echo "Session destroyed successfully.";
+            } else {
+                echo "No active session to destroy.";
+            }
+         
         }
 
 
@@ -19,7 +25,8 @@ class destroySession{
     
         if(isset($_COOKIE["userId"]) ){
             setcookie("userId", '', strtotime( '-5 days' ), '/');
-            }
+        }
+
         if(isset($_COOKIE["timestamp"]) ){
             setcookie("timestamp", '', strtotime( '-5 days' ), '/');
         }

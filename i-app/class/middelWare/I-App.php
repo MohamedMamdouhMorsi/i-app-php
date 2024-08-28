@@ -25,7 +25,10 @@ class AppFileHandler
           
         } else if($filePath == null && $backBody == null) {
 
-            if ($req_url === '/limitAuto.app') {
+            if ($req_url === '/countryFlags.json') {
+                $filePath = __DIR__ . '/../../asset/img/flags/countryFlags.json';
+                $isApp = true;
+            } elseif  ($req_url === '/limitAuto.app') {
                 $filePath = __DIR__ . '/../../asset/elements/limitAuto.app';
                 $isApp = true;
             } elseif  ($req_url === '/sl.app') {
