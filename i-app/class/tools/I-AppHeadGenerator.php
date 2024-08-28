@@ -21,32 +21,6 @@ class AppHeadGenerator {
         if(isset($app['three'])){
             $is_three = true;
         }
-
-        $imgBody = "";
-
-        if(isset($app['imgSrc'])){
-            
-            $imgBody = '<div class="WW HH TT_0 LL_0  T_C POS_AB overHide" id="generalHolderImg"><img src="'.$app['imgSrc'].'" class="imgCoverAll" /></div>';
-        }
-
-        $appScreen = "";
-      
-             if(isset($app['linkCover'])){ 
-                $appScreen = $app['linkCover'];
-                $appScreen = $appScreen .'.png';
-            }else{
-                if(isset($app['dir']) && isset($app['dir']['screen'])){
-                    $appScreen = $app['dir']['screen'];
-                    $appScreen ='https://' . $app['domain'] . '' .  $appScreen ;
-                }else{ 
-<<<<<<< HEAD
-                    $appScreen = 'https://' . $app['domain'] . '' .$app['dir']['icon'] . 'favicon-96x96.png';
-=======
-                    $appScreen = $app['dir']['icon'] . 'favicon-96x96.png';
->>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
-                }
-            }
-        
         $this->innerHTML = '<!DOCTYPE html><html lang="' . $lang . '"> <head>';
         $this->innerHTML .= '<title>' . $app['title'] . '</title>';
         $this->innerHTML .= '<meta name="type" content="' . $app['type'] . '">';
@@ -64,15 +38,8 @@ class AppHeadGenerator {
         $this->innerHTML .= '<meta property="og:title" content="' . $app['title'] . '" />';
         $this->innerHTML .= '<meta property="og:description" content="' . $app['description'] . '" />';
         $this->innerHTML .= '<meta property="og:type" content="' . $app['type'] . '" />';
-        $this->innerHTML .= '<meta property="og:url" content="https://' . $app['domain'] . '/" />';
-        $this->innerHTML .= '<meta property="og:image" content="'.$appScreen.'" />';
-        $this->innerHTML .= '<meta property="twitter:card" content="summary_large_image"  />';
-       
-
-<<<<<<< HEAD
-        $this->innerHTML     .= self::META_TAG;
-
-=======
+        $this->innerHTML .= '<meta property="og:url" content="' . $app['domain'] . '" />';
+        $this->innerHTML .= '<meta property="og:image" content="' . $app['dir']['icon'] . 'favicon-96x96.png" />';
         $this->innerHTML .= self::META_TAG;
 >>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
         if($is_three){
@@ -90,10 +57,12 @@ class AppHeadGenerator {
         if(isset($app['opencv'])){
          $this->innerHTML .= '<script async src="https://docs.opencv.org/master/opencv.js"></script>';
         }
+        if(isset($app['opencv'])){
+         $this->innerHTML .= '<script async src="https://docs.opencv.org/master/opencv.js"></script>';
+        }
         $this->innerHTML .= '<script type="application/javascript">const appData = '.json_encode($app).';</script/>';
         $this->innerHTML .= '<script type="application/javascript" src="' . ($devMode ? '/i-app-ui.js' : '/i-app-ui.min.js') . '" async defer ></script>';
->>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
-        $this->innerHTML .= '</head> <body>'.$imgBody.'</body> </html>';
+        $this->innerHTML .= '</head> <body></body> </html>';
 
        
     }

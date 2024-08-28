@@ -11,7 +11,7 @@ class system {
     public $appData;
     function __construct($dir_)
     {
-<<<<<<< HEAD
+
         $host = $_SERVER['HTTP_HOST'];
         if (strpos($host, 'www.') === 0) {
             $host = substr($host, 4);
@@ -22,18 +22,13 @@ class system {
         exit();
         }
         
-=======
->>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
+
         if (!isset($_SERVER['HTTPS']) or $_SERVER['HTTPS'] == 'off' ) {
             $redirect_url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
             header("Location: $redirect_url");
             exit();
         }
-<<<<<<< HEAD
-  
-     
-=======
->>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
+
         $this->dir =$dir_;
       
         $this->loadeAppFile = $this->dir."/i.app";
