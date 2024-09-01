@@ -2,7 +2,9 @@
 class AppHeadGenerator {
     private const META_TAG = '<meta charset="utf-8"><meta i_app="true"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" /><meta http-equiv="X-UA-Compatible" content="ie=edge"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"/><meta name="full-screen" content="yes"/><meta name="screen-orientation" content="portrait"><link rel="manifest" href="/manifest.json" ><style id="T_ASS"></style><style id="TC_ASS"></style><style id="C_ASS"></style><style id="F_ASS"></style><style id="F_ASSB"></style><style id="F_ASSC"></style><style id="PASSSTYLE">:root {--W:#fff;--B:#000;--BODYB: #ffffff;--BODYF: #000000;--WH__: 1000px;--WW__: 1000px;}.F_PR {color: var(--BODYF);}.B_PR {background: var(--BODYB);}</style><style id="STYLE_DIR">:root {--DirL: left;--DirR: right;}</style><style id="AUTO_DIR"></style><style> .FWI{color:#ffffff;}.FBI{color:#000000;}</style><link href="https://fonts.googleapis.com/css?family=Cairo:400,900&display=swap"  rel="stylesheet"   type="text/css"  media="print"  onload="this.media=\'all\'" /><link href="/icofont.css"   rel="stylesheet"   type="text/css"  media="print"  onload="this.media=\'all\'" /><style id="S_FONT">h1,h2,h3,h4,h5,h6,p,button,input,table,th,td,nav,div,table,a,b,tr,ul,li,tbody,select,svg,textarea,title {font-family: \'Lucida Sans Unicode\', \'Lucida Grande\', \'Cairo\', sans-serif;}</style> ';
     public $innerHTML = "<h1>No HTML !!</h1>";
-    public function __construct($app, $PR_D) {
+    public function __construct($app, $PR_D , $userDir) {
+      
+
         $devMode = isset($app['mode']) && $app['mode'] == 'dev';
         $lang = "en";
 
@@ -41,11 +43,11 @@ class AppHeadGenerator {
         $this->innerHTML .= '<meta property="og:url" content="' . $app['domain'] . '" />';
         $this->innerHTML .= '<meta property="og:image" content="' . $app['dir']['icon'] . 'favicon-96x96.png" />';
         $this->innerHTML .= self::META_TAG;
->>>>>>> 43a45af8640155305d00ad73ff5ae490875b71ab
+
         if($is_three){
             $this->innerHTML .= '<script type="importmap">{"imports": {"three": "https://' . $app['domain'] . '/three.js"}}</script>';
         }
-<<<<<<< HEAD
+
 
         if(isset($app['opencv'])){
             $this->innerHTML .= '<script async src="https://docs.opencv.org/master/opencv.js"></script>';
@@ -53,13 +55,8 @@ class AppHeadGenerator {
 
         $this->innerHTML .= '<script type="application/javascript">const appData = '.json_encode($app).';</script/>';
         $this->innerHTML .= '<script type="application/javascript" src="https://' . $app['domain'] . '' . ($devMode ? '/i-app-ui.js' : '/i-app-ui.min.js') . '" async defer ></script>';
-=======
-        if(isset($app['opencv'])){
-         $this->innerHTML .= '<script async src="https://docs.opencv.org/master/opencv.js"></script>';
-        }
-        if(isset($app['opencv'])){
-         $this->innerHTML .= '<script async src="https://docs.opencv.org/master/opencv.js"></script>';
-        }
+
+       
         $this->innerHTML .= '<script type="application/javascript">const appData = '.json_encode($app).';</script/>';
         $this->innerHTML .= '<script type="application/javascript" src="' . ($devMode ? '/i-app-ui.js' : '/i-app-ui.min.js') . '" async defer ></script>';
         $this->innerHTML .= '</head> <body></body> </html>';

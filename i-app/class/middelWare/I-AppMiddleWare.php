@@ -241,9 +241,33 @@ class middleWare {
                         new AssetFileHandler($url,$extname,$this->userDir,$this->swScript, $assetUserData , $this->i_app, $this->dbConnection_);
             
                     } else if ($is_route) {
+                      
+                        if($url  == '/testApis'){
+                            if(isset($this->i_app['dir']['main']) && isset($this->i_app['dir']['src'])){
+                                $srcMain = $this->i_app['dir']['main'];
+                                $srcDir = $this->i_app['dir']['src'];
+                                $projectDir = $this->userDir.''.$srcMain.''.$srcDir;
+                                $fixedDirectory = str_replace('//', '/', $projectDir);
+                                $Directory =  $fixedDirectory.'/home.app';
+                                if(file_exists($Directory )){
+                                    $RouteData  = new RouteData( $Directory ,'/home.app',$srcDir,$fixedDirectory );
+                                    $app_data = $RouteData->getData();
+                                    $html       = new CreateHTML($app_data);
+                                    echo $html;
+                                    exit();
+                                }else{
+                                    echo "Error File is Not Exists";
+                                    exit();
+                                }
+                              
+                            }
+                        
+                        }else{
+                            //   return route app file
 
-                        //   return route app file
-                        new view($this->i_app,$this->colorPR_D);
+                            new view($this->i_app,$this->colorPR_D,$this->userDir);
+                        }
+                      
                 
                     } else {
 

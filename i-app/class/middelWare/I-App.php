@@ -25,7 +25,11 @@ class AppFileHandler
           
         } else if($filePath == null && $backBody == null) {
 
-            if ($req_url === '/limitAuto.app') {
+            if ($req_url === '/testApi.app') {
+
+               echo  $userDir . '/public_html' . $req_url;
+               exit();
+            } else  if ($req_url === '/limitAuto.app') {
 
                 $filePath = __DIR__ . '/../../asset/elements/limitAuto.app';
                 $isApp = true;
@@ -132,6 +136,8 @@ class AppFileHandler
         switch ($extname) {
             case 'html':
                 return 'text/html';
+            case 'app':
+                return 'application/json';
             case 'json':
                 return 'application/json';
             // Add more cases for other file types if needed

@@ -8,6 +8,8 @@ class orders {
             return new countries();
         } elseif ($order === 'languages') {
             return new languages();
+        } elseif   ($order === 'currency') {
+            return new currency();
         } elseif ($order === 'icons') {
             return new icons();
         } elseif ($order === 'serverOffer') {
