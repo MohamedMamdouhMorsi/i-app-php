@@ -9,7 +9,8 @@
                 ],
     "type": "library",
     "require": {
-
+        "maxmind-db/reader": "~1.0",
+        "mongodb/mongodb": "^1.6"
 
     },
     "autoload": {

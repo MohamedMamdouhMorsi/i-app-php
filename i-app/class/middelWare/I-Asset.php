@@ -49,20 +49,21 @@ class AssetFileHandler
         // Format the time as needed
         $timestamp = $dateTime->format('Y-m-d\TH:i:sP');
         if($req_url === '/robots.txt'){
+          
             $host = $_SERVER['HTTP_HOST'];
-            $host = $_SERVER['HTTP_HOST'];
+
             $txt  = "# * \n";
             $txt .= "User-agent: * \n";
-            $txt .= "Allow: / \n\n";  // Added extra new line for separation
+            $txt .= "Allow: / \n";  // Added extra new line for separation
             
             $txt .= "User-agent: SemrushBot \n";
-            $txt .= "Crawl-delay: 60 \n\n";  // Added extra new line for separation
+            $txt .= "Crawl-delay: 60 \n";  // Added extra new line for separation
             
             $txt .= "# Host \n";
-            $txt .= "Host: https://".$host."\n\n";  // Added extra new line for separation
+            $txt .= "Host: https://".$host."\n";  // Added extra new line for separation
             
             $txt .= "# Sitemaps \n";
-            $txt .= "Sitemap: https://".$host."/sitemap.xml\n";
+            $txt .= "Sitemap: https://".$host."/sitemap.xml";
             
             // Example: Output the content
             echo nl2br($txt);
@@ -111,8 +112,8 @@ class AssetFileHandler
      
         } else if($req_url === '/sitemap.xml'){
             $host = $_SERVER['HTTP_HOST'];
-        
-            $txtMap  = '<sitemapindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">';
+            $txtMap = "<?xml-stylesheet type='text/xsl' href='/sitemap.xsl'?>\n";
+            $txtMap  .= '<sitemapindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">';
             $txtMap .= '<sitemap>';
             $txtMap .= '<loc>https://'.$host.'/sitemap/main.xml</loc>';
             $txtMap .= '<lastmod>' . $timestamp . '</lastmod>';
@@ -133,51 +134,60 @@ class AssetFileHandler
             exit();
             
 
-        }else if($req_url === '/sitemap/main.xml') {
-            $contentType = 'text/javascript';
-           
-            if(isset($i_app['dir']) && isset($i_app['dir']['main'])){
-                $projectDir = $userDir.''.$i_app['dir']['main'];
+        }else if($req_url === '/sitemap.xsl') {
+            $sitemapStyle   = __DIR__."/sitemap.xsl";
+            header('Content-Type: application/xml;');
+            $template = file_get_contents($sitemapStyle,true); 
+            echo  $template;
+            exit();
+        }elseif ($req_url === '/sitemap/main.xml') {
+            if (isset($i_app['dir']) && isset($i_app['dir']['main'])) {
+                $projectDir = $userDir . '' . $i_app['dir']['main'];
                 
                 if (file_exists($projectDir)) {
-                   
-                     $treeST         = new getDirectoryTree($projectDir);
-            
-                     $treeJson       = json_decode($treeST,true);
-                     $treeST         = "";
-                     $assetArr       = new getPagesArray($treeJson,""); 
-                   
-                     $assetArrDecode = json_decode( $assetArr,true);
-                 
-                    $mainMap = '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:pagemap="http://www.google.com/schemas/sitemap-pagemap/1.0" xmlns:xhtml="http://www.w3.org/1999/xhtml" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">';
-
-
-                     if(is_array(  $assetArrDecode )){
-                            for($i = 0 ; $i < sizeof($assetArrDecode ); $i++){
-                                $host     = $_SERVER['HTTP_HOST'];
-                                $page     = $assetArrDecode[$i];
-                                $link     = 'https://'.$host.'/'.$page;
-                                $mainMap .='<url>';
-                                $mainMap .='<loc>'.$link.'</loc>';
-                            
-                                $mainMap .= '<lastmod>' . $timestamp . '</lastmod>';
-                                $mainMap .='<changefreq>weekly</changefreq>';
-                                $mainMap .='<priority>0.5</priority>';
-                                $mainMap .='</url>';
-                            }
-                    }
-
-                    $mainMap .='</urlset>';
-                   
-                     header('Content-Type: text/xml;');
+                    $treeST = new getDirectoryTree($projectDir);
+                    $treeJson = json_decode($treeST, true);
+                    $assetArr = new getPagesArray($treeJson, "");
+                    $assetArrDecode = json_decode($assetArr, true);
+                    $host = $_SERVER['HTTP_HOST'];
+                    $link_ = 'https://' . $host . '/';
                     
-                        echo $mainMap ;
-                        exit();
+                    
+                    $mainMap = "<?xml-stylesheet type='text/xsl' href='/sitemap.xsl'?>\n";
+                    $mainMap .= "<urlset xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns='http://www.sitemaps.org/schemas/sitemap/0.9' xmlns:image='http://www.google.com/schemas/sitemap-image/1.1' xmlns:video='http://www.google.com/schemas/sitemap-video/1.1' xmlns:news='http://www.google.com/schemas/sitemap-news/0.9' xmlns:mobile='http://www.google.com/schemas/sitemap-mobile/1.0' xmlns:pagemap='http://www.google.com/schemas/sitemap-pagemap/1.0' xmlns:xhtml='http://www.w3.org/1999/xhtml' xsi:schemaLocation='http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd'>";
+                    
+                    // Home URL
+                    $mainMap .= '<url>';
+                    $mainMap .= '<loc>' . $link_ . '</loc>';
+                    if (isset($i_app['lang']) && sizeof($i_app['lang']) > 0) {
+                        foreach ($i_app['lang'] as $lang_) {
+                            $mainMap .= "<xhtml:link rel='alternate' hreflang='" . $lang_ . "' href='" . $link_ . $lang_ . "/' />";
+                        }
+                    }
+                    $mainMap .= '</url>';
+        
+                    // Additional pages
+                    if (is_array($assetArrDecode)) {
+                        foreach ($assetArrDecode as $page) {
+                            $link = 'https://' . $host . '/' . $page;
+                            $mainMap .= '<url>';
+                            $mainMap .= '<loc>' . $link . '</loc>';
+                            $mainMap .= '<lastmod>' . date('c') . '</lastmod>';
+                            $mainMap .= '<changefreq>weekly</changefreq>';
+                            $mainMap .= '<priority>0.5</priority>';
+                            $mainMap .= '</url>';
+                        }
+                    }
+        
+                    $mainMap .= '</urlset>';
+        
+                    // Set the correct content type and output the sitemap
+                    header('Content-Type: application/xml; charset=UTF-8');
+                    echo $mainMap;
+                    exit();
                 }
             }
-            
-     
-        } elseif (preg_match('/\/img\/flags\//', $req_url)) {
+        }elseif (preg_match('/\/img\/flags\//', $req_url)) {
          
             $img = str_replace('/img/flags/', '', $req_url);
             $filePath = __DIR__ . '/../../asset/img/flags/' . $img;

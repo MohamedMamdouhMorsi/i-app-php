@@ -10,7 +10,9 @@ class orders {
             return new languages();
         } elseif   ($order === 'currency') {
             return new currency();
-        } elseif ($order === 'icons') {
+        }elseif   ($order === 'geoip') {
+            return new I_APP_GEOIP($msgData);
+        }  elseif ($order === 'icons') {
             return new icons();
         } elseif ($order === 'serverOffer') {
             return new serverOffer($dbConnection,$userData,$msgData  );

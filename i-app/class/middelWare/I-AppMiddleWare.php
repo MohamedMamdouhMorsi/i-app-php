@@ -178,7 +178,21 @@ class middleWare {
                 new logoutUser($this->dbConnection_,$this->userData->userData);
             }
             $url =$_SERVER['REQUEST_URI'] ;
-
+            
+            if(isset($this->i_app["lang"])){
+                for($k = 0 ; $k < sizeof($this->i_app["lang"]); $k++){
+                    $lang = '/'.$this->i_app["lang"][$k].'/';
+                    if (strpos($url, $lang) === 0) {
+                        if($url == $lang){
+                            $url = "/";
+                        }else{
+                            $url = str_replace($lang, "/",$url);
+                        }
+                       
+                    }
+                }
+            }
+                    
             // $destroy = "";
             $is_api = $this->is_api($url);
             
@@ -241,33 +255,45 @@ class middleWare {
                         new AssetFileHandler($url,$extname,$this->userDir,$this->swScript, $assetUserData , $this->i_app, $this->dbConnection_);
             
                     } else if ($is_route) {
-                      
-                        if($url  == '/testApis'){
-                            if(isset($this->i_app['dir']['main']) && isset($this->i_app['dir']['src'])){
+
+               
+                            if($url == "" || $url == "/"){
+                                $url = $this->i_app['dir']["start"];
+                                $url = str_replace('.app', '', $url);
+                          }
+                            
+                             if(isset($this->i_app['dir']['main']) && isset($this->i_app['dir']['src'])){
                                 $srcMain = $this->i_app['dir']['main'];
                                 $srcDir = $this->i_app['dir']['src'];
                                 $projectDir = $this->userDir.''.$srcMain.''.$srcDir;
                                 $fixedDirectory = str_replace('//', '/', $projectDir);
-                                $Directory =  $fixedDirectory.'/home.app';
+                                $projectDir_ = $this->userDir.''.$srcMain.''.$srcDir.$url.'.app';
+                                $Directory =  str_replace('//', '/', $projectDir_);
+                             
+                                 
                                 if(file_exists($Directory )){
-                                    $RouteData  = new RouteData( $Directory ,'/home.app',$srcDir,$fixedDirectory );
-                                    $app_data = $RouteData->getData();
-                                    $html       = new CreateHTML($app_data);
-                                    echo $html;
-                                    exit();
+                                    
+                                    $RouteData    = new RouteData( $Directory ,$url,$srcDir,$fixedDirectory );
+                                    $app_data     = $RouteData->getData();
+                                    $html         = "html";
+                                    $css          = "";
+                                    if($app_data !== "html"){
+    
+                                        $htmlDo       = new CreateHTML($app_data,$this->userDir,$this->i_app);
+                                        $html         = $htmlDo->getHTML();
+                                        $css          = $htmlDo->getCSS();
+                                    }
+                                  
+                                  
+                                    new view($this->i_app,$this->colorPR_D,$this->userDir,$html,$css);
                                 }else{
                                     echo "Error File is Not Exists";
                                     exit();
                                 }
-                              
+                             
                             }
                         
-                        }else{
-                            //   return route app file
-
-                            new view($this->i_app,$this->colorPR_D,$this->userDir);
-                        }
-                      
+                 
                 
                     } else {
 
@@ -293,7 +319,7 @@ class middleWare {
      
         $styleDir = $this->deleteFirstSlash($this->i_app['dir']['style']);
         $mainDir  = $this->i_app['dir']['main'];
-       $styleDir_ = $this->userDir.$mainDir.$styleDir;
+        $styleDir_ = $this->userDir.$mainDir.$styleDir;
    
       if(file_exists($styleDir_)){
 

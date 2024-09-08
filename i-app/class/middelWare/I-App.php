@@ -14,6 +14,7 @@ class AppFileHandler
 
 
         if ($isDevUrl) {
+            
           
             $filePath = __DIR__ . '/../../asset/elements/' . $fileNamedev;
             $isApp = true;
@@ -25,17 +26,20 @@ class AppFileHandler
           
         } else if($filePath == null && $backBody == null) {
 
-            if ($req_url === '/testApi.app') {
+            if ($req_url === '/countryFlags.json') {
 
-               echo  $userDir . '/public_html' . $req_url;
-               exit();
+                $filePath = __DIR__ . '/../../asset/db/countryFlags.json' ;
+             
             } else  if ($req_url === '/limitAuto.app') {
 
                 $filePath = __DIR__ . '/../../asset/elements/limitAuto.app';
-                $isApp = true;
+                $isApp    = true;
+
             } elseif  ($req_url === '/sl.app') {
+                
                 $filePath = __DIR__ . '/../../asset/elements/sl.app';
                 $isApp = true;
+            
             } elseif(preg_match('/dev.app/', $req_url) && $i_app['mode'] == 'dev') {
 
                 $filePath = __DIR__ . '/../../asset/elements/dev.app';
