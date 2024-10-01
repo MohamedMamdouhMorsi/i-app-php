@@ -12,22 +12,7 @@ class system {
     function __construct($dir_)
     {
 
-        $host = $_SERVER['HTTP_HOST'];
-        if (strpos($host, 'www.') === 0) {
-            $host = substr($host, 4);
-            
-        // Construct the redirect URL without 'www'
-        $redirect_url = "https://" . $host . $_SERVER['REQUEST_URI'];
-        header("Location: $redirect_url");
-        exit();
-        }
-        
-
-        if (!isset($_SERVER['HTTPS']) or $_SERVER['HTTPS'] == 'off' ) {
-            $redirect_url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-            header("Location: $redirect_url");
-            exit();
-        }
+        new SCURE_IAPP();
 
         $this->dir =$dir_;
       

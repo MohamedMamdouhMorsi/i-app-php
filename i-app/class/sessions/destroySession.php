@@ -36,13 +36,11 @@ class destroySession{
     function __destruct()
     {
      
-        /*         
-            header('Location: /https://google.com' );
+            $host = $_SERVER['HTTP_HOST'];
+            header('Location: /https://'.$host );
             exit(); 
-        */
+        
 
-    echo "Error : ".$this->errorTxt;
-    exit();
     }
 }
 ?>

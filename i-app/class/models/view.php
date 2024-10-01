@@ -2,9 +2,12 @@
 
 class view {
     public $data = "view";
-    function __construct($appData, $PR_D,$userDir,$html,$css)
+    function __construct($appData, $PR_D,$userDir,$html,$css,$url)
     {
-        $this->data =new AppHeadGenerator($appData, $PR_D,$userDir,$html,$css);
+        header("Content-Type: text/html; charset=UTF-8");
+
+        
+        $this->data = new AppHeadGenerator($appData, $PR_D,$userDir,$html,$css,$url);
         echo $this->data;
         exit();
       

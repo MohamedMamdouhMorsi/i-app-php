@@ -12,7 +12,7 @@ class userInfo {
         $deviceInfo  = $sessionData->getDeviceInfo();
 
         $fingerPrint = $deviceInfo['fingerPrint'];
-
+    
         $deviceId    = new isSession("deviceId");
         $timestamp   = new isSession("timestamp");
         $userId      = new isSession("userId");
@@ -29,7 +29,7 @@ class userInfo {
             // Validate device ID
             $stcureDeviceId = "$cureDeviceId";
             if ($deviceId == $stcureDeviceId) {
-
+               
                     // Check User Data in DB
                    
 
@@ -38,8 +38,9 @@ class userInfo {
                   
 
                     if(!$checkUserData){
-
-                        new destroySession("Try To Login again #1");
+                        echo  "checkUserData".$checkUserData;
+                        exit();
+                     //   new destroySession("Try To Login again #1");
                     }else{
                         $this->userData = $checkUserData->userData;
                      

@@ -56,9 +56,6 @@ class middleWare {
                 //  isUser 
 
                 $this->userData = new userInfo( $this->dbConnection_);
-         
-                
-            
                 $this->appWare();
 
             } else {
@@ -174,9 +171,11 @@ class middleWare {
             if($_SERVER['REQUEST_URI'] == "/logout"){
                 $is_logout = true;
             }
+
             if(isset($this->userData->userData) && $is_logout){
                 new logoutUser($this->dbConnection_,$this->userData->userData);
             }
+
             $url =$_SERVER['REQUEST_URI'] ;
             
             if(isset($this->i_app["lang"])){
@@ -203,6 +202,7 @@ class middleWare {
                 }
                 if(!$isAttack){
                                 $lastUserData = [];
+                                
                                 if(isset($this->userData->userData)){
                                     $lastUserData =$this->userData->userData;
                                 }
@@ -210,8 +210,8 @@ class middleWare {
                             new api($this->i_app,$this->userDir,$this->i_app_st,$this->dbConnection_,$lastUserData,$this->loadeAppFile);
                 }else{
 
-                    echo  "<h1> 500 Internal Server Error $isAttack</h1>";
-                    exit();
+                            echo  "<h1> 500 Internal Server Error $isAttack</h1>";
+                            exit();
 
                 }
                 }
@@ -285,10 +285,9 @@ class middleWare {
                                     }
                                   
                                   
-                                    new view($this->i_app,$this->colorPR_D,$this->userDir,$html,$css);
+                                    new view($this->i_app,$this->colorPR_D,$this->userDir,$html,$css,$url);
                                 }else{
-                                    echo "Error File is Not Exists";
-                                    exit();
+                                    new view($this->i_app,$this->colorPR_D,$this->userDir,"","",$url);
                                 }
                              
                             }

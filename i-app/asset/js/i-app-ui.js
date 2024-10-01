@@ -76,79 +76,15 @@ i-app start by one function i-app() default with loading
     return document.getElementsByTagName(tag).length > 0 ? document.getElementsByTagName(tag) : [];
     };
     
-  /**
+  /* *
    * i-app functions
-   */
-this.isFired = false;
-const configFire = (con, lan,ty,theme,sendNumber) => {
+   *
+   * */
 
-
-    const loadFire = ()=>{
-      CL_(["loadFire"]);
-        if(!this.isFired){
-            firebase.initializeApp(con);
-            firebase.auth().languageCode = lan;
-            this.isFired = true;
-        }
-
-        if(ty == "reC"){
-          CL_(["rec"]);
-            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            'theme':theme,
-            'callback': (response) => {
-                // reCAPTCHA solved, allow signInWithPhoneNumber.
-                sendNumber();
-              }
-            });
-            recaptchaVerifier.render();
-            
-        }
-    }
-    if(!E_I("fireSrc")){
-        CL_(["No script script"]);
-        const src = CE_("script");
-        src.src = "https://www.gstatic.com/firebasejs/6.0.2/firebase.js";
-        src.id = "fireSrc";
-        E_T("head")[0].appendChild(src);
-        src.onload =()=>{
-          CL_(["this is script"]);
-          setTimeout(loadFire,3000);
-        }
-      
-    }else{
-        loadFire();
-    }
-}
-
-const GOS = (d, s, id)=> {
-    var hh = d.getElementsByTagName('head')[0];
-
-
-    var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) {
-          return;
-      }
-      const scope = d.createElement('meta');
-      scope.name = "google-signin-scope";
-      scope.content= "profile email";
-      const client = d.createElement('meta');
-      client.name = "google-signin-client_id";
-      client.content= "94508468930-rnl3toalkm9akk5kri0qff4i6f39fcv9.apps.googleusercontent.com";
-      js = d.createElement(s);
-      js.id = id;
-      js.src = 'https://apis.google.com/js/platform.js';
-      fjs.parentNode.insertBefore(scope, fjs);
-      fjs.parentNode.insertBefore(client, fjs);
-
-      fjs.parentNode.insertBefore(js, fjs);
-};
-
-
-
-var fcmCon = {};
 const i_app = (()=>{
 
     'use strict';
+    const userData = {};
     const I_APP_DIR = "/i.app";
     /** app connection & loading state */
     var is_online    = true;
@@ -169,7 +105,7 @@ const i_app = (()=>{
         return ob;
      }
     
-    const userData = {};
+    
     let i_app_v = {};
     let i_app_colors =[];
     let i_app_style = {};
@@ -185,20 +121,25 @@ const i_app = (()=>{
     let historyIndex = 0;
     let autoClsDrive = [];
     var runAutoClsrun = false;
+    const translateManger = {};
     const destroySession = ()=>{
       deleteConstKeys(userData);
-      app = {};
-      I_OB = {};
-      document.innerHTML = '';
-      window.location = '/login';
+        app = {};
+        I_OB = {};
+        document.innerHTML = '';
+        window.location = '/login';
    }
-    /**Functions Varibles */
+   const countries ={};
+    
+   /**Functions Varibles */
+    
     const windowHistory = [];
     const ReturnScriptFunctions = {};
     const locationWrapper = {};
     const popJsD = {};
     const sLang = {};
     let poJSOB = [];
+    var GLOB_LANG = null;
     this.sli_MEM = [];
     this.lastScroll = 0;
     this.S_DAY = "0";
@@ -543,7 +484,7 @@ function getDataDB(databaseName, version, objectStoreName, successCallback, erro
   
   Encodes a string to base64.
   @param {string} mw - The string to be encoded.
-  @returns {string} The encoded string.
+  @returns {string} The encoded string
   */
   const DC_ = (mw) => { var n = btoa(unescape(encodeURIComponent(mw))); return n; }
   /**
@@ -592,8 +533,13 @@ function getDataDB(databaseName, version, objectStoreName, successCallback, erro
   */
   const COPY_OB = (ob) => {
     if (typeof ob !== 'object') {
-      console.error('Error: COPY_OB argument is not an object');
-      return;
+      if(JD_(ob)){
+        ob = JD_(ob);
+      }else{
+        console.error('Error: COPY_OB argument is not an object');
+        return;
+      }
+   
     }
   
     const { a, ...rest } = ob;
@@ -701,18 +647,21 @@ const hideOtherKeys = (k,obj)=>{
         delete elementValue[i_root][childId];
       
       }
- 
+      I_OB[id].children = [];
+
     }
   }
   }
   const DEL_E = (id) => {
     const myNode = isString(id) ? E_I_S(id) : id;
+
     if (myNode && myNode.childNodes && myNode.childNodes.length > 0) {
         while (myNode.firstChild) {
             myNode.removeChild(myNode.firstChild);
         }
     }
     deleteChildren(id);
+    myNode.innerHTML = '';
 }
 const  scrollToBottom = () =>{
   window.scrollTo({
@@ -785,6 +734,7 @@ const DEL_ = (id)=>{
       if(E_I(id)){
         E_I(id).value = value;
       }else if(E_I_S(id)){
+
         E_I_S(id).value = value;
       
       }
@@ -952,65 +902,12 @@ const FCMTCS = (e) => {
         AL_(error.message);
     });
 }
-const readyNumber = {}
-const FCMTC = (e,numberHolder,activeHolder) => {
-  if(!E_I('google-jssdk')){
-    GOS(document,  'script','google-jssdk');
+
+const FBC_ =()=>{
+  if(window.FBC && app.fcm){
+  const fbc =  window.FBC({},URS());
+    fbc.start(app.fcm);
   }
- 
-  if(E_I_V(e) !== ''){
-
-    const sendNumber = ()=>{
-    
-    if(readyNumber[E_I_V(e)]){
-    FCMTCS(e);
-      D_CL([activeHolder,"D_N"]);
-      A_CL(numberHolder,"D_N");
-      var ms = GTX("sending-sms");
-      AL_(ms);
-    }else{
-      var ms = GTX("re-send-code");
-      AL_(ms);
-    }
-
-    }
-   
-    const callback =(res)=>{
-      res = res.res;
-      if(res == true){
-        AL_('number is allready exist !!');
-      }else{
-      readyNumber[E_I_V(e)] = true;
-       E_I_S(`${e}_view`).setAttribute('disabled','true');
-       E_I_S("recaptcha-container-tx").innerText = "Solve Recaptcha";
-        configFire(app.fcm, selectLang,"reC",i_app_theme,sendNumber);
-        D_CL("signFormHolder","D_N");
-        A_CL("phonenumber-active-holder","D_N");
-      sendNumber();
-      }
-    
-    }
-    _POST('/api',{order:'checkUser',phonenumber:E_I_V(e)},callback);
-  }
-}
-
-const FCMTA = (i,a,b) => {
- 
-    var c = E_I_V(i);
-    D_CL([b,"D_N"]);
-    A_CL(a,"D_N");
-   
-  window.confirmationResult.confirm(c).then(function(r) {
-        var ms = GTX("activation-done");
-   
-        AL_(ms);
-    }).catch(function(error) {
-        alert(error.message);
-       
-    });
-    
-    
-
 }
     // functions
   
@@ -1074,14 +971,36 @@ const funcHandel = (str) => {
 function openTap(url) {
   window.open(url, '_blank').focus();
 }
-   const GTL = (txt)=>{
-    window.location.href = txt;
+   const GTL = (url)=>{
+    window.location.href =  `${httpStarter()}://${appData.domain}${url}`;
    }
   // This function returns the root name and directory of the current page's JavaScript file
   const i_root_ = () => {
     // Set a default file extension of '.app'
     let ex =  app.dir && app.dir.file ? app.dir.file :'.app';
-  const root = window.location.pathname.replace(/\//g,"");
+    var url = window.location.pathname;
+  
+   
+    if (app.lang && app.lang.length > 0) {
+        for (var i = 0; i < app.lang.length; i++) {
+            const lang = `/${app.lang[i]}/`;
+            
+            // Create a regular expression to match the language prefix at the start of the URL
+            const regex = new RegExp(`^${lang}`);
+         
+            // Check if the URL matches the regex (starts with the language prefix)
+            if (regex.test(url)) {
+                GLOB_LANG = app.lang[i];
+              
+                // Replace the language prefix with "/"
+                url = url.replace(regex, "/");
+                break; // Exit the loop once the replacement is done
+            }
+        }
+    }
+  
+  const root = url.replace(/^\//, "");
+
     // If the current URL includes a query string, use it as the root name instead of the default
     if ( root!== "") {
       i_root =root;
@@ -1213,7 +1132,6 @@ function openTap(url) {
   
   const G_root = async(url, callback, data) => {
     // Fetch data from the specified URL
-   
     const isJsonFile = !url.includes('.app') && url.includes('.json') ? true : false ;
 
     if(wait_root[url]){
@@ -1225,7 +1143,7 @@ function openTap(url) {
       wait_root[url] = [];
       wait_root[url].push([callback,data]);
 
-      fetch(url)
+      fetch(`${httpStarter()}://${appData.domain}${url}`)
       .then((res) => {
         // If the response is successful, convert the text response to JSON
         if (res) {
@@ -1424,7 +1342,7 @@ var getAnswerTime = 10;
   const G_Json = (url,callback) => {
     return new Promise((resolve, reject) => {
       // Fetch data from the specified URL
-      fetch(url)
+      fetch(`${httpStarter()}://${appData.domain}${url}`)
         .then((res) => {
           // If the response is successful, convert the text response to JSON
           if (res.ok) {
@@ -1452,7 +1370,7 @@ var getAnswerTime = 10;
     var compressedText = '';
     for (var i = 0; i < text.length; i++) {
         var charCode = text.charCodeAt(i);
-        //console.log(["compress charCode:",compress , charCode + 300]);
+      
         compressedText += String.fromCharCode(charCode + 1000); // Offset by 1000
     }
     return DC_(compressedText);
@@ -1495,7 +1413,7 @@ return data;
         if(data.Q){
            delete data.Q;
         }
-   //   CL_(['->',data])
+      //CL_(['->',data])
         const queryName =await SHA256(JDS_(strQ));
       
         isQuery = true;
@@ -1533,12 +1451,11 @@ return data;
    }
       if (send) {
         const jsonSt =JDS_(lastData);
-      
+     
         const DEDATA = DC_(jsonSt);
 
-       fetch(url, {
+       fetch(`${httpStarter()}://${appData.domain}${url}`, {
           method: "POST",
-        
           mode: "same-origin",
           cache: 'no-cache', 
           credentials: "same-origin", 
@@ -1552,9 +1469,7 @@ return data;
         })
           .then((res) => res.json())
           .then(async(json) => {
-            if(app.mode == 'dev'){
-             // CL_(['con',data,json])
-            }
+           
           
             if (json.res && json.res === "destroySession") {
               destroySession();
@@ -1617,12 +1532,10 @@ return data;
         .then(response => { return response.json()})
         .then(data => {
          
-          let translatedAll = "";
-      const translatedText = data[0];
-        for(var x =0 ; x < translatedText.length; x++){
-          translatedAll += translatedText[x][0]
-        }
+         
+      const translatedAll = data[0][0][0];
         
+       
             callback(translatedAll);
            
             return translatedAll;
@@ -1647,15 +1560,18 @@ const loadAllTxt =async ()=>{
 }
 
   const dev_translate =async (txt)=>{
-  
+    var defLang = app.defLang ?  app.defLang : "en" ;
+       
+     
     for(let i = 0 ; i < app.lang.length; i++){
-      const lang       = app.lang[i];
-      const langDir    = `${app.dir.txt}${lang}.json`;
- 
+      const langLink       = app.lang[i];
+      const langDir    = `${app.dir.txt}${langLink}.json`;
       const langFile   = await G_Json(langDir);
-    
-      i_app_lang[lang] = langFile;
-  }
+
+      i_app_lang[langLink] = langFile;
+
+    }
+
     if(txt === 'app'){
       for(let i = 0 ; i < app.lang.length; i++){
        
@@ -1663,18 +1579,47 @@ const loadAllTxt =async ()=>{
        
        var time = 300;
        let count = 0;
-       const defLang = app.defLang ?  app.defLang : "en" ;
+     
+       
        let totalTime = Object.keys(i_app_lang[defLang]).length * 400;
-       totalTime = totalTime + 3000;
+            totalTime = totalTime + 3000;
      
        if(lang !== defLang){
+
         for(const key in i_app_lang[defLang]){
+          
           if(!i_app_lang[lang][key]){
 
-              const text = i_app_lang[defLang][key];
+                if(translateManger[lang]){
+
+                  translateManger[lang].target = translateManger[lang].target +1;
+
+                }else{
+
+                  translateManger[lang] = {};
+                  translateManger[lang].target = 1;
+
+                }
+
+                  const text = i_app_lang[defLang][key];
+
+                  const callBackB = ()=>{
+
+                  const lastLang = i_app_lang[lang];
+                
+                  _POST('/api',{order:'updateTranslate',data:lastLang ,lang:lang},false);
+              }
 
               const callbackA =(value)=>{
                   i_app_lang[lang][key] = value;
+                  if(translateManger[lang].done){
+                    translateManger[lang].done = translateManger[lang].done + 1
+                  }else{
+                    translateManger[lang].done = 1;
+                  }
+                  if( translateManger[lang].target ==  translateManger[lang].done){
+                    callBackB();
+                  }
               }
 
               const tt = ()=>{
@@ -1684,13 +1629,11 @@ const loadAllTxt =async ()=>{
             setTimeout(tt,time);
             time = time + 300;
 
+          }
+          
         }
-        }
-        const callBackB = ()=>{
-          const lastLang = i_app_lang[lang];
-            _POST('/api',{order:'updateTranslate',data:lastLang ,lang:lang},false);
-        }
-        setTimeout(callBackB,totalTime);
+       
+     
        }
       }
     }
@@ -1841,6 +1784,7 @@ const loadAllTxt =async ()=>{
     scrollToBottom:scrollToBottom,
     COPYE:copyInnerTextToClipboard,
     COPYTX:COPYTX,
+    FBC_:FBC_,
     GTD:GTD,
     IND:IND,
     getDataDB:getDataDB,
@@ -1906,8 +1850,6 @@ const loadAllTxt =async ()=>{
     scrollToTop: scrollToTop,
     CL_: CL_,
     CL: CL_,
-    FCMTC: FCMTC,
-    FCMTA: FCMTA,
     AL_: AL_,
     IS_EMAIL: IS_EMAIL,
     IS_PHONE_NUMBER:IS_PHONE_NUMBER,
@@ -1934,7 +1876,7 @@ const loadAllTxt =async ()=>{
         src.id = `css_${f}`;
         const tt = Date.now(); // Generate a new timestamp for cache busting
 
-        src.href = `${app.dir.css}${f}.css`;
+        src.href = `${httpStarter()}://${appData.domain}${app.dir.css}${f}.css`;
         src.rel = "stylesheet";
 
         const head = E_T("head")[0];
@@ -1943,7 +1885,15 @@ const loadAllTxt =async ()=>{
 
     }
 };
-
+const httpStarter =()=>{
+ if( appData.domain ){
+  if(appData.domain.startsWith("127.0.0.1:") || appData.domain.startsWith("localhost")){
+    return "http";
+  }else{
+    return "https";
+  }
+ }
+}
   const L_SCRIPT = (f,v)=>{
     const srcFn = URS();
     if(!E_I(`js_${f}`)){
@@ -1951,8 +1901,9 @@ const loadAllTxt =async ()=>{
     const src = CE_('script');
     src.id = `js_${f}`;
     // Get the number of milliseconds since midnight
-    src.src = `${app.dir.script}${f}.${v==='module'?'mjs':'js'}?${time_()}`;
-    src.type = v == 'module' ? "module":"text/javascript";
+    
+    src.src = `${httpStarter()}://${appData.domain}${app.dir.script}${f}.${v==='module'?'mjs':'js'}?${time_()}`;
+    src.type =v && v == 'module' ? "module":"text/javascript";
 
     var afterload =false;
     if(v === 'module'  ){
@@ -1973,22 +1924,27 @@ const loadAllTxt =async ()=>{
       src.setAttribute('defer','true');
       const iappScript = E_I('i-app-ui');
       head.insertBefore(src, head.children[head.children.length -1]);
+
     }else{
+
       const head = E_T("head")[0];
       head.appendChild(src);
+
     }
 
   
-    if(v && !afterload){
+    if(v&& v !== ' , ' && v !== ' ' &&  !afterload){
+    
       window[f] = (a,b)=>{}
       ReturnScriptFunctions[f] = (a,b)=>{}
+
       const srcOnLoad = ()=> {
+
         ReturnScriptFunctions[f] = (a,b)=>{return window[f](a,b)}; 
-       
         var rFd = ()=>{
         
             if(typeof ReturnScriptFunctions[f] ===  'function'){
-         //    CL_(["script loaded :", ReturnScriptFunctions])
+              //    CL_(["script loaded :", ReturnScriptFunctions])
               return  ReturnScriptFunctions[f](v,[srcFn,app]); 
             }else{
                 setTimeout(rFd,300);
@@ -2010,7 +1966,7 @@ const loadAllTxt =async ()=>{
           var rFd = ()=>{
           
               if(typeof ReturnScriptFunctions[f] ===  'function'){
-               CL_(["script loaded :", ReturnScriptFunctions])
+          
                 return  ReturnScriptFunctions[f](v,[srcFn,app]); 
               }else{
                   setTimeout(rFd,300);
@@ -2118,6 +2074,7 @@ const loadAllTxt =async ()=>{
   }
   }
   const setObV = async (ob) => {
+    
     for (const [k, v] of Object.entries(ob)) {
       if (!Object.prototype.hasOwnProperty.call(i_app_v, k)) {
         // If the property doesn't exist on the object, define it
@@ -2208,7 +2165,7 @@ const loadAllTxt =async ()=>{
     }
     }
     const setInputV = async (k) => {
-    
+    if(elementValue[i_root]){
         Object.defineProperty(elementValue[i_root], k, {
     
             configurable: true,
@@ -2220,16 +2177,18 @@ const loadAllTxt =async ()=>{
           },
         });
       
-    
+      }
     
       };
     const setInputEvent = async (i) => {
+      if(E_I_S(i)){
       E_I_S(i).addEventListener('input', () => {
         
         elementValue[i_root][i] = E_I_V(i);
         onInputChange_(i);
       });
       setInputV(i);
+    }
       };
   /**
   * TEXT builder
@@ -2528,7 +2487,7 @@ const loadAllTxt =async ()=>{
   
     if(app.electron){
       _POST('/print',{sc:nD},(res)=>{
-        CL_(res);
+     //   CL_(res);
       })
     }else{
       var Pagelink = app.name;
@@ -3684,7 +3643,12 @@ const loadAllTxt =async ()=>{
         }
       }
     }
-    newOb.replace = true;
+    if(newOb && newOb !== null){
+      newOb.replace = true;
+    }else{
+      console.log(['ErrornewOb',newOb])
+    }
+   
     CR_(newOb,id,data);
       
   }
@@ -3702,7 +3666,8 @@ const loadAllTxt =async ()=>{
             return `${app.dir.img}${chick[1]}.gif`;
           }
         }
-        return `${app.dir.img}${src}`;
+        
+        return `${httpStarter()}://${appData.domain}${app.dir.img}${src}`;
       
   }
   const getImageName = (src)=>{
@@ -3841,7 +3806,7 @@ const closeOverHide =(dialog)=>{
     D_CL(['i-app','OV_HIDE']);
   }
 } 
- const selectElement =(ob,data)=>{
+ const selectElement =  async(ob,data)=>{
 
   const holderId = `${ob.i}_holder`;
 
@@ -3850,6 +3815,7 @@ const closeOverHide =(dialog)=>{
        
       
       const NewSelectElment = ()=>{
+       
         const fnStOpen = `{_.E_I_S("${ob.i}_selectScreen").showModal();_.E_I_S("${ob.i}_selectScreen").scrollTo(0,0); }`;
         const fnStOpenDC = DC_(fnStOpen);
         const fnStClose = `{_.E_I_S("${ob.i}_selectScreen").close();_.E_I_S("${ob.i}_selectScreen").scrollTo(0,0); }`;
@@ -3886,41 +3852,133 @@ const closeOverHide =(dialog)=>{
         selectModel.e[1].e[0].e[2].e =[];
         return selectModel;
       }
-        const selectModel = NewSelectElment();
+      
+      const selectModel = NewSelectElment();
      
-        
-        
+      
+     
         if(ob.e && ob.e.length > 0){
+       
          
-          selectModel.e[1].e[0].e[2].e =ob.e;
-          for(var i = 0; i < selectModel.e[1].e[0].e[2].e.length;i++){
-            if(selectModel.e[1].e[0].e[2].e[i].v || selectModel.e[1].e[0].e[2].e[i].val){
-              const fnStItem = `{_.IN_V("${ob.i}","${selectModel.e[1].e[0].e[2].e[i].val}");_.E_I_S("${ob.i}_selectScreen").close();_.E_I_S("${ob.i}_selectScreen").scrollTo(0,0); _.elmChange('${ob.i}');}`;
-              const fnStItemDC = DC_(fnStItem);
-                    selectModel.e[1].e[0].e[2].e[i].a = {fn:fnStItemDC};
-                    selectModel.e[1].e[0].e[2].e[i].t = 'ly';
-                    selectModel.e[1].e[0].e[2].e[i].c = 'pointer WW PD_5 ST_B_GRY8_1';
-                    selectModel.e[1].e[0].e[2].e[i].i = `${ob.i}_${i}_item`;
+          for(var i = 0; i < ob.e.length;i++){
+            if(ob.e[i].v || ob.e[i].val){
+                var val_ ;
+                if(ob.e[i].val){
+                    val_ = ob.e[i].val;
+                }else if(ob.e[i].v){
+                    val_ = ob.e[i].v;
+                }
+                
+                const vq = `_.IN_V("${ob.i}","${val_ }");`;
+                const modelTx = ob.e[i].s ? ob.e[i].s :'no model text';
+                const _selectButtonData = {t:"sp",s:modelTx} ;
+                    const fnStItem   = `{
+                      ${vq}
+                      _.elmChange('${ob.i}');
+                      _.E_I_S("${ob.i}_selectScreen").close();_.E_I_S("${ob.i}_selectScreen").scrollTo(0,0); 
+                      _.E_I_S("${ob.i}_selectButton").innerHTML = '';
+                      _.CR_(${JDS_(_selectButtonData)} ,'${ob.i}_selectButton',false);
+                    }`;
+               
+                const fnStItemDC = DC_(fnStItem);modelTx
+                const selectItem = {
+                  c:'WW ST_B_GRY8_1 pointer PD_4 F_B',
+                  i: `${ob.i}_${i}_item`,
+                  e:[
+                    {
+                      t:'sp',
+                      s:modelTx,
+                      
+                      c:'F_S_12 '
+                    }
+                  ],
+                  Q:data,
+                  a:{fn:fnStItemDC}
+              }
+              selectModel.e[1].e[0].e[2].e.push(selectItem);
+                    
             }
           
           }
          
-          selectModel.e[0].s = selectModel.e[1].e[0].e[2].e[0] && selectModel.e[1].e[0].e[2].e[0].s ? selectModel.e[1].e[0].e[2].e[0].s : 'No Items';
-       
-          CR_(selectModel,holderId,data);
+          selectModel.e[0].s = ob.e[0] && ob.e[0].s ? ob.e[0].s : 'No Items';
+          
+          
+          const loader = ()=>{
+            if(E_I_S(holderId)){
+              
+              DEL_E(holderId)
+              CR_(selectModel,holderId,false);
+            }else{
+             
+              setTimeout(loader,200);
+            }
+          
+          }
+          setTimeout(loader,200);
           
         }else {
           if(data){
+           if(ob.mod == 'country'){
+              
+              // countries
            
-            if( ob.mod == 'phonecode'){
+             for(var i = 0 ; i < data.length ; i++){
+              const lowerCode  = data[i].code.toLowerCase();
+              const imgSrc     = countries.flags[lowerCode];
+              const fnStItem   = `{
+                _.IN_V("${ob.i}","${data[i].code}");
+                
+                _.elmChange('${ob.i}');
+                _.E_I_S("${ob.i}_selectScreen").close();_.E_I_S("${ob.i}_selectScreen").scrollTo(0,0); 
+                
+                _.E_I_S('${ob.i}_flag').src = "${imgSrc}";
+                _.E_I_S('${ob.i}_code').innerText = "${data[i].name}";
+              }`;
+
+              const fnStItemDC = DC_(fnStItem);
+              const selectItem = {
+                                c:'WW ST_B_GRY8_1 pointer PD_4',
+                                i: `${ob.i}_${i}_item`,
+                                e:[
+                                  {
+                                    t:'img',
+                                    c:'W_20',
+                                    srcUrl:imgSrc
+                                  },
+                                  {
+                                    t:'sp',
+                                    s:'q.{name} ',
+                                    c:'F_S_12 '
+                                  },{
+                                    t:'sp',
+                                    s:' ( q.{originalName} )',
+                                    c:'F_S_12 '
+                                  }
+                ],
+                Q:data[i] ,
+                a:{fn:fnStItemDC}
+            }
+            selectModel.e[1].e[0].e[2].e.push(selectItem);
+            }
+
+            const firstLowerCode  = data[0].code.toLowerCase();
+           
+            const firstImgSrc     =countries.flags[firstLowerCode];
+            selectModel.e[0].e    = [{t:'img',i:`${ob.i}_flag`,srcUrl: firstImgSrc ,c:'W_20'},{t:'sp',i:`${ob.i}_code`,s: data[0].name ,c:'mL_5'},{t:'icon',c:'ICO-caret-down mL_5'}];
+            
+            CR_(selectModel,holderId,false)      
+
+           }else if( ob.mod == 'phonecode'){
+         
               for(var i = 0 ; i < data.length ; i++){
                 const lowerCode  = data[i].code.toLowerCase();
-                const imgSrc     = `flags/${lowerCode}.png`;
+                const imgSrc     = countries.flags[lowerCode];
                 const fnStItem   = `{
                   _.IN_V("${ob.i}","${data[i].dialCode}");
                   _.E_I_S("${ob.i}_selectScreen").close();_.E_I_S("${ob.i}_selectScreen").scrollTo(0,0); 
                   _.elmChange('${ob.i}_dialCode');
-                  _.E_I_S('${ob.i}_flag').src = _.G_SRC('${imgSrc}');
+                  _.E_I_S('${ob.i}_flag').src = '${imgSrc}';
                   _.E_I_S('${ob.i}_code').innerText = '${data[i].dialCode}';
                 }`;
   
@@ -3932,7 +3990,7 @@ const closeOverHide =(dialog)=>{
                                     {
                                       t:'img',
                                       c:'W_20',
-                                      src:imgSrc
+                                      srcUrl:imgSrc
                                     },
                                     {
                                       t:'sp',
@@ -3955,11 +4013,12 @@ const closeOverHide =(dialog)=>{
               }
   
               const firstLowerCode  = data[0].code.toLowerCase();
-              const firstImgSrc     = `flags/${firstLowerCode}.png`;
-              selectModel.e[0].e    = [{t:'img',i:`${ob.i}_flag`,src: firstImgSrc ,c:'W_20'},{t:'sp',i:`${ob.i}_code`,s: data[0].dialCode ,c:'mL_5'},{t:'icon',c:'ICO-caret-down mL_5'}];
+             
+              const firstImgSrc     =countries.flags[firstLowerCode];
+              selectModel.e[0].e    = [{t:'img',i:`${ob.i}_flag`,srcUrl: firstImgSrc ,c:'W_20'},{t:'sp',i:`${ob.i}_code`,s: data[0].dialCode ,c:'mL_5'},{t:'icon',c:'ICO-caret-down mL_5'}];
               
               CR_(selectModel,holderId,false)
-            }else  if( ob.mod !== 'phonecode' && ob.model ){
+            }else  if( ob.mod !== 'phonecode' &&  ob.mod !== 'country' && ob.model ){
             
               for(var i = 0 ; i < data.length ; i++){
                   for(var m = 0 ; m < ob.model.length ; m++){
@@ -3980,6 +4039,7 @@ const closeOverHide =(dialog)=>{
                     }`;
                 
                     const fnStItemDC = DC_(fnStItem);
+                  
                     const selectItem = {
                       c:'WW ST_B_GRY8_1 pointer PD_4 F_B',
                       i: `${ob.i}_${i}_item`,
@@ -3987,17 +4047,26 @@ const closeOverHide =(dialog)=>{
                         {
                           t:'sp',
                           s:model_.s,
+                          
                           c:'F_S_12 '
                         }
                       ],
-                      Q:data[i] ,
+                      Q:data[i],
                       a:{fn:fnStItemDC}
                   }
+                  
                   if(ob._IQuery_ && ob._IQuery_.order && ob._IQuery_.order == 'icons'){
                     selectItem.e = [{
                       t:'icon',
                       c:'F_S_30 '+data[i].class
-                    },...selectItem.e ]
+                    },...selectItem.e ];
+                  }else{
+                    if(model_.e && model_.e.length > 0){
+                      for(var x = 0; x < model_.e.length ; x++){
+                        
+                        selectItem.e.push(model_.e[x]);
+                      }
+                    }
                   }
                   selectModel.e[1].e[0].e[2].e.push(selectItem);
                   }
@@ -4142,10 +4211,10 @@ const closeOverHide =(dialog)=>{
                 let pageNumberSt = pageNumber > 1 ? `of ${pageNumber} pages` : '';
           
                 
-               if(pageNumber < 2){
-                A_CL(`forwardBt_${ob.Q.DBId}`,"D_N");
-               }
-               In_S(DB_pageNo,pageNumberSt);
+                if(pageNumber < 2){
+                    A_CL(`forwardBt_${ob.Q.DBId}`,"D_N");
+                }
+                In_S(DB_pageNo,pageNumberSt);
                 IN_V(DB_Qsize,Qsize);
               }
            
@@ -4231,10 +4300,11 @@ const closeOverHide =(dialog)=>{
   }
 
   const updateQueryValue = (query,Qo)=>{
-    
+  
     if(query.q){
       for(var ob = 0 ; ob < query.q.length; ob++){
-        if(typeof query.q[ob] === 'object'){
+        if(query.q[ob] !== null && typeof query.q[ob] === 'object' && Object.prototype.hasOwnProperty.call(query.q[ob], 't')){
+       
           if(query.q[ob].t && query.q[ob].t == "app"){
             if( i_app[query.q[ob].d ]){
               query.q[ob] = i_app[query.q[ob].d ];
@@ -4281,7 +4351,8 @@ const closeOverHide =(dialog)=>{
     }
     if(query.d){
       for(var ob = 0 ; ob < query.d.length; ob++){
-        if(typeof query.d[ob] === 'object'){
+     
+          if(query.d[ob] !== null && typeof query.d[ob] === 'object' && Object.prototype.hasOwnProperty.call(query.d[ob], 't')){
           if(query.d[ob].t && query.d[ob].t == "app"){
             if( i_app[query.d[ob].d ]){
               query.d[ob] = i_app[query.d[ob].d ];
@@ -4629,21 +4700,22 @@ const tableSetModelData = (ob)=>{
   */
   if(body.per){
     let per = true;
+  
     if(body.per == 'isuser'){
-      if(userData.id === 0){
-        GTL("/login");
-        per =false;
+      if(!userData || userData && !userData.id ||userData && userData.id && userData.id < 1){
+        openRoot("/login");
+        per = false;
       }
     }else if(body.per == 'notuser'){
-      if(userData.id > 0){
-        GTL("/user");
-        per =false;
+      if(userData && userData.id > 0){
+        openRoot("/user");
+        per = false;
         return true;
       }
     }else{
       const perTrue = permissionsControl(body.per);
       if(!perTrue){
-        per =false;
+        per = false;
       }
     }
    if(!per){
@@ -4662,7 +4734,9 @@ const tableSetModelData = (ob)=>{
   }else if(body.body){
   body_ = body.body;
   }
+  
   const ob = COPY_OB(body_);
+
 if(ob.forkey){
   const fork =  forKeys(ob,data);
   ob.e = ob.e  ? [...fork,...ob.e]:[...fork];
@@ -4684,12 +4758,11 @@ if(ob.forkey){
   let ob_type = null ,ob_css = null,ob_css_list = [];
   /// set ob_type
   if(ob.loadAllTxt){
-
     window.addEventListener("DOMContentLoaded",loadAllTxt());
   }
   if(ob.t){
 
-  ob_type = ob.t;
+  ob_type = ob.t; 
   }else if(ob.typ){
   ob_type = ob.typ;
   }
@@ -4740,19 +4813,21 @@ if(ob.forkey){
         ob_css = ob_css.replace(regex,'');
       }
     }else{
+
       if(ob.perClass.addClass){
       
-        ob_css_list = ob_css_list.filter((o)=>{
-                if(o !==  ob.perClass.addClass){
-                  return o;
-                }
-              });
-        const regex =  new RegExp( ob.perClass.addClass, "g");
-        ob_css = ob_css.replace(regex,'');
+          ob_css_list = ob_css_list.filter((o)=>{
+                  if(o !==  ob.perClass.addClass){
+                    return o;
+                  }
+          });
+          const regex =  new RegExp( ob.perClass.addClass, "g");
+          ob_css = ob_css.replace(regex,'');
       }
+
       if( ob.perClass.delClass){
-        ob_css_list.push(ob.perClass.delClass);
-        ob_css += ob.perClass.delClass;
+          ob_css_list.push(ob.perClass.delClass);
+          ob_css += ob.perClass.delClass;
 
       }
     }
@@ -4765,6 +4840,7 @@ if(ob.forkey){
   /// if i-app element baisc dev
   
   if(id == "i-app" && ob.offset == undefined){
+
   isI_APP = true;
   ob.offset = 0;
   }
@@ -4797,17 +4873,30 @@ if(ob.forkey){
   if(ob_css_list.includes("D_N")){
     isHideElement =true;
   }
+  if(ob.mod && ob.mod == 'phone' || ob.mod && ob.mod == 'country'){
+    if(countries.flags && countries.flags.us){
+      //doNothing
+    }else{
+      await  G_root('/countryFlags.json',(countryFlags)=>{
+        countries.flags =countryFlags;
+     
+         });
+     }
+  }
 
   if(ob.mod && ob.mod == 'phone'){
+  
     const updateInputFnST =`{
-      const code= _.E_I_V("${ob.i}_dialCode");
+      const code = _.E_I_V("${ob.i}_dialCode");
        const num =_.E_I_V('${ob.i}_view'); 
         const st =code +''+num;_.IN_V('${ob.i}','');
         if(num !== ''){
           _.IN_V('${ob.i}',st);
         }
       }`; 
+
     const updateInputFnSTDC = DC_(updateInputFnST);
+
     const countryCode = { 
                           t:'sl', 
                           vq:'dialCode', 
@@ -4819,6 +4908,7 @@ if(ob.forkey){
                             fn:updateInputFnSTDC
                           } 
                         }
+
 
       CR_(countryCode,id,false);
 
@@ -4866,6 +4956,7 @@ if(ob.forkey){
     if(ob.srcUrl){
       e.src = ob.srcUrl;
       }
+ 
     if(ob.srcQ && data[ob.srcQ]){
       if(Array.isArray(data[ob.srcQ])){
         var imgSrc = "";
@@ -4955,18 +5046,27 @@ if(ob.forkey){
   }
 
   if(ob_type == "sl"   ){
+
     // select type
-   
-      if(ob.mod == 'phonecode'){
-        ob._IQuery_ = { order:'countries' }
-      }
-   
+    if( ob.mod == 'country'){
+          ob._IQuery_ = { order:'countries' }
+          ob.model = [{t:"op", vq:"code"}];
+    }
+
+    if( ob.mod == 'phonecode'){
+
+            ob._IQuery_ = { order:'countries' }
+    }
+    if( ob.mod == 'currency'){
+
+            ob._IQuery_ = { order:'currency' }
+    }
       isHideElement = true;
       holder.t      = 'span';
       holder.i      = `${ob.i}_holder`;
 
   }
-  
+ 
   // up = make is the element appended to parent
    let up = false;
   let isCheckbox = false;
@@ -4992,7 +5092,11 @@ if(ob.forkey){
 
   const st = ob.s ? ob.s : ob.txt;
   const txt = eTxt(st,ob.i,data);
-
+    if(ob.hr){
+      
+    
+      e.setAttribute('aria-label',txt);
+    }
     if(ob_type == "in" ){
 
       e.placeholder = txt !== undefined ? txt : '';
@@ -5086,6 +5190,7 @@ if(ob.forkey){
     }
   
   }
+
 if(ob.val){
     e.value = ob.val;
     e.setAttribute('value',e.value);
@@ -5102,6 +5207,7 @@ if(ob.val){
 }
 
   if(ob.hr){
+
     if(ob.hr.http ){
       e.href = `http://${ob.hr.http}`;
     }else if(ob.hr.https){
@@ -5118,6 +5224,11 @@ if(ob.val){
 
  if(ob.t === 'img'){
 
+  e.setAttribute("decoding","async");
+  e.setAttribute("fetchpriority","high");
+  e.setAttribute("rel","preload");
+  e.setAttribute("as","image");
+ 
   if(ob.alt){
     e.setAttribute("alt",ob.alt);
     e.alt = ob.alt;
@@ -5255,8 +5366,14 @@ if(ob.val){
     
     }else if(id && E_I_S(id)){
         // append to element have privte id
+       
         if(append && !isHideElement){
+       
           E_I_S(id).appendChild(e);
+          if(id == 'usageType_holder'){
+            
+            console.log(["usageType_holder", E_I_S(id) , e])
+          }
         }
 
         if(append && holder.t){
@@ -5288,10 +5405,11 @@ if(ob.val){
     I_OB[ob.i] = ob;//set the ob in i-app objects tree define by i 
     if(isHideElement){
       if(ob_type == "sl"){
-        if(ob.mod && ob.mod == 'phonecode'){
+        if(ob.mod && ob.mod == 'phonecode' && ob.mod == 'country'){
 
         }else{
           if(!ob._IQuery_ ){
+          
             selectElement(ob,data);
           }
          
@@ -5324,6 +5442,7 @@ if(ob.val){
                 let el = elm[i];
                 const ch = COPY_OB(el);
                       ch.offset = i;
+                   
                       CR_(ch,ob.i,data);
             
             }
@@ -5341,7 +5460,8 @@ if(ob.val){
     const IROUTE = ob.IRoute ? ob.IRoute : ob.I;
     
     if(! i_app_model[IROUTE] ){
-    G_root(`${app.dir.src}${IROUTE}.${app.dir.file ? app.dir.file :'app'}`,L_ROUTE,[ob.i,data,IROUTE,ob]);
+
+        G_root(`${app.dir.src}${IROUTE}.${app.dir.file ? app.dir.file :'app'}`,L_ROUTE,[ob.i,data,IROUTE,ob]);
 
     }else if(i_app_model[IROUTE]){
      
@@ -5491,12 +5611,13 @@ if(ob.val){
    if( E_I("i-app")){
     E_I("i-app").remove();
    } 
-  
+ 
     I_OB = {};
     scrollToTop();
    
     createAppObjV(i_route);
         if(i_app_model[i_route]){
+      
          i_sc.ob = JD_(i_app_model[i_route]);
                 CR_(i_sc.ob,"i-app",false);
                 for(var i = 0 ; i < windowHistory.length; i++){
@@ -5529,22 +5650,34 @@ const getBrowserLang = ()=>{
 const createAppTxt =async(lang)=>{
 
     if(!lang){
+      if(GLOB_LANG !== null){
+        selectLang = GLOB_LANG;
+      }else{
+
+      
       if(GTD('lang')){
         selectLang = GTD('lang');
       }else{
-      let browserLang = getBrowserLang();
-      if(app.lang){
-          if(app.lang.includes(browserLang)){
-            selectLang = browserLang;
-          }else{
-            selectLang = app.lang[0]
-          }
+        if(app.defLang){
+
+          selectLang = app.defLang;
+        }else{
+          let browserLang = getBrowserLang();
+          if(app.lang){
+              if(app.lang.includes(browserLang)){
+                selectLang = browserLang;
+              }else{
+                selectLang = app.lang[0]
+              }
+            }
         }
+  
       }
+    }
     }else if(lang && lang !== undefined){
       selectLang =  isAr(lang) ? lang[0] : lang;
     }
-    
+    IND("lang",selectLang);
     if( i_app_lang[selectLang] && i_app_lang[selectLang] !== undefined){
               setTxtV(i_app_lang[selectLang]);
      }else{
@@ -5562,30 +5695,35 @@ const createAppTxt =async(lang)=>{
   
   var BL = 'left';
   var BR = 'right';
+  
     if (selectLangDirection == 'r') {
         BL = 'right';
         BR = 'left';
     }
-  var newDir = `:root {
+  
+    var newDir = `:root {
     --DirL : ${BL};
     --DirR :  ${BR};
     --WH__ :${window.innerHeight}px;
     --WW__ :${window.innerWidth}px;
     }`;  
-    var autoDir  = '',
-        autoDirP = '';
+
+  var autoDir  = '',
+      autoDirP = '';
   
         for (var at = 0; at < 1001; at++) {
+
             autoDir += `.A_L_${at} { ${BL}:${at}px} `;
             autoDir += `.A_R_${at} { ${BR}:${at}px} `;
             if (at < 101) {
                 autoDirP += `.A_L_P_${at} { ${BL}:${at}%} `;
                 autoDirP += `.A_R_P_${at} { ${BR}:${at}px} `;
             }
+
         }
   
-        E_I("STYLE_DIR").innerHTML = newDir;
-        E_I("AUTO_DIR").innerHTML = autoDir + ' ' + autoDirP; 
+        E_I("STYLE_DIR").innerHTML  = newDir;
+        E_I("AUTO_DIR").innerHTML   = autoDir + ' ' + autoDirP; 
       return true;
   }
   
@@ -6247,6 +6385,7 @@ const createAppTxt =async(lang)=>{
     }
   
   }
+
   const inCssCls =(name,cls)=>{
     var isNew = true;
     
@@ -6459,8 +6598,9 @@ const createAppTxt =async(lang)=>{
     }
     for (var w = 0; w < csAr.length; w++) {
       /// clean class name string for auto fix 
-      let cleanStr_class =csAr[w];//csAr[w].replace(/PR_D/g, "PRD");
-        cleanStr_class  = P_CLS(cleanStr_class);
+
+      let cleanStr_class = csAr[w];//csAr[w].replace(/PR_D/g, "PRD");
+          cleanStr_class  = P_CLS(cleanStr_class);
         /// create css class if not exist
         C_CSS(cleanStr_class);
     }
@@ -6560,17 +6700,61 @@ const createAppTxt =async(lang)=>{
   }
 
   const createAppContent = (i_app_OB,dataIncome) => {
+  if(E_I("i-app")){
+    E_I("i-app").remove();
+  }
     i_sc.ob = i_app_OB;
-    const root = window.location.pathname.replace(/\//g,"");
+    var url = window.location.pathname;
+
+    if (app.lang && app.lang.length > 0) {
+        for (var i = 0; i < app.lang.length; i++) {
+            const lang = `/${app.lang[i]}/`;
+            
+            // Create a regular expression to match the language prefix at the start of the URL
+            const regex = new RegExp(`^${lang}`);
+            
+            // Check if the URL matches the regex (starts with the language prefix)
+            if (regex.test(url)) {
+              GLOB_LANG = app.lang[i];
+            
+                // Replace the language prefix with "/"
+                url = url.replace(regex, "/");
+                break; // Exit the loop once the replacement is done
+            }
+        }
+    }
+    
+  const root = url.replace(/\//g,"");
     if(root == ''){
       const appRoot = app.dir.start.replace(/.app/g,'');
       i_app_model[appRoot] =JDS_( i_app_OB);
     }
   
     createAppObjV(i_root);
-    CR_(i_app_OB,"i-app",false);
-    
+   
 
+    if(E_I("i-app-start-screen")){
+      i_app_OB.c ="D_N";
+      E_I("i-app-start-screen").className = "hideScreen";  
+      const showIapp = ()=>{
+   
+        if(  E_I("i-app") ){
+          if(E_I("i-app").className !== null){
+            E_I("i-app").className =""; 
+          }
+       }else{
+        setTimeout(showIapp,1000);
+       }   
+      } 
+      setTimeout(showIapp,3000);
+   
+      setTimeout(()=>{
+       E_I("i-app").className =""; 
+        E_I("i-app-start-screen").className = "hiddenScreen";
+        
+      },5000)
+    }  
+    CR_(i_app_OB,"i-app",false);
     };
 
     const  START_USER_SERVER = ()=>{
@@ -6588,7 +6772,7 @@ const createAppTxt =async(lang)=>{
      * load bassc app colors
      * i.app dir{css:'/css/'}
      */
-    const curePageLink = window.location.pathname.replace(/\//g,"");
+    const curePageLink = window.location.pathname.replace(/^\//, "");
 
     let urlColors =`/dev_colors.json`;
     let urlStyle =`/dev_style.json`;
@@ -6605,7 +6789,7 @@ const createAppTxt =async(lang)=>{
     const textToCopy = element.innerText;
     navigator.clipboard.writeText(textToCopy)
         .then(() => {
-            console.log("Text copied to clipboard successfully!");
+          showToast("Copied to Clipboard");
         })
         .catch(err => {
             console.error("Failed to copy text to clipboard: ", err);
@@ -6614,7 +6798,7 @@ const createAppTxt =async(lang)=>{
 function COPYTX(textToCopy){
   navigator.clipboard.writeText(textToCopy)
   .then(() => {
-      console.log("Text copied to clipboard successfully!");
+    showToast("Copied to Clipboard");
   })
   .catch(err => {
       console.error("Failed to copy text to clipboard: ", err);
@@ -6623,7 +6807,7 @@ function COPYTX(textToCopy){
   function handleHistoryChange(event) {
     // Check if the user navigated backward or forward
 
-      let newRoot     = window.location.pathname.replace(/\//g,"");
+      let newRoot     =  window.location.pathname.replace(/^\//, "");
       if(newRoot == ''){
           window.location = '/';
       }
@@ -6663,21 +6847,27 @@ function COPYTX(textToCopy){
      * if app mode ist not developing mode
      * i.app { mode : ""}
      */
-     if(app.mode !== "dev"){
-      window.addEventListener("DOMContentLoaded",startSw());
+     if(app.mode !== "dev" && app.PWA){
+        window.addEventListener("DOMContentLoaded",startSw());
       
     }
+
     await createApp();
+
+    i_root_();
+
     if (i_root == "start") {
+    
       G_root(`${app.dir.src}${app.dir.start}`, createAppContent);
   
     } else {
-      // Otherwise, load the file for the current root name and directory
+
       G_root(`${app.dir.src}${i_root_().dir}`, createAppContent);
+
     }
   };
   const startSw = ()=>{
-    if(!E_I("divTools")){
+    if(!E_I("divTools") && app.pwa){
      
         if ('serviceWorker' in navigator) {
             this.sw =  navigator.serviceWorker.register('/sw.js');
@@ -6713,7 +6903,7 @@ function COPYTX(textToCopy){
   };
   
     const _=()=>{
-        i_root = i_root_().name;
+      //  i_root = i_root_().name;
         i_app_start();
         CL_("i-app Start...")
       }
